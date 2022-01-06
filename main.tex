@@ -161,7 +161,7 @@
 
  & \noindent\large{Jiaqi Yang,\textit{$^{a}$} Panayotis Manganaris\textit{$^{a}$} and Arun Mannodi-Kanakkithodi\textit{$^{a}$}} \\%Author names go here instead of "Full name", etc.
 
-\includegraphics{head_foot/dates} & \noindent\normalsize{The great tunability of the properties of halide perovskites presents new opportunities for optoelectronic applications as well as significant challenges associated with exploring combinatorial chemical spaces. In this work, we develop a framework powered by high-throughput computations and machine learning for the design and prediction of mixed cation halide perovskite alloys. In a chemical space of ABX$_{3}$ perovskites with a selected set of options for A, B, and X atoms, pseudo-cubic structures of compounds with B-site mixing are simulated using density functional theory (DFT) and several properties are computed, including stability, lattice constant, band gap, vacancy formation energy, refractive index, and optical absorption spectrum, using both semi-local and hybrid functionals. Neural networks (NN) are used to train predictive models for every property using tabulated elemental properties of A, B, and X site atoms as descriptors. Starting from the DFT dataset of 229 points, we use the trained NN models to predict the structural, energetic, electronic and optical properties of a complete dataset of 17,955 compounds, and perform high-throughput screening in terms of stability, band gap and defect tolerance, to obtain 574 promising compounds that are ranked as potential absorbers according to their photovoltaic figure of merit. Compositional trends in the screened set of attractive mixed cation halide perovskites are revealed and additional computations are performed on selected compounds. The data-driven design framework developed here is promising for designing novel mixed compositions and can be extended to a wider perovskite chemical space in terms of A, B, and X atoms, different kinds of mixing at the A, B, or X sites, non-cubic phases, and other properties of interest.} 
+\includegraphics{head_foot/dates} & \noindent\normalsize{Novel halide perovskites with improved stability and optoelectronic properties can be designed via composition engineering at cation and/or anion sites. Data-driven methods, especially high-throughput first principles computations and subsequent analysis based on unique materials descriptors, are key to achieving this goal. In this work, we report a density functional theory (DFT)-based dataset of 550 ABX$_3$ halide perovskite compounds, with various atomic and molecular species considered at A, B and X sites, and different amounts of mixing considered at each site to simulate special quasirandom structures of alloys. We perform GGA-PBE calculations on pseudo-cubic perovskite structures to determine their lattice constants, stability in terms of formation and decomposition energies, electronic band gaps, and properties extracted from optical absorption spectra. To elucidate the importance of the level of theory used, we further perform 300 calculations using the more expensive HSE06 functional and determine lattice constant, stability and band gap, and compare PBE and HSE06 properties with some experimentally measured results. Trends in the datasets are unraveled in terms of the effects of mixing at different sites, the composition in terms of specific atomic or molecular species, and averaged elemental properties of species at different sites. This work presents the most comprehensive DFT perovskite alloy dataset to date and the data, which is open-source, can be exploited to train predictive and optimization models for accelerating the design of completely new compositions that may yield large solar cell efficiencies and improved performance across many optoelectronic applications.} 
 
 \end{tabular}
 
@@ -193,12 +193,54 @@
 
 ... \\
 
-% \begin{figure*}[h]
-% \centering
-% \includegraphics[width=0.80\linewidth]{Figure1.pdf}
-% \caption{\label{Fig:outline} 
-% (a) DFT properties computed for 229 perovskite compounds at the PBE and HSE06 levels of theory. (b) Typical neural network architecture used to train predtictive models from DFT data. (c) Screening performed on ML predicted dataset of 17,955 perovskite compounds in terms of their stability, band gaps and defect tolerance.}
-% \end{figure*}
+
+\begin{figure*}[h]
+\centering
+\includegraphics[width=0.99\linewidth]{Figure1.pdf}
+\caption{\label{Fig:outline} 
+(a) Chemical space of ABX$_3$ perovskites. (b) Pie charts showing the amounts of various atomic and molecular species as well as types of mixing in the DFT dataset. (c) Detailed outline of this work.}
+\end{figure*}
+
+
+\begin{figure*}[h]
+\centering
+\includegraphics[width=0.99\linewidth]{Figure2.pdf}
+\caption{\label{Fig:outline} 
+Visualization of DFT data: PBE and HSE properties; lattice constants, decomposition energies, band gaps, photovoltaic figure of merit.}
+\end{figure*}
+
+
+\begin{figure*}[h]
+\centering
+\includegraphics[width=0.80\linewidth]{Figure3.pdf}
+\caption{\label{Fig:outline} 
+Comparison of PBE and HSE computed properties with collected experimental measurements: (a) pseudo-cubic lattice constants, and (b) electronic band gaps.}
+\end{figure*}
+
+
+\begin{figure*}[h]
+\centering
+\includegraphics[width=0.99\linewidth]{Figure4.pdf}
+\caption{\label{Fig:outline} 
+Pearson linear correlation coefficients between 50 composition and elemental descriptors and (a) 6 PBE computed properties, and (b) 4 HSE computed properties.}
+\end{figure*}
+
+
+\begin{figure*}[h]
+\centering
+\includegraphics[width=0.80\linewidth]{Figure5.pdf}
+\caption{\label{Fig:outline} 
+Data visualization / dimensionality reduction / importance of features / trends in data using PCE, MDS, T-SNE, Isomap, etc.}
+\end{figure*}
+
+
+\begin{figure*}[h]
+\centering
+\includegraphics[width=0.99\linewidth]{Figure6.pdf}
+\caption{\label{Fig:outline} 
+Computed band structure, density of states, and optical absorption spectrum of 6 selected promising mixed composition perovskites.}
+\end{figure*}
+
 
 \newpage
 
@@ -225,7 +267,13 @@
 
 \section*{Results and discussion}
 
-\subsection*{Visualization of DFT Data}
+\subsection*{Visualization of DFT Data / Explanation of Trends}
+
+\subsection*{Pearson Correlation Results}
+
+\subsection*{PCA / MDS / T-SNE / Isomap Results}
+
+\subsection*{Band Structure and Absorption Spectrum of Selected Compounds}
 
 ... \\
 
