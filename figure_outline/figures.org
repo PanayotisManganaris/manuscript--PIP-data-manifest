@@ -1,0 +1,196 @@
+#+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
+#+options: author:t broken-links:mark c:nil creator:nil
+#+options: d:(not "LOGBOOK") date:t e:t email:nil f:t inline:t num:t
+#+options: p:nil pri:nil prop:nil stat:t tags:t tasks:t tex:t
+#+options: timestamp:t title:t toc:t todo:t |:t
+#+title: A High-Throughput Computational Dataset of Halide Perovskite Alloys
+#+date: \today
+#+AUTHOR: Panayotis Manganaris\inst{1}
+#+EMAIL: pmangana@purdue.edu
+#+language: en
+#+select_tags: export
+#+exclude_tags: noexport
+#+creator: Emacs 27.2 (Org mode 9.5)
+#+startup: beamer
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [10pt, compress]
+#+BEAMER_FRAME_LEVELS: 2
+#+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
+#+latex_header: \institute[Mannodi Group]{Purdue Materials Science and Engineering
+#+latex_header: \inst{1} Mannodi Group
+#+latex_header: \mode<beamer>{\usetheme{Warsaw}}
+#+latex_header: \useoutertheme{miniframes}
+#+begin_export latex
+\expandafter\def\expandafter\insertshorttitle\expandafter{%
+  \insertshorttitle\hfill
+  \insertframenumber\,/\,\inserttotalframenumber}
+#+end_export
+* COMMENT Switch to scrymat environment:
+#+begin_src emacs-lisp
+  (conda-env-activate "scrymat")
+#+end_src
+
+#+RESULTS:
+: Switched to conda environment: /opt/miniconda3/envs/scrymat/
+
+* COMMENT import packages
+#+begin_src jupyter-python :session "py" :kernel "scrymat" :exports "both" :results "none"
+  import pandas as pd
+  import sqlite3
+  import re
+
+  import matplotlib.pyplot as plt
+  import matplotlib as mpl
+  #PCA
+  from sklearn.decomposition import PCA
+  from sklearn.preprocessing import StandardScaler
+  #tSNE
+  from sklearn import manifold, datasets
+  #Utils                           
+  from pathlib import Path
+  import numpy as np
+#+end_src
+
+#+begin_src jupyter-python :session "py" :exports "both" :results "none"
+  pd.options.plotting.backend="matplotlib"
+  plt.style.use("dark_background")
+#+end_src
+
+* COMMENT load data
+#+begin_src jupyter-python :session "py" :exports "both" :results "raw drawer"
+  conn = sqlite3.connect("/home/panos/MannodiGroup/data/perovskites.db")
+  sql_string = '''SELECT * 
+                  FROM mannodi_agg'''
+  mannodi_df = pd.read_sql(sql_string,
+                           conn,
+                           index_col='index')
+  sql_string = '''SELECT * 
+                  FROM almora_agg'''
+  almora_df = pd.read_sql(sql_string,
+                          conn,
+                          coerce_float=False,
+                          index_col='index')
+  conn.close()
+#+end_src
+
+#+RESULTS:
+
+** prep almora for corroboration study
+cutdown almora to definite comparables - exclude conjugate ratios described alloys
+#+begin_src jupyter-python :session "py" :exports "results" :results "raw drawer"
+  almora_df_sub = almora_df[almora_df.Formula.apply(lambda x: not bool(re.search(r'[x]', x)))]
+#+end_src
+
+#+RESULTS:
+
+* Methodology
+:PROPERTIES:
+:CUSTOM_ID: methodology
+:END:
+** DFT Details                                                     :B_frame:
+:PROPERTIES:
+:CUSTOM_ID: dft-details
+:BEAMER_env: frame
+:BEAMER_opt: allowframebreaks
+:END:
+*** Perovskite structure summary                                  :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+*** species representation in DFT dataset                         :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+*** flowchart of workflow                                         :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+** Almora Meta-analysis Comparison                                 :B_frame:
+:PROPERTIES:
+:CUSTOM_ID: exp-vs-comp
+:BEAMER_env: frame
+:BEAMER_opt: allowframebreaks
+:END:
+The computational results are compared here, composition for
+composition, to a selection of experimentally obtained Perovskite
+properties aggregated by Almora et.al.
+[[cite:&almora-2020-devic-perfor]]
+
+#+begin_src jupyter-python :session "py" :exports "none" :results "raw drawer"
+  # database style join used to create the corroborative dataframe
+  #comparision = checkpoint3.iloc[:,1:12].isin(compu_comp.to_dict())
+  cols = list(almora_df_sub.columns.values)[9:21]
+  total_merged = pd.merge(mannodi_df[cols], almora_df_sub, on=cols, how='outer', indicator=True)
+  total_merged_other = pd.merge(mannodi_df, almora_df_sub[cols], on=cols, how='outer', indicator=True)    
+  #composition_merged = pd.merge(mannodi_df[cols], almora_df_sub[cols], on=cols, how='outer', indicator=True)
+  corr_compu_out = total_merged_other[total_merged_other._merge=="both"].iloc[:, 52::]
+  corr_emp_out = total_merged[total_merged._merge=="both"].iloc[:, 12:16]
+
+  corr_form = total_merged[total_merged._merge=="both"].Formula
+
+  comparision_df = pd.concat([corr_compu_out, corr_emp_out, corr_form], axis=1)
+  comparision_df.head(41)
+#+end_src
+*** a) computational vs empirical bad gaps
+:PROPERTIES:
+:ID:       1c7b2b5c-dd95-4880-8d3d-473ef2383b93
+:END:
+#+begin_src jupyter-python :session "py" :exports "results" :results "raw drawer"
+  fig, ax = plt.subplots(figsize=[10,10])
+  ax.scatter(comparision_df.EMP_bg_eV, comparision_df.PBE_bg_eV)
+  ax.set_title("test")
+  ax.set_xlabel("EMP")
+  ax.set_ylabel("PBE")  
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+: Text(0, 0.5, 'PBE')
+#+attr_org: :width 861
+[[file:./.ob-jupyter/b312cf86734713555b940580355c35e051dbee79.png]]
+:END:
+** Material Zone
+show distributions of measured outputs vs time and vs composition ratios
+** Accessing and Analyzing DFT Data
+:PROPERTIES:
+:CUSTOM_ID: accessing-and-analyzing-dft-data
+:CLASS: unnumbered
+:END:
+*** TODO Collect experimental points
+- figure 3 :: rigorous experimental comparison
+*** TODO 
+- figure 4 :: pearson maps
+*** 
+
+** Dataset Projections
+:PROPERTIES:
+:CUSTOM_ID: data-visualization-methods
+:CLASS: unnumbered
+:END:
+*** TODO PCA examinations
+- 
+*** TODO MDS, TSNE, ISOMAP, UMAP
+-
+* Results and discussion
+:PROPERTIES:
+:CUSTOM_ID: results-and-discussion
+:CLASS: unnumbered
+:END:
+** Visualization of DFT Data
+:PROPERTIES:
+:CUSTOM_ID: visualization-of-dft-data
+:CLASS: unnumbered
+:END:
+...\\
+\newpage
+* Perspective and Future Work
+:PROPERTIES:
+:CUSTOM_ID: perspective-and-future-work
+:CLASS: unnumbered
+:END:
+
+
+* figure ideas
+
+3. show frequency of investigation over time (as in paper)
+4. show change in band gap with multidimensional ratio shift
