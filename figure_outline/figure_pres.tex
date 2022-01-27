@@ -1,4 +1,4 @@
-% Created 2022-01-27 Thu 13:53
+% Created 2022-01-27 Thu 14:17
 % Intended LaTeX compiler: pdflatex
 \documentclass[9pt, compress]{beamer}
 \usepackage[utf8]{inputenc}
@@ -37,7 +37,7 @@
   \insertshorttitle\hfill
   \insertframenumber\,/\,\inserttotalframenumber}
 \section{Methodology}
-\label{sec:org1450c0a}
+\label{sec:org9cf44e5}
 \begin{frame}[allowframebreaks]{DFT simulation premise}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
@@ -52,7 +52,7 @@
 \begin{column}{0.5\columnwidth}
 \begin{block}{Perovskite Chemical Domain}
 \begin{table}[htbp]
-\caption{\label{tab:orgad369a0}\label{tbl:chem} ABX\textsubscript{3} Chemical Domain}
+\caption{\label{tab:org596eb89}\label{tbl:chem} ABX\textsubscript{3} Chemical Domain}
 \centering
 \begin{tabular}{lll}
 A-site & B-site & X-site\\
@@ -150,7 +150,7 @@ data sourced from \cite{almora-2020-devic-perfor}.
 \end{block}
 \end{frame}
 \section{Results}
-\label{sec:org874c373}
+\label{sec:orgc210d14}
 \begin{frame}[allowframebreaks]{Computational vs Experimental}
 \begin{block}{Band Gaps}
 \begin{figure}[htbp]
@@ -176,9 +176,35 @@ data sourced from \cite{almora-2020-devic-perfor}.
 \end{figure}
 \end{block}
 \end{frame}
+\section{Modeling:}
+\label{sec:org553edfb}
+\begin{frame}[allowframebreaks]{Directive:}
+Try to find some reliable clustering in crystal properties/composition
+features that predict photovoltaic performance.
+\begin{block}{Attempt on Computational data}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=150]{./.ob-jupyter/c96d1bca37c915325d43c4dbe3809364c6ca3751.png}
+\caption{\label{fig:prop_top} Magpie Descriptors hypercube shaded by PV\textsubscript{FOM}}
+\end{figure}
+\end{block}
+\begin{block}{Compare to Experimental data}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=150]{./.ob-jupyter/fd6a7e6e0596e5443ab99ca2ccf1944b360b5e59.png}
+\caption{\label{fig:prop_top} Magpie Descriptors projected onto mannodi properties space and shaded by PCE\%}
+\end{figure}
+\end{block}
+\end{frame}
+
+\begin{frame}[label={sec:orgdebe79a}]{Plans:}
+Due to the demonstrable topology in the input spaces sampled by these
+experiments, tSNE or U-Map projection techniques will be explored for
+possible cluster representations.
+\end{frame}
 \section{reference}
-\label{sec:org329dce2}
-\begin{frame}[label={sec:org45234c9}]{citations}
+\label{sec:org1ac50a4}
+\begin{frame}[label={sec:org94a0c7d}]{citations}
 \bibliographystyle{plain}
 \bibliography{../../../../org/bibliotex/bibliotex}
 \end{frame}

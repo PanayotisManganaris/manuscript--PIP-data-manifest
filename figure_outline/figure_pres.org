@@ -181,6 +181,36 @@ data sourced from [[cite:&almora-2020-devic-perfor]].
 #+caption: label:fig:PBE_clust In this projection larger band gaps appear to inversely correlate with higher SLME values recorded for 5um absorption layers
 #+attr_latex: :width 220
 [[file:./.ob-jupyter/31e788491b6aa6d149463dbbcfe5ba03a59088da.png]]
+* Modeling:
+** Directive:                                                      :B_frame:
+:PROPERTIES:
+:BEAMER_env: frame
+:BEAMER_opt: allowframebreaks
+:END:
+Try to find some reliable clustering in crystal properties/composition
+features that predict photovoltaic performance.
+*** Attempt on Computational data                                 :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+#+caption: label:fig:prop_top Magpie Descriptors hypercube shaded by PV_FOM
+#+attr_latex: :width 150
+[[file:./.ob-jupyter/c96d1bca37c915325d43c4dbe3809364c6ca3751.png]]
+*** Compare to Experimental data                                  :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+#+caption: label:fig:prop_top Magpie Descriptors projected onto mannodi properties space and shaded by PCE%
+#+attr_latex: :width 150
+[[file:./.ob-jupyter/fd6a7e6e0596e5443ab99ca2ccf1944b360b5e59.png]]
+
+** Plans:                                                          :B_frame:
+:PROPERTIES:
+:BEAMER_env: frame
+:END:
+Due to the demonstrable topology in the input spaces sampled by these
+experiments, tSNE or U-Map projection techniques will be explored for
+possible cluster representations.
 * reference
 ** citations                                                       :B_frame:
 :PROPERTIES:
