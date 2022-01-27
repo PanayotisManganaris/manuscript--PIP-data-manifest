@@ -1,0 +1,140 @@
+#+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
+#+options: author:t broken-links:mark c:nil creator:nil
+#+options: d:(not "LOGBOOK") date:t e:t email:nil f:t inline:t num:t
+#+options: p:nil pri:nil prop:nil stat:t tags:t tasks:t tex:t
+#+options: timestamp:t title:t toc:t todo:t |:t
+#+title: Figure Outline for Computational Perovskite Alloys Dataset
+#+date: \today
+#+AUTHOR: Panayotis Manganaris\inst{1}
+#+EMAIL: pmangana@purdue.edu
+#+language: en
+#+select_tags: export
+#+exclude_tags: noexport
+#+creator: Emacs 27.2 (Org mode 9.5)
+#+startup: beamer
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [9pt, compress]
+#+BEAMER_FRAME_LEVELS: 2
+#+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
+#+latex_header: \institute[Mannodi Group]{Mannodi Group - Purdue MSE}
+#+latex_header: \mode<beamer>{\usetheme{Warsaw}}
+#+latex_header: \useoutertheme{miniframes}
+#+begin_export latex
+\expandafter\def\expandafter\insertshorttitle\expandafter{%
+  \insertshorttitle\hfill
+  \insertframenumber\,/\,\inserttotalframenumber}
+#+end_export
+* Methodology
+:PROPERTIES:
+:CUSTOM_ID: methodology
+:END:
+** DFT simulation premise                                          :B_frame:
+:PROPERTIES:
+:CUSTOM_ID: dft-details
+:BEAMER_env: frame
+:BEAMER_opt: allowframebreaks
+:END:
+*** Perovskite structure summary                                  :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:BEAMER_col: 0.5
+:END:
+#+DOWNLOADED: screenshot @ 2022-01-24 19:23:38
+#+caption: label:fig:struct ABX_3 Cubic Perovskite Structure 
+#+attr_latex: :width 100
+[[file:Methodology/2022-01-24_19-23-38_screenshot.png]]
+*** Perovskite Chemical Domain                                    :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:BEAMER_col: 0.5
+:END:
+#+NAME: site_tbl
+#+caption: label:tbl:chem ABX_3 Chemical Domain
+| A-site | B-site | X-site |
+|--------+--------+--------|
+| MA     | Pb     | I      |
+| FA     | Sn     | Br     |
+| Cs     | Ge     | Cl     |
+| Rb     | Ba     |        |
+| K      | Sr     |        |
+|        | Ca     |        |
+|        | Be     |        |
+|        | Mg     |        |
+|        | Si     |        |
+|        | V      |        |
+|        | Cr     |        |
+|        | Mn     |        |
+|        | Fe     |        |
+|        | Ni     |        |
+|        | Zn     |        |
+|        | Pd     |        |
+|        | Cd     |        |
+|        | Hg     |        |
+
+** Composition Space Sampling                                      :B_frame:
+:PROPERTIES:
+:BEAMER_env: frame
+:BEAMER_opt: allowframebreaks
+:END:
+*** construction of simulations                                   :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+
+#+CAPTION: label:tbl:mixing Mix Table
+| cell construct               | trials |
+|------------------------------+--------|
+| 2x2x2 Supercell A-site mixed |    126 |
+| 2x2x2 B & X-site mixed       |      5 |
+| 2x2x2 Supercell B-site mixed |    151 |
+| 3x3x3 Supercell B-site mixed |      5 |
+| 4x4x4 Supercell B-site mixed |     10 |
+| Alternative B-site elements  |     36 |
+| 2x2x2 Pure                   |     90 |
+| 2x2x2 X-site mixed           |    127 |
+*** Sampling in DFT dataset                                       :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:ID:       f73d807f-b74b-4c92-b3cf-af35edde7b82
+:END:
+#+caption: label:fig:dft_rep Species by weight and frequency, and alloy representations in DFT dataset 
+#+attr_latex: :width 225
+[[file:./.ob-jupyter/8f1d4f1aa030bd0ee679d35e9f028fd0a4997cc5.png]]
+*** Sampling in experimental dataset                              :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+#+caption: label:fig:exp_rep Species by weight and frequency, and alloy representations in experimental dataset to date
+#+attr_latex: :width 225
+[[file:./.ob-jupyter/dcb62144b4024f99ad012a5dac7e0bdac84b5968.png]]
+** Topology of Composition Space                                   :B_frame:
+:PROPERTIES:
+:BEAMER_env: frame
+:BEAMER_opt: allowframebreaks
+:END:
+*** PCA projection of Mannodi compositions                        :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+
+*** PCA projection of Experimental compositions                   :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+
+* Results
+:PROPERTIES:
+:CUSTOM_ID: results
+:END:
+** Computational vs Experimental                                   :B_frame:
+:PROPERTIES:
+:BEAMER_env: frame
+:BEAMER_opt: allowframebreaks
+:END:
+*** Band Gaps                                                     :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+#+caption: label:fig:bg_corr HSE and PBE bandgaps vs experimental measures show clearly computation methods need improvement
+#+attr_latex: :width 225
+[[file:./.ob-jupyter/BGcorrob.png]]

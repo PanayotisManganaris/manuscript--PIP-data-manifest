@@ -1,0 +1,138 @@
+% Created 2022-01-27 Thu 13:02
+% Intended LaTeX compiler: pdflatex
+\documentclass[9pt, compress]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\institute[Mannodi Group]{Mannodi Group - Purdue MSE}
+\mode<beamer>{\usetheme{Warsaw}}
+\useoutertheme{miniframes}
+\usetheme{default}
+\author{Panayotis Manganaris\inst{1}}
+\date{\today}
+\title{Figure Outline for Computational Perovskite Alloys Dataset}
+\hypersetup{
+ pdfauthor={Panayotis Manganaris\inst{1}},
+ pdftitle={Figure Outline for Computational Perovskite Alloys Dataset},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 27.2 (Org mode 9.5)}, 
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+\begin{frame}{Outline}
+\tableofcontents
+\end{frame}
+
+\expandafter\def\expandafter\insertshorttitle\expandafter{%
+  \insertshorttitle\hfill
+  \insertframenumber\,/\,\inserttotalframenumber}
+\section{Methodology}
+\label{sec:org710a355}
+\begin{frame}[allowframebreaks]{DFT simulation premise}
+\begin{columns}
+\begin{column}{0.5\columnwidth}
+\begin{block}{Perovskite structure summary}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=100]{Methodology/2022-01-24_19-23-38_screenshot.png}
+\caption{\label{fig:struct} ABX\textsubscript{3} Cubic Perovskite Structure}
+\end{figure}
+\end{block}
+\end{column}
+\begin{column}{0.5\columnwidth}
+\begin{block}{Perovskite Chemical Domain}
+\begin{table}[htbp]
+\caption{\label{tab:org18d61f4}\label{tbl:chem} ABX\textsubscript{3} Chemical Domain}
+\centering
+\begin{tabular}{lll}
+A-site & B-site & X-site\\
+\hline
+MA & Pb & I\\
+FA & Sn & Br\\
+Cs & Ge & Cl\\
+Rb & Ba & \\
+K & Sr & \\
+ & Ca & \\
+ & Be & \\
+ & Mg & \\
+ & Si & \\
+ & V & \\
+ & Cr & \\
+ & Mn & \\
+ & Fe & \\
+ & Ni & \\
+ & Zn & \\
+ & Pd & \\
+ & Cd & \\
+ & Hg & \\
+\end{tabular}
+\end{table}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Composition Space Sampling}
+\begin{block}{construction of simulations}
+\begin{table}[htbp]
+\caption{\label{tbl:mixing} Mix Table}
+\centering
+\begin{tabular}{lr}
+cell construct & trials\\
+\hline
+2x2x2 Supercell A-site mixed & 126\\
+2x2x2 B \& X-site mixed & 5\\
+2x2x2 Supercell B-site mixed & 151\\
+3x3x3 Supercell B-site mixed & 5\\
+4x4x4 Supercell B-site mixed & 10\\
+Alternative B-site elements & 36\\
+2x2x2 Pure & 90\\
+2x2x2 X-site mixed & 127\\
+\end{tabular}
+\end{table}
+\end{block}
+\begin{block}{Sampling in DFT dataset}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=225]{./.ob-jupyter/8f1d4f1aa030bd0ee679d35e9f028fd0a4997cc5.png}
+\caption{\label{fig:dft_rep} Species by weight and frequency, and alloy representations in DFT dataset}
+\end{figure}
+\end{block}
+\begin{block}{Sampling in experimental dataset}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=225]{./.ob-jupyter/dcb62144b4024f99ad012a5dac7e0bdac84b5968.png}
+\caption{\label{fig:exp_rep} Species by weight and frequency, and alloy representations in experimental dataset to date}
+\end{figure}
+\end{block}
+\end{frame}
+\begin{frame}[allowframebreaks]{Topology of Composition Space}
+\begin{block}{PCA projection of Mannodi compositions}
+\end{block}
+
+\begin{block}{PCA projection of Experimental compositions}
+\end{block}
+\end{frame}
+
+\section{Results}
+\label{sec:org84281bf}
+\begin{frame}[allowframebreaks]{Computational vs Experimental}
+\begin{block}{Band Gaps}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=225]{./.ob-jupyter/BGcorrob.png}
+\caption{\label{fig:bg_corr} HSE and PBE bandgaps vs experimental measures show clearly computation methods need improvement}
+\end{figure}
+\end{block}
+\end{frame}
+\end{document}
