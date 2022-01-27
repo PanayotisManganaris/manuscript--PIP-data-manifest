@@ -453,7 +453,7 @@ show distributions of measured outputs vs time and vs composition ratios
                               arrowprops=dict(arrowstyle="->"))
           annot.set_visible(False)
       elif N_labels.size == 0: #quick view, no scale
-          scatterplane = ax.scatter(xs * scalex, ys * scaley, c = "white", **kwargs)
+          scatterplane = ax.scatter(xs * scalex, ys * scaley, c = "black", **kwargs)
       else:
           raise ValueError("N_labels badly argued. see biplot docstring")
       #plot and label projection of original dimensions on plane
@@ -484,9 +484,10 @@ show distributions of measured outputs vs time and vs composition ratios
 :END:
 *** PCA op mannodi
 #+begin_src jupyter-python :session "py" :exports both :results raw drawer
-  comp_cols = ['K', 'Rb', 'Cs', 'MA', 'FA', 'Ca', 'Sr', 'Ba', 'Ge', 'Sn', 'Pb', 'Cl', 'Br', 'I']
-  pdf_compu_comp = pd.DataFrame(StandardScaler().fit_transform(mannodi_df[comp_cols].dropna()),
-                                index = mannodi_df[comp_cols].dropna().index, columns = mannodi_df[comp_cols].columns)
+  almora_comp_cols = almora_df.columns.values[test_len(almora_df.columns.values) == 2]
+  mannodi_comp_cols = mannodi_df.columns.values[test_len(mannodi_df.columns.values) == 2]
+  pdf_compu_comp = pd.DataFrame(StandardScaler().fit_transform(mannodi_df[mannodi_comp_cols].fillna(0)),
+                                index = mannodi_df[mannodi_comp_cols].index, columns = mannodi_df[mannodi_comp_cols].columns)
   comp_label = pdf_compu_comp.columns.values
 #+end_src
 
@@ -518,6 +519,7 @@ show distributions of measured outputs vs time and vs composition ratios
 #+end_src
 
 #+RESULTS:
+[[file:./.ob-jupyter/8b50fbbee4a1d9a4c730d46e9dca6d5e2495cf26.png]]
 *** mannodi projection
 #+begin_src jupyter-python :session "py" :exports both :results raw drawer
   #Call the function. Use only the 2 PCs at a time.
@@ -528,42 +530,25 @@ show distributions of measured outputs vs time and vs composition ratios
 #+end_src
 
 #+RESULTS:
+:RESULTS:
+#+attr_org: :width 552
+[[file:./.ob-jupyter/5902b5ff1d6349e8f36ce1aabaede144c396a274.png]]
+:END:
 *** PCA op almora
 #+begin_src jupyter-python :session "py" :exports both :results raw drawer
-  al_comp_cols = cols
-  pdf_exp_comp = pd.DataFrame(StandardScaler().fit_transform(almora_df[al_comp_cols].dropna()),
-                                index = almora_df[al_comp_cols].dropna().index, columns = almora_df[al_comp_cols].columns)
+  pdf_exp_comp = pd.DataFrame(StandardScaler().fit_transform(almora_df[almora_comp_cols].fillna(0)),
+                                index = almora_df[almora_comp_cols].index, columns = almora_df[almora_comp_cols].columns)
   al_comp_label = pdf_exp_comp.columns.values
 #+end_src
 
 #+RESULTS:
-:RESULTS:
-# [goto error]
-: [0;31m---------------------------------------------------------------------------[0m
-: [0;31mNameError[0m                                 Traceback (most recent call last)
-: [0;32m/tmp/ipykernel_116532/2906145211.py[0m in [0;36m<module>[0;34m[0m
-: [0;32m----> 1[0;31m [0mal_comp_cols[0m [0;34m=[0m [0mcols[0m[0;34m[0m[0;34m[0m[0m
-: [0m[1;32m      2[0m pdf_exp_comp = pd.DataFrame(StandardScaler().fit_transform(almora_df[al_comp_cols].dropna()),
-: [1;32m      3[0m                               index = almora_df[al_comp_cols].dropna().index, columns = almora_df[al_comp_cols].columns)
-: [1;32m      4[0m [0mal_comp_label[0m [0;34m=[0m [0mpdf_exp_comp[0m[0;34m.[0m[0mcolumns[0m[0;34m.[0m[0mvalues[0m[0;34m[0m[0;34m[0m[0m
-: 
-: [0;31mNameError[0m: name 'cols' is not defined
-:END:
 
+here, use the mannodi composition space to compare coverages of the topology
 #+begin_src jupyter-python :session "py" :exports both :results raw drawer
-  pcaxis = PCA(n_components = min(pdf_exp_comp.shape), svd_solver = 'full')
+  pcaxis = PCA(n_components = min(pdf_compu_comp[almora_comp_cols].shape), svd_solver = 'full')
 #+end_src
 
 #+RESULTS:
-:RESULTS:
-# [goto error]
-: [0;31m---------------------------------------------------------------------------[0m
-: [0;31mNameError[0m                                 Traceback (most recent call last)
-: [0;32m/tmp/ipykernel_116532/1004501844.py[0m in [0;36m<module>[0;34m[0m
-: [0;32m----> 1[0;31m [0mpcaxis[0m [0;34m=[0m [0mPCA[0m[0;34m([0m[0mn_components[0m [0;34m=[0m [0mmin[0m[0;34m([0m[0mpdf_exp_comp[0m[0;34m.[0m[0mshape[0m[0;34m)[0m[0;34m,[0m [0msvd_solver[0m [0;34m=[0m [0;34m'full'[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-: [0m
-: [0;31mNameError[0m: name 'pdf_exp_comp' is not defined
-:END:
 
 #+begin_src jupyter-python :session "py" :exports both :results raw drawer
   PCs = ['pc_%i' % i for i in range(pcaxis.n_components)]
@@ -573,18 +558,6 @@ show distributions of measured outputs vs time and vs composition ratios
 #+end_src
 
 #+RESULTS:
-:RESULTS:
-# [goto error]
-: [0;31m---------------------------------------------------------------------------[0m
-: [0;31mNameError[0m                                 Traceback (most recent call last)
-: [0;32m/tmp/ipykernel_116532/4078583296.py[0m in [0;36m<module>[0;34m[0m
-: [1;32m      1[0m [0mPCs[0m [0;34m=[0m [0;34m[[0m[0;34m'pc_%i'[0m [0;34m%[0m [0mi[0m [0;32mfor[0m [0mi[0m [0;32min[0m [0mrange[0m[0;34m([0m[0mpcaxis[0m[0;34m.[0m[0mn_components[0m[0;34m)[0m[0;34m][0m[0;34m[0m[0;34m[0m[0m
-: [0;32m----> 2[0;31m [0mpdf_pcmodel[0m [0;34m=[0m [0mpd[0m[0;34m.[0m[0mDataFrame[0m[0;34m([0m[0mpcaxis[0m[0;34m.[0m[0mfit_transform[0m[0;34m([0m[0mpdf_exp_comp[0m[0;34m)[0m[0;34m,[0m [0mindex[0m[0;34m=[0m[0mpdf_exp_comp[0m[0;34m.[0m[0mindex[0m[0;34m,[0m [0mcolumns[0m[0;34m=[0m[0mPCs[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-: [0m[1;32m      3[0m [0;31m#pdf_pcmodel_plus = pd.concat([pdf_pcmodel, pdf_pse[["Formula"]]], axis=1)[0m[0;34m[0m[0;34m[0m[0m
-: [1;32m      4[0m [0;31m#scdf_pcmodel_plus[0m[0;34m[0m[0;34m[0m[0m
-: 
-: [0;31mNameError[0m: name 'pdf_exp_comp' is not defined
-:END:
 
 #+begin_src jupyter-python :session "py" :exports both :results raw drawer
   #Obtain PC axes and name them nicely
@@ -597,28 +570,21 @@ show distributions of measured outputs vs time and vs composition ratios
 #+end_src
 
 #+RESULTS:
+[[file:./.ob-jupyter/7fa258949ef6f94fc65290b3f795348b6257ca80.png]]
 
 *** almora projection
 #+begin_src jupyter-python :session "py" :exports both :results raw drawer
   #Call the function. Use only the 2 PCs at a time.
   fig, ax1 = plt.subplots(1,1, figsize=(6,6))
 
-  plane = biplot([0,1], pdf_pcmodel, pcaxis.components_, dim_labels=al_comp_label, ax=ax1, N_labels=almora_df["I"].dropna())
+  plane = biplot([0,1], pdf_pcmodel, pcaxis.components_, dim_labels=al_comp_label, ax=ax1)
   plt.show()
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-# [goto error]
-: [0;31m---------------------------------------------------------------------------[0m
-: [0;31mNameError[0m                                 Traceback (most recent call last)
-: [0;32m/tmp/ipykernel_116532/1394880465.py[0m in [0;36m<module>[0;34m[0m
-: [1;32m      2[0m [0mfig[0m[0;34m,[0m [0max1[0m [0;34m=[0m [0mplt[0m[0;34m.[0m[0msubplots[0m[0;34m([0m[0;36m1[0m[0;34m,[0m[0;36m1[0m[0;34m,[0m [0mfigsize[0m[0;34m=[0m[0;34m([0m[0;36m6[0m[0;34m,[0m[0;36m6[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-: [1;32m      3[0m [0;34m[0m[0m
-: [0;32m----> 4[0;31m [0mplane[0m [0;34m=[0m [0mbiplot[0m[0;34m([0m[0;34m[[0m[0;36m0[0m[0;34m,[0m[0;36m1[0m[0;34m][0m[0;34m,[0m [0mpdf_pcmodel[0m[0;34m,[0m [0mpcaxis[0m[0;34m.[0m[0mcomponents_[0m[0;34m,[0m [0mdim_labels[0m[0;34m=[0m[0mal_comp_label[0m[0;34m,[0m [0max[0m[0;34m=[0m[0max1[0m[0;34m,[0m [0mN_labels[0m[0;34m=[0m[0malmora_df[0m[0;34m[[0m[0;34m"I"[0m[0;34m][0m[0;34m.[0m[0mdropna[0m[0;34m([0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-: [0m[1;32m      5[0m [0mplt[0m[0;34m.[0m[0mshow[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-: 
-: [0;31mNameError[0m: name 'al_comp_label' is not defined
+#+attr_org: :width 563
+[[file:./.ob-jupyter/716a588caef9af7978ee203e8bc1d6a9b8ca3274.png]]
 :END:
 
 *** PCA on corroboration subset
@@ -856,13 +822,14 @@ show distributions of measured outputs vs time and vs composition ratios
   #Obtain PC axes and name them nicely
   scree = pcaxis.explained_variance_ratio_
   screefig = plt.figure(figsize = [15,5])
-  plt.semilogy(PCs, scree, '*')
+  plt.plot(PCs, scree, '*')
   plt.title('Proportion of Variance explained by Principal Components')
   plt.ylabel('Fraction of Variance')
   plt.show()
 #+end_src
 
 #+RESULTS:
+[[file:./.ob-jupyter/4b96d0c88c935d26b7d14992d57a5e51c6cb1d0a.png]]
 *** HSE projection
 #+begin_src jupyter-python :session "py" :exports both :results raw drawer
   #Call the function. Use only the 2 PCs at a time.
@@ -874,6 +841,7 @@ show distributions of measured outputs vs time and vs composition ratios
 #+end_src
 
 #+RESULTS:
+[[file:./.ob-jupyter/7d2d75ceef4bb57614094fcb0a2af8b9d15918ca.png]]
 *** PBE PCA op
 #+begin_src jupyter-python :session "py" :exports both :results raw drawer
   pbe_outs = ['PBE_LC', 'PBE_bg_eV', 'PBE_dbg_eV', 'PBE_FormE_eV', 'PBE_DecoE_eV', 'dielc', 'PV_FOM', 'SLME_5um', 'SLME_100um']
@@ -910,19 +878,19 @@ show distributions of measured outputs vs time and vs composition ratios
 #+end_src
 
 #+RESULTS:
-[[file:./.ob-jupyter/5a38eb5c005c7aa7507f7ffae959cf86247ee0f8.png]]
+[[file:./.ob-jupyter/98a7051a3f0c7b24a88ead40adf5d03bd97e794f.png]]
 *** PBE projection
 #+begin_src jupyter-python :session "py" :exports both :results raw drawer
   #Call the function. Use only the 2 PCs at a time.
   fig, (ax1, ax2) = plt.subplots(1,2, figsize=(16,6))
 
-  plane_LC = biplot([0,1], pdf_pcmodel, pcaxis.components_, dim_labels=pbe_label, ax=ax1, N_labels=mannodi_df["PBE_LC"].dropna())
+  plane_LC = biplot([0,1], pdf_pcmodel, pcaxis.components_, dim_labels=pbe_label, ax=ax1, N_labels=mannodi_df["SLME_5um"].dropna())
   plane_bg = biplot([0,1], pdf_pcmodel, pcaxis.components_, dim_labels=pbe_label, ax=ax2, N_labels=mannodi_df["PBE_bg_eV"].dropna())
   plt.show()
 #+end_src
 
 #+RESULTS:
-[[file:./.ob-jupyter/174085f74b5bfb70922e3d943386bd6e9f20057a.png]]
+[[file:./.ob-jupyter/31e788491b6aa6d149463dbbcfe5ba03a59088da.png]]
 * TODO TSNE projections
 ** mannodi chemical space
 recover information loss plot
@@ -1001,18 +969,6 @@ recover information loss plot
 
 * UMAP
 
-* Results and discussion
-:PROPERTIES:
-:CUSTOM_ID: results-and-discussion
-:CLASS: unnumbered
-:END:
-** Visualization of DFT Data
-:PROPERTIES:
-:CUSTOM_ID: visualization-of-dft-data
-:CLASS: unnumbered
-:END:
-...\\
-\newpage
 
 * figure ideas
 

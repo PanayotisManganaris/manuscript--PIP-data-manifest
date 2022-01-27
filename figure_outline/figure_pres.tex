@@ -1,4 +1,4 @@
-% Created 2022-01-27 Thu 13:02
+% Created 2022-01-27 Thu 13:53
 % Intended LaTeX compiler: pdflatex
 \documentclass[9pt, compress]{beamer}
 \usepackage[utf8]{inputenc}
@@ -37,7 +37,7 @@
   \insertshorttitle\hfill
   \insertframenumber\,/\,\inserttotalframenumber}
 \section{Methodology}
-\label{sec:org710a355}
+\label{sec:org1450c0a}
 \begin{frame}[allowframebreaks]{DFT simulation premise}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
@@ -52,7 +52,7 @@
 \begin{column}{0.5\columnwidth}
 \begin{block}{Perovskite Chemical Domain}
 \begin{table}[htbp]
-\caption{\label{tab:org18d61f4}\label{tbl:chem} ABX\textsubscript{3} Chemical Domain}
+\caption{\label{tab:orgad369a0}\label{tbl:chem} ABX\textsubscript{3} Chemical Domain}
 \centering
 \begin{tabular}{lll}
 A-site & B-site & X-site\\
@@ -109,6 +109,7 @@ Alternative B-site elements & 36\\
 \end{figure}
 \end{block}
 \begin{block}{Sampling in experimental dataset}
+data sourced from \cite{almora-2020-devic-perfor}.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=225]{./.ob-jupyter/dcb62144b4024f99ad012a5dac7e0bdac84b5968.png}
@@ -116,16 +117,40 @@ Alternative B-site elements & 36\\
 \end{figure}
 \end{block}
 \end{frame}
-\begin{frame}[allowframebreaks]{Topology of Composition Space}
+\begin{frame}[allowframebreaks]{Topology of Computational Composition Space}
 \begin{block}{PCA projection of Mannodi compositions}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=160]{./.ob-jupyter/5902b5ff1d6349e8f36ce1aabaede144c396a274.png}
+\caption{Definite Prismatic Topology in the Chemical Sample}
+\end{figure}
 \end{block}
-
-\begin{block}{PCA projection of Experimental compositions}
+\begin{block}{computation samples Variance shares}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=200]{./.ob-jupyter/8b50fbbee4a1d9a4c730d46e9dca6d5e2495cf26.png}
+\caption{Variance in chemical ratios is fairly evenly spread. So, we expect little domain bias in future model training.}
+\end{figure}
 \end{block}
 \end{frame}
-
+\begin{frame}[allowframebreaks]{Topology of Experimental Composition Space}
+\begin{block}{projection of Experimental compositions into Mannodi space}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=160]{./.ob-jupyter/716a588caef9af7978ee203e8bc1d6a9b8ca3274.png}
+\caption{experimental data currently covers only boundaries of experimental domain. Alloying is more thoroughly explored in experimental domain.}
+\end{figure}
+\end{block}
+\begin{block}{Experimental samples Variance shares}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=200]{./.ob-jupyter/7fa258949ef6f94fc65290b3f795348b6257ca80.png}
+\caption{Variance in chemical ratios remains even.}
+\end{figure}
+\end{block}
+\end{frame}
 \section{Results}
-\label{sec:org84281bf}
+\label{sec:org874c373}
 \begin{frame}[allowframebreaks]{Computational vs Experimental}
 \begin{block}{Band Gaps}
 \begin{figure}[htbp]
@@ -134,5 +159,27 @@ Alternative B-site elements & 36\\
 \caption{\label{fig:bg_corr} HSE and PBE bandgaps vs experimental measures show clearly computation methods need improvement}
 \end{figure}
 \end{block}
+\end{frame}
+\begin{frame}[allowframebreaks]{Trends in Computational Data}
+\begin{block}{LC vs Bg in HSE results}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=220]{./.ob-jupyter/7d2d75ceef4bb57614094fcb0a2af8b9d15918ca.png}
+\caption{\label{fig:HSE_clust} In this projection larger lattice constants appear to inversely correlate with larger band gaps}
+\end{figure}
+\end{block}
+\begin{block}{SLME vs Bg in PBE results}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=220]{./.ob-jupyter/31e788491b6aa6d149463dbbcfe5ba03a59088da.png}
+\caption{\label{fig:PBE_clust} In this projection larger band gaps appear to inversely correlate with higher SLME values recorded for 5um absorption layers}
+\end{figure}
+\end{block}
+\end{frame}
+\section{reference}
+\label{sec:org329dce2}
+\begin{frame}[label={sec:org45234c9}]{citations}
+\bibliographystyle{plain}
+\bibliography{../../../../org/bibliotex/bibliotex}
 \end{frame}
 \end{document}
