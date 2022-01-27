@@ -37,10 +37,11 @@
 #+begin_src jupyter-python :session "py" :kernel "scrymat" :exports "both" :results "none"
   import pandas as pd
   import sqlite3
-  import re
 
   import matplotlib.pyplot as plt
   import matplotlib as mpl
+  import mplcursors
+  from matplotlib.ticker import NullFormatter
   #PCA
   from sklearn.decomposition import PCA
   from sklearn.preprocessing import StandardScaler
@@ -68,7 +69,7 @@
                   FROM almora_agg'''
   almora_df = pd.read_sql(sql_string,
                           conn,
-                          coerce_float=False,
+                          #coerce_float=False,
                           index_col='index')
   conn.close()
 #+end_src
@@ -78,7 +79,13 @@
 ** prep almora for corroboration study
 cutdown almora to definite comparables - exclude conjugate ratios described alloys
 #+begin_src jupyter-python :session "py" :exports "results" :results "raw drawer"
-  almora_df_sub = almora_df[almora_df.Formula.apply(lambda x: not bool(re.search(r'[x]', x)))]
+  # filtering on the formula encoding cuts two entries not cut on the comp matri processing...
+  #almora_df_sub = almora_df[almora_df.Formula.apply(lambda x: not bool(re.search(r'[x]', x)))]
+  # almora currently contains non-numeric composition entries due to conjugate ratios in alloys
+  # index all of these -- index all rows with any NaN
+  idx = almora_df.iloc[:, 9:21].fillna(0).apply(pd.to_numeric, errors="coerce").isna().any(axis=1) 
+  # cut down and ensure comp matrix column types are compatible
+  almora_df = almora_df[~idx].apply(pd.to_numeric, errors="ignore")
 #+end_src
 
 #+RESULTS:
@@ -87,7 +94,7 @@ cutdown almora to definite comparables - exclude conjugate ratios described allo
 :PROPERTIES:
 :CUSTOM_ID: methodology
 :END:
-** DFT Details                                                     :B_frame:
+** DFT sim init                                                    :B_frame:
 :PROPERTIES:
 :CUSTOM_ID: dft-details
 :BEAMER_env: frame
@@ -96,81 +103,904 @@ cutdown almora to definite comparables - exclude conjugate ratios described allo
 *** Perovskite structure summary                                  :B_block:
 :PROPERTIES:
 :BEAMER_env: block
+:COLUMNS:  0.5
 :END:
-*** species representation in DFT dataset                         :B_block:
+#+DOWNLOADED: screenshot @ 2022-01-24 19:23:38
+#+caption: label:fig:struct ABX_3 Cubic Perovskite Structure 
+#+attr_org: :width 200
+[[file:Methodology/2022-01-24_19-23-38_screenshot.png]]
+*** Perovskite Chemical Domain                                    :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:COLUMNS:  0.5
+:END:
+#+NAME: site_tbl
+#+caption: label:tbl:chem ABX_3 Chemical Domain
+| A-site | B-site | X-site |
+|--------+--------+--------|
+| MA     | Pb     | I      |
+| FA     | Sn     | Br     |
+| Cs     | Ge     | Cl     |
+| Rb     | Ba     |        |
+| K      | Sr     |        |
+|        | Ca     |        |
+|        | Be     |        |
+|        | Mg     |        |
+|        | Si     |        |
+|        | V      |        |
+|        | Cr     |        |
+|        | Mn     |        |
+|        | Fe     |        |
+|        | Ni     |        |
+|        | Zn     |        |
+|        | Pd     |        |
+|        | Cd     |        |
+|        | Hg     |        |
+** Data                                                            :B_frame:
+:PROPERTIES:
+:BEAMER_env: frame
+:BEAMER_opt: allowframebreaks
+:END:
+*** representations in DFT dataset                                :B_block:
 :PROPERTIES:
 :BEAMER_env: block
 :END:
-*** flowchart of workflow                                         :B_block:
+
+#+CAPTION: label:tbl:mixing Mix Table
+| alloy construct                  | portions |
+|----------------------------------+----------|
+| A-site mixed                     |      126 |
+| B-site and X-site mixed          |        5 |
+| B-site mixed                     |      151 |
+| New 3x3x3 Supercell (B-site mix) |        5 |
+| New 4x4x4 Supercell (B-site mix) |       10 |
+| Alternative B-site elements      |       36 |
+| Pure                             |       90 |
+| X-site mixed                     |      127 |
+
+#+begin_src jupyter-python :session "py" :exports "results" :results "raw drawer"
+  %matplotlib inline
+  fig = plt.figure(figsize=[12,6])
+  gs = fig.add_gridspec(2,3)
+  ax1 = fig.add_subplot(gs[0, 0])
+  ax2 = fig.add_subplot(gs[1, 0])
+  ax3 = fig.add_subplot(gs[0::, 1::])
+  # counts constituent element's representation in fraction of total 550 compounds
+  test_len = np.vectorize(len)
+  cols = mannodi_df.columns.values[test_len(mannodi_df.columns.values) == 2]
+  compound_rep = mannodi_df[cols][mannodi_df[cols] > 0].notna().sum(axis=0)
+  #ax3.pie(compound_rep, labels = )
+  ax3.set_title("Constituent Element Representation Fractions")
+
+  patches, texts = ax3.pie(compound_rep)
+  labels = ['{0} - {1:1.2f}'.format(i,j) for i,j in zip(compound_rep.index.values, compound_rep)]
+
+  sort_legend = True
+  if sort_legend:
+      patches, labels, dummy =  zip(*sorted(zip(patches, labels, compound_rep.index.values),
+                                            key=lambda x: x[2],
+                                            reverse=True))
+
+  plt.legend(patches, labels, loc='center right', bbox_to_anchor=(0.1, 0.5),
+             fontsize=8)
+  #second count constituent element's net weight fraction of total 550 x 5 net unit weights
+  #sum the composition matrix columns
+  mixing_rep = pd.get_dummies(mannodi_df.Mixing).sum(axis=0)
+  ax2.pie(mixing_rep, labels = mixing_rep.index.values)
+  ax2.set_title("Representation of Alloy Constructs")
+
+  sumcomp=mannodi_df.iloc[:, 2:16].sum(axis=0)
+  ax1.pie(sumcomp, labels = sumcomp.index.values)
+  ax1.set_title("constituent weight fractions out of whole")
+#+end_src
+
+#+RESULTS:
+#+caption: label:fig:dft_rep (a) Species and (b) Alloy Representations in DFT dataset 
+#+attr_org: :width 917
+[[file:./.ob-jupyter/8f1d4f1aa030bd0ee679d35e9f028fd0a4997cc5.png]]
+**** COMMENT notes
+The computational dataset consists of 550 compositions of cubic
+perovskites. 536 of which are purely based on only different
+combinations of 14 standard constituent elements elaborated in figure
+ref:fig:struct_chem. The perovskites arising from these constituents
+are the focus of this analysis. The composition space is evenly
+represented by each of the 14 constituent elements as illustrated in
+figure ref:fig:dft_rep (a). Evidently, the computational setting
+affords much more even coverage of the chemical domain compared to
+physical experiments.
+
+Furthermore, both pure site and alloyed site compounds are
+explored. Mostly cite specific alloying is tested, the detailed
+divisions are listed in table ref:tbl:mixing. Figure ref:fig:dft_rep
+(b) summarizes the representation of each alloy construct. The alloy
+space is certainly much larger than the pure space. However this
+dataset is not yet large enough to fully explore it.
+*** representations in experimental dataset                       :B_block:
 :PROPERTIES:
 :BEAMER_env: block
 :END:
+#+begin_src jupyter-python :session "py" :exports "results" :results "raw drawer"
+  fig = plt.figure(figsize=[12,6])
+  gs = fig.add_gridspec(2,3)
+  ax1 = fig.add_subplot(gs[0, 0])
+  ax2 = fig.add_subplot(gs[1, 0])
+  ax3 = fig.add_subplot(gs[0::, 1::])
+  # counts constituent element's representation in fraction of total 550 compounds
+  test_len = np.vectorize(len)
+  cols = almora_df.columns.values[test_len(almora_df.columns.values) == 2]
+  compound_rep = almora_df[cols][almora_df[cols] > 0].notna().sum(axis=0)
+  #ax3.pie(compound_rep, labels = )
+  ax3.set_title("Constituent Element Representation Fractions")
+
+  patches, texts = ax3.pie(compound_rep)
+  labels = ['{0} - {1:1.2f}'.format(i,j) for i,j in zip(compound_rep.index.values, compound_rep)]
+
+  sort_legend = True
+  if sort_legend:
+      patches, labels, dummy =  zip(*sorted(zip(patches, labels, compound_rep.index.values),
+                                            key=lambda x: x[2],
+                                            reverse=True))
+
+  plt.legend(patches, labels, loc='center right', bbox_to_anchor=(0.1, 0.5),
+             fontsize=8)
+  #second count constituent element's net weight fraction of total 550 x 5 net unit weights
+  #sum the composition matrix columns
+  mixing_rep = pd.get_dummies(almora_df.Mixing).sum(axis=0)
+  ax2.pie(mixing_rep, labels = mixing_rep.index.values)
+  ax2.set_title("Representation of Alloy Constructs")
+
+  sumcomp=almora_df[cols].sum(axis=0)
+  ax1.pie(sumcomp, labels = sumcomp.index.values)
+  ax1.set_title("constituent weight fractions out of whole")
+#+end_src
+
+#+RESULTS:
+#+caption: label:fig:exp_rep (a) Species and (b) Alloy Representations in experimental dataset to date
+#+attr_org: :width 917
+[[file:./.ob-jupyter/dcb62144b4024f99ad012a5dac7e0bdac84b5968.png]]
+
+*** TODO COMMENT flowchart of workflow                            :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+
 ** Almora Meta-analysis Comparison                                 :B_frame:
 :PROPERTIES:
 :CUSTOM_ID: exp-vs-comp
 :BEAMER_env: frame
 :BEAMER_opt: allowframebreaks
 :END:
-The computational results are compared here, composition for
-composition, to a selection of experimentally obtained Perovskite
-properties aggregated by Almora et.al.
-[[cite:&almora-2020-devic-perfor]]
+Here, a selection of experimentally obtained Perovskite band gaps
+aggregated for twelve different compounds by Almora et.al.
+[[cite:&almora-2020-devic-perfor]] are compared to computed band gaps
+
+Almora computed the Power Conversion Efficiency of a variety of solar
+cell devices from the short circuit curent density, open circuit
+voltage, and "Fill Factor"
 
 #+begin_src jupyter-python :session "py" :exports "none" :results "raw drawer"
-  # database style join used to create the corroborative dataframe
-  #comparision = checkpoint3.iloc[:,1:12].isin(compu_comp.to_dict())
-  cols = list(almora_df_sub.columns.values)[9:21]
-  total_merged = pd.merge(mannodi_df[cols], almora_df_sub, on=cols, how='outer', indicator=True)
-  total_merged_other = pd.merge(mannodi_df, almora_df_sub[cols], on=cols, how='outer', indicator=True)    
-  #composition_merged = pd.merge(mannodi_df[cols], almora_df_sub[cols], on=cols, how='outer', indicator=True)
-  corr_compu_out = total_merged_other[total_merged_other._merge=="both"].iloc[:, 52::]
-  corr_emp_out = total_merged[total_merged._merge=="both"].iloc[:, 12:16]
-
-  corr_form = total_merged[total_merged._merge=="both"].Formula
-
-  comparision_df = pd.concat([corr_compu_out, corr_emp_out, corr_form], axis=1)
-  comparision_df.head(41)
+  # identify composition matrix labels
+  almora_comp_cols = almora_df.columns.values[test_len(almora_df.columns.values) == 2]
+  # create corroborative table by unioning all indicies on the joint composion matrix + indicate source
+  union_df = pd.merge(mannodi_df, almora_df, on=list(almora_comp_cols), how='outer', indicator=True, suffixes=("_mannodi", "_almora"))
+  both_df = union_df[union_df._merge=="both"]
 #+end_src
-*** a) computational vs empirical bad gaps
+
+#+RESULTS:
+
+*** computational vs experimental bad gaps                        :B_block:
 :PROPERTIES:
-:ID:       1c7b2b5c-dd95-4880-8d3d-473ef2383b93
+:CUSTOM_ID: man_alm_bg
+:BEAMER_env: block
 :END:
+parity comparisons indicate PBE underestimates bandgaps and HSE
+overestimates bandgaps systematically
+
+#+begin_src jupyter-python :session "py" :exports "results" :results "raw drawer" :file ./.ob-jupyter/BGcorrob.png
+  def axsquare(ax):
+      """improve comparative presentation of two data series with pairity"""
+      minx, maxx = ax.get_xlim()
+      miny, maxy = ax.get_ylim()
+      axmax = max([maxx, maxy])
+      axmin = min([minx, miny])
+      ax.set_xlim(axmin, axmax)
+      ax.set_ylim(axmin, axmax)
+
+  fig, (ax1, ax2) = plt.subplots(1,2, figsize=[15,6])
+
+  cor = both_df.dropna(subset=list(almora_comp_cols), how="all")
+
+  groups = cor.groupby(cor.Formula_almora)
+  for name, group in groups:
+      ax1.scatter(group.EMP_bg_eV, group.PBE_bg_eV, label = name)
+      ax2.scatter(group.EMP_bg_eV, group.HSE_bg_eV, label = name)      
+  axsquare(ax1)
+  axsquare(ax2)
+  ax1.axline((0,0), slope=1, ls='-')
+  ax2.axline((0,0), slope=1, ls='-')  
+  ax1.set_title("Comparing PBE simulation with Experimental Bandgaps")
+  ax2.set_title("Comparing HSE simulation with Experimental Bandgaps")
+  ax1.set_xlabel("Almora Bandgap [eV]")
+  ax2.set_xlabel("Almora Bandgap [eV]")  
+  ax1.set_ylabel("PBE Bandgap [eV]")
+  ax2.set_ylabel("HSE Bandgap [eV]")  
+  lgd = ax2.legend()
+  lgd.loc = "lower right"
+#+end_src
+
+#+RESULTS:
+[[file:./.ob-jupyter/BGcorrob.png]]
+
+**** COMMENT interactive
 #+begin_src jupyter-python :session "py" :exports "results" :results "raw drawer"
-  fig, ax = plt.subplots(figsize=[10,10])
-  ax.scatter(comparision_df.EMP_bg_eV, comparision_df.PBE_bg_eV)
-  ax.set_title("test")
-  ax.set_xlabel("EMP")
-  ax.set_ylabel("PBE")  
+  #optionally use interactive qt canvas -- not set up nicely yet.
+  %gui qt
+  %matplotlib qt
+
+  mplcursors.cursor(multiple = True).connect("add", lambda sel: sel.annotation.set_text(
+      both_df.Formula_mannodi.values[sel.target.index]))
+#+end_src
+
+#+RESULTS:
+: <function __main__.<lambda>(sel)>
+
+**** COMMENT inline
+#+begin_src jupyter-python :session "py" :exports "results" :results "raw drawer"
+  %gui inline
+  %matplotlib qt
+#+end_src
+
+#+RESULTS:
+
+*** table
+#+begin_src jupyter-python :session "py" :exports "both" :results "raw drawer"
+  both_df[["Formula_mannodi", "EMP_bg_eV", "PBE_bg_eV", "HSE_bg_eV"]]
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-: Text(0, 0.5, 'PBE')
-#+attr_org: :width 861
-[[file:./.ob-jupyter/b312cf86734713555b940580355c35e051dbee79.png]]
+# [goto error]
+: [0;31m---------------------------------------------------------------------------[0m
+: [0;31mNameError[0m                                 Traceback (most recent call last)
+: [0;32m/tmp/ipykernel_116532/2470955539.py[0m in [0;36m<module>[0;34m[0m
+: [0;32m----> 1[0;31m [0mboth_df[0m[0;34m[[0m[0;34m[[0m[0;34m"Formula_mannodi"[0m[0;34m,[0m [0;34m"EMP_bg_eV"[0m[0;34m,[0m [0;34m"PBE_bg_eV"[0m[0;34m,[0m [0;34m"HSE_bg_eV"[0m[0;34m][0m[0;34m][0m[0;34m[0m[0;34m[0m[0m
+: [0m
+: [0;31mNameError[0m: name 'both_df' is not defined
 :END:
-** Material Zone
-show distributions of measured outputs vs time and vs composition ratios
-** Accessing and Analyzing DFT Data
-:PROPERTIES:
-:CUSTOM_ID: accessing-and-analyzing-dft-data
-:CLASS: unnumbered
-:END:
-*** TODO Collect experimental points
-- figure 3 :: rigorous experimental comparison
-*** TODO 
-- figure 4 :: pearson maps
-*** 
 
-** Dataset Projections
-:PROPERTIES:
-:CUSTOM_ID: data-visualization-methods
-:CLASS: unnumbered
+** TODO Material Zone
+show distributions of measured outputs vs time and vs composition ratios
+* DONE PCA projections
+:STATUSLOG:
+- State "DONE"       from "TODO"       [2022-01-25 Tue 14:45]
 :END:
-*** TODO PCA examinations
-- 
-*** TODO MDS, TSNE, ISOMAP, UMAP
--
+** COMMENT define plotfunction
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  def biplot(components, PCs, transform_matrix, dim_labels=None, N_labels=[], ax=None, cbar_kw={}, cbarlabel="", **kwargs):
+      """
+      modify or create and return axis containing cross-section of pca space as
+      scatter plot with projection of orignal dimensions onto the plane of major
+      variance
+
+      Parameters:
+      ----------    
+      components
+      2-length list of integers from 0 to D-1. Selects 2 components to be scatter
+      plotted against each other.
+      PCs
+      D-colummn DataFrame where each column is a principal component.
+      transform_matrix
+      DxD array of component weights summarizing the contribution of each dimension to
+      each PC. Meant for use with PCA by sklearn.Decomposition.PCA.components_
+      dim_labels
+      D-length list of dimension labels corresponding the axes of the original
+      data-space transformed in the PCA.
+      N_labels
+      Either:
+      1. N-length pandas Series of unique labels to individually annotate each datapoint 
+         Optionally, use cbar* args to control continuous coloration. String labels will be
+         white.
+      2. N-length list of nonunique labels to be annotate clusters of datapoints
+         use with cbar* args to control descrete coloration
+      3. None. Datapoints will be white and noninteractive
+
+
+      Utility Args:
+      -------------
+      ax
+      A `matplotlib.axes.Axes` instance on which the principal coordinates are scattered.
+      If not provided, use current axes or create a new one.  Optional.
+      cbar_kw
+      A dictionary with arguments to `matplotlib.Figure.colorbar`.  Optional.
+      cbarlabel
+      The label for the colorbar.  Optional.
+      ,**kwargs
+      All other arguments are forwarded to `scatter`.
+
+      transform_matrix is necssary for quantifying the contribution of each dimension
+      to the principal components being plotted
+      """
+      if not ax:
+          ax = plt.gca()
+      #Number of dimensions to biplot
+      n = transform_matrix.shape[0]
+      #plot the plane of major variance
+      xs = PCs.iloc[:,components[0]]
+      ys = PCs.iloc[:,components[1]]
+      scalex = 1.0/(xs.max() - xs.min())
+      scaley = 1.0/(ys.max() - ys.min())
+      N_labels = np.array(N_labels)
+      unique = np.unique(N_labels)
+      #wip:
+      if (N_labels.size > unique.size) & (unique.size > 1): #color and annotate coords by discrete scale, disp scale
+          #TODO if discrete scale consists of unique strings color discrete strings uniquely + label
+          scatterplane = ax.scatter(xs * scalex, ys * scaley, c = N_labels, **kwargs)
+          cbar = ax.figure.colorbar(scatterplane, ax=ax, **cbar_kw)
+          cbar.ax.set_ylabel(cbarlabel, rotation=-90, va="bottom")
+          # for key, value in np.arange(5):
+          #     annot = ax.annotate("", xy=(0,0), xytext=(20,20), textcoords="offset points",
+          #                         bbox=dict(boxstyle="round", fc="w"),
+          #                         arrowprops=dict(arrowstyle="->"))
+          #     annot.set_visible(False)
+      elif (N_labels.size == unique.size) & (unique.size > 1): #color and annotate coords by continuous scale, disp scale
+          #TODO if continuous scale consists of unique strings label without color
+          #if numbers, make and apply colorscale as well as label
+          scatterplane = ax.scatter(xs * scalex, ys * scaley, c = N_labels, **kwargs)
+          cbar = ax.figure.colorbar(scatterplane, ax=ax, **cbar_kw)
+          cbar.ax.set_ylabel(cbarlabel, rotation=-90, va="bottom")
+          annot = ax.annotate("", xy=(0,0), xytext=(20,20), textcoords="offset points",
+                              bbox=dict(boxstyle="round", fc="w"),
+                              arrowprops=dict(arrowstyle="->"))
+          annot.set_visible(False)
+      elif N_labels.size == 0: #quick view, no scale
+          scatterplane = ax.scatter(xs * scalex, ys * scaley, c = "white", **kwargs)
+      else:
+          raise ValueError("N_labels badly argued. see biplot docstring")
+      #plot and label projection of original dimensions on plane
+      slice1 = transform_matrix[components[0]]
+      slice2 = transform_matrix[components[1]]
+      proj_slice_transposed = np.stack([slice1, slice2], axis=1)
+      xs_weight = proj_slice_transposed[:,0]
+      ys_weight = proj_slice_transposed[:,1]
+      for i in range(n):
+          ax.arrow(0, 0, xs_weight[i], ys_weight[i], color = 'r', alpha = 0.5)
+          if dim_labels is None:
+              ax.text(xs_weight[i] * 1.2, ys_weight[i] * 1.2, "Var"+str(i+1), color = 'g', ha = 'center', va = 'center')
+          else:
+              ax.text(xs_weight[i] * 1.2, ys_weight[i] * 1.2, dim_labels[i], color = 'g', ha = 'center', va = 'center')
+      ax.set_xlabel("PC{}".format(components[0]))
+      ax.set_ylabel("PC{}".format(components[1]))
+      ax.grid()
+
+      return ax
+#+end_src
+
+#+RESULTS:
+
+** Chemical space                                                  :B_frame:
+:PROPERTIES:
+:BEAMER_env: frame
+:BEAMER_opt: allowframebreaks
+:END:
+*** PCA op mannodi
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  comp_cols = ['K', 'Rb', 'Cs', 'MA', 'FA', 'Ca', 'Sr', 'Ba', 'Ge', 'Sn', 'Pb', 'Cl', 'Br', 'I']
+  pdf_compu_comp = pd.DataFrame(StandardScaler().fit_transform(mannodi_df[comp_cols].dropna()),
+                                index = mannodi_df[comp_cols].dropna().index, columns = mannodi_df[comp_cols].columns)
+  comp_label = pdf_compu_comp.columns.values
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  pcaxis = PCA(n_components = min(pdf_compu_comp.shape), svd_solver = 'full')
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  PCs = ['pc_%i' % i for i in range(pcaxis.n_components)]
+  pdf_pcmodel = pd.DataFrame(pcaxis.fit_transform(pdf_compu_comp), index=pdf_compu_comp.index, columns=PCs)
+  #pdf_pcmodel_plus = pd.concat([pdf_pcmodel, pdf_pse[["Formula"]]], axis=1)
+  #scdf_pcmodel_plus
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  #Obtain PC axes and name them nicely
+  scree = pcaxis.explained_variance_ratio_
+  screefig = plt.figure(figsize = [15,5])
+  plt.plot(PCs, scree, '*')
+  plt.title('Proportion of Variance explained by Principal Components')
+  plt.ylabel('Fraction of Variance')
+  plt.show()
+#+end_src
+
+#+RESULTS:
+*** mannodi projection
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  #Call the function. Use only the 2 PCs at a time.
+  fig, ax1 = plt.subplots(1,1, figsize=(6,6))
+
+  plane = biplot([0,1], pdf_pcmodel, pcaxis.components_, dim_labels=comp_label, ax=ax1,)
+  plt.show()
+#+end_src
+
+#+RESULTS:
+*** PCA op almora
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  al_comp_cols = cols
+  pdf_exp_comp = pd.DataFrame(StandardScaler().fit_transform(almora_df[al_comp_cols].dropna()),
+                                index = almora_df[al_comp_cols].dropna().index, columns = almora_df[al_comp_cols].columns)
+  al_comp_label = pdf_exp_comp.columns.values
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# [goto error]
+: [0;31m---------------------------------------------------------------------------[0m
+: [0;31mNameError[0m                                 Traceback (most recent call last)
+: [0;32m/tmp/ipykernel_116532/2906145211.py[0m in [0;36m<module>[0;34m[0m
+: [0;32m----> 1[0;31m [0mal_comp_cols[0m [0;34m=[0m [0mcols[0m[0;34m[0m[0;34m[0m[0m
+: [0m[1;32m      2[0m pdf_exp_comp = pd.DataFrame(StandardScaler().fit_transform(almora_df[al_comp_cols].dropna()),
+: [1;32m      3[0m                               index = almora_df[al_comp_cols].dropna().index, columns = almora_df[al_comp_cols].columns)
+: [1;32m      4[0m [0mal_comp_label[0m [0;34m=[0m [0mpdf_exp_comp[0m[0;34m.[0m[0mcolumns[0m[0;34m.[0m[0mvalues[0m[0;34m[0m[0;34m[0m[0m
+: 
+: [0;31mNameError[0m: name 'cols' is not defined
+:END:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  pcaxis = PCA(n_components = min(pdf_exp_comp.shape), svd_solver = 'full')
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# [goto error]
+: [0;31m---------------------------------------------------------------------------[0m
+: [0;31mNameError[0m                                 Traceback (most recent call last)
+: [0;32m/tmp/ipykernel_116532/1004501844.py[0m in [0;36m<module>[0;34m[0m
+: [0;32m----> 1[0;31m [0mpcaxis[0m [0;34m=[0m [0mPCA[0m[0;34m([0m[0mn_components[0m [0;34m=[0m [0mmin[0m[0;34m([0m[0mpdf_exp_comp[0m[0;34m.[0m[0mshape[0m[0;34m)[0m[0;34m,[0m [0msvd_solver[0m [0;34m=[0m [0;34m'full'[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+: [0m
+: [0;31mNameError[0m: name 'pdf_exp_comp' is not defined
+:END:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  PCs = ['pc_%i' % i for i in range(pcaxis.n_components)]
+  pdf_pcmodel = pd.DataFrame(pcaxis.fit_transform(pdf_exp_comp), index=pdf_exp_comp.index, columns=PCs)
+  #pdf_pcmodel_plus = pd.concat([pdf_pcmodel, pdf_pse[["Formula"]]], axis=1)
+  #scdf_pcmodel_plus
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# [goto error]
+: [0;31m---------------------------------------------------------------------------[0m
+: [0;31mNameError[0m                                 Traceback (most recent call last)
+: [0;32m/tmp/ipykernel_116532/4078583296.py[0m in [0;36m<module>[0;34m[0m
+: [1;32m      1[0m [0mPCs[0m [0;34m=[0m [0;34m[[0m[0;34m'pc_%i'[0m [0;34m%[0m [0mi[0m [0;32mfor[0m [0mi[0m [0;32min[0m [0mrange[0m[0;34m([0m[0mpcaxis[0m[0;34m.[0m[0mn_components[0m[0;34m)[0m[0;34m][0m[0;34m[0m[0;34m[0m[0m
+: [0;32m----> 2[0;31m [0mpdf_pcmodel[0m [0;34m=[0m [0mpd[0m[0;34m.[0m[0mDataFrame[0m[0;34m([0m[0mpcaxis[0m[0;34m.[0m[0mfit_transform[0m[0;34m([0m[0mpdf_exp_comp[0m[0;34m)[0m[0;34m,[0m [0mindex[0m[0;34m=[0m[0mpdf_exp_comp[0m[0;34m.[0m[0mindex[0m[0;34m,[0m [0mcolumns[0m[0;34m=[0m[0mPCs[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+: [0m[1;32m      3[0m [0;31m#pdf_pcmodel_plus = pd.concat([pdf_pcmodel, pdf_pse[["Formula"]]], axis=1)[0m[0;34m[0m[0;34m[0m[0m
+: [1;32m      4[0m [0;31m#scdf_pcmodel_plus[0m[0;34m[0m[0;34m[0m[0m
+: 
+: [0;31mNameError[0m: name 'pdf_exp_comp' is not defined
+:END:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  #Obtain PC axes and name them nicely
+  scree = pcaxis.explained_variance_ratio_
+  screefig = plt.figure(figsize = [15,5])
+  plt.plot(PCs, scree, '*')
+  plt.title('Proportion of Variance explained by Principal Components')
+  plt.ylabel('Fraction of Variance')
+  plt.show()
+#+end_src
+
+#+RESULTS:
+
+*** almora projection
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  #Call the function. Use only the 2 PCs at a time.
+  fig, ax1 = plt.subplots(1,1, figsize=(6,6))
+
+  plane = biplot([0,1], pdf_pcmodel, pcaxis.components_, dim_labels=al_comp_label, ax=ax1, N_labels=almora_df["I"].dropna())
+  plt.show()
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# [goto error]
+: [0;31m---------------------------------------------------------------------------[0m
+: [0;31mNameError[0m                                 Traceback (most recent call last)
+: [0;32m/tmp/ipykernel_116532/1394880465.py[0m in [0;36m<module>[0;34m[0m
+: [1;32m      2[0m [0mfig[0m[0;34m,[0m [0max1[0m [0;34m=[0m [0mplt[0m[0;34m.[0m[0msubplots[0m[0;34m([0m[0;36m1[0m[0;34m,[0m[0;36m1[0m[0;34m,[0m [0mfigsize[0m[0;34m=[0m[0;34m([0m[0;36m6[0m[0;34m,[0m[0;36m6[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+: [1;32m      3[0m [0;34m[0m[0m
+: [0;32m----> 4[0;31m [0mplane[0m [0;34m=[0m [0mbiplot[0m[0;34m([0m[0;34m[[0m[0;36m0[0m[0;34m,[0m[0;36m1[0m[0;34m][0m[0;34m,[0m [0mpdf_pcmodel[0m[0;34m,[0m [0mpcaxis[0m[0;34m.[0m[0mcomponents_[0m[0;34m,[0m [0mdim_labels[0m[0;34m=[0m[0mal_comp_label[0m[0;34m,[0m [0max[0m[0;34m=[0m[0max1[0m[0;34m,[0m [0mN_labels[0m[0;34m=[0m[0malmora_df[0m[0;34m[[0m[0;34m"I"[0m[0;34m][0m[0;34m.[0m[0mdropna[0m[0;34m([0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+: [0m[1;32m      5[0m [0mplt[0m[0;34m.[0m[0mshow[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+: 
+: [0;31mNameError[0m: name 'al_comp_label' is not defined
+:END:
+
+*** PCA on corroboration subset
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  pdf_corob = pd.DataFrame(StandardScaler().fit_transform(both_df[al_comp_cols].dropna()),
+                                index = both_df[al_comp_cols].dropna().index, columns = both_df[al_comp_cols].columns)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# [goto error]
+: [0;31m---------------------------------------------------------------------------[0m
+: [0;31mNameError[0m                                 Traceback (most recent call last)
+: [0;32m/tmp/ipykernel_116532/1718641013.py[0m in [0;36m<module>[0;34m[0m
+: [0;32m----> 1[0;31m pdf_corob = pd.DataFrame(StandardScaler().fit_transform(both_df[al_comp_cols].dropna()),
+: [0m[1;32m      2[0m                               index = both_df[al_comp_cols].dropna().index, columns = both_df[al_comp_cols].columns)
+: 
+: [0;31mNameError[0m: name 'both_df' is not defined
+:END:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  pcaxis = PCA(n_components = min(pdf_corob.shape), svd_solver = 'full')
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# [goto error]
+: [0;31m---------------------------------------------------------------------------[0m
+: [0;31mNameError[0m                                 Traceback (most recent call last)
+: [0;32m/tmp/ipykernel_116532/1002228103.py[0m in [0;36m<module>[0;34m[0m
+: [0;32m----> 1[0;31m [0mpcaxis[0m [0;34m=[0m [0mPCA[0m[0;34m([0m[0mn_components[0m [0;34m=[0m [0mmin[0m[0;34m([0m[0mpdf_corob[0m[0;34m.[0m[0mshape[0m[0;34m)[0m[0;34m,[0m [0msvd_solver[0m [0;34m=[0m [0;34m'full'[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+: [0m
+: [0;31mNameError[0m: name 'pdf_corob' is not defined
+:END:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  PCs = ['pc_%i' % i for i in range(pcaxis.n_components)]
+  pdf_pcmodel = pd.DataFrame(pcaxis.fit_transform(pdf_corob), index=pdf_corob.index, columns=PCs)
+  #pdf_pcmodel_plus = pd.concat([pdf_pcmodel, pdf_pse[["Formula"]]], axis=1)
+  #scdf_pcmodel_plus
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# [goto error]
+: [0;31m---------------------------------------------------------------------------[0m
+: [0;31mNameError[0m                                 Traceback (most recent call last)
+: [0;32m/tmp/ipykernel_116532/1437655521.py[0m in [0;36m<module>[0;34m[0m
+: [1;32m      1[0m [0mPCs[0m [0;34m=[0m [0;34m[[0m[0;34m'pc_%i'[0m [0;34m%[0m [0mi[0m [0;32mfor[0m [0mi[0m [0;32min[0m [0mrange[0m[0;34m([0m[0mpcaxis[0m[0;34m.[0m[0mn_components[0m[0;34m)[0m[0;34m][0m[0;34m[0m[0;34m[0m[0m
+: [0;32m----> 2[0;31m [0mpdf_pcmodel[0m [0;34m=[0m [0mpd[0m[0;34m.[0m[0mDataFrame[0m[0;34m([0m[0mpcaxis[0m[0;34m.[0m[0mfit_transform[0m[0;34m([0m[0mpdf_corob[0m[0;34m)[0m[0;34m,[0m [0mindex[0m[0;34m=[0m[0mpdf_corob[0m[0;34m.[0m[0mindex[0m[0;34m,[0m [0mcolumns[0m[0;34m=[0m[0mPCs[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+: [0m[1;32m      3[0m [0;31m#pdf_pcmodel_plus = pd.concat([pdf_pcmodel, pdf_pse[["Formula"]]], axis=1)[0m[0;34m[0m[0;34m[0m[0m
+: [1;32m      4[0m [0;31m#scdf_pcmodel_plus[0m[0;34m[0m[0;34m[0m[0m
+: 
+: [0;31mNameError[0m: name 'pdf_corob' is not defined
+:END:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  #Obtain PC axes and name them nicely
+  scree = pcaxis.explained_variance_ratio_
+  screefig = plt.figure(figsize = [15,5])
+  plt.plot(PCs, scree, '*')
+  plt.title('Proportion of Variance explained by Principal Components')
+  plt.ylabel('Fraction of Variance')
+  plt.show()
+#+end_src
+
+#+RESULTS:
+
+*** corroboration subset projection
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  #Call the function. Use only the 2 PCs at a time.
+  fig, ax1 = plt.subplots(1,1, figsize=(6,6))
+
+  plane = biplot([0,1], pdf_pcmodel, pcaxis.components_, dim_labels=al_comp_label, ax=ax1, N_labels=both_df["I"].dropna())
+  plt.show()
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# [goto error]
+: [0;31m---------------------------------------------------------------------------[0m
+: [0;31mNameError[0m                                 Traceback (most recent call last)
+: [0;32m/tmp/ipykernel_116532/368748681.py[0m in [0;36m<module>[0;34m[0m
+: [1;32m      2[0m [0mfig[0m[0;34m,[0m [0max1[0m [0;34m=[0m [0mplt[0m[0;34m.[0m[0msubplots[0m[0;34m([0m[0;36m1[0m[0;34m,[0m[0;36m1[0m[0;34m,[0m [0mfigsize[0m[0;34m=[0m[0;34m([0m[0;36m6[0m[0;34m,[0m[0;36m6[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+: [1;32m      3[0m [0;34m[0m[0m
+: [0;32m----> 4[0;31m [0mplane[0m [0;34m=[0m [0mbiplot[0m[0;34m([0m[0;34m[[0m[0;36m0[0m[0;34m,[0m[0;36m1[0m[0;34m][0m[0;34m,[0m [0mpdf_pcmodel[0m[0;34m,[0m [0mpcaxis[0m[0;34m.[0m[0mcomponents_[0m[0;34m,[0m [0mdim_labels[0m[0;34m=[0m[0mal_comp_label[0m[0;34m,[0m [0max[0m[0;34m=[0m[0max1[0m[0;34m,[0m [0mN_labels[0m[0;34m=[0m[0mboth_df[0m[0;34m[[0m[0;34m"I"[0m[0;34m][0m[0;34m.[0m[0mdropna[0m[0;34m([0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+: [0m[1;32m      5[0m [0mplt[0m[0;34m.[0m[0mshow[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+: 
+: [0;31mNameError[0m: name 'al_comp_label' is not defined
+:END:
+
+** properties space                                                :B_frame:
+:PROPERTIES:
+:BEAMER_env: frame
+:BEAMER_opt: allowframebreaks
+:END:
+*** PCA op mannodi
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  prop_cols = ['A_ion_rad', 'A_BP', 'A_MP', 'A_dens', 'A_at_wt', 'A_EA', 'A_IE',
+       'A_hof', 'A_hov', 'A_En', 'A_at_num', 'A_period', 'B_ion_rad',
+       'B_BP', 'B_MP', 'B_dens', 'B_at_wt', 'B_EA', 'B_IE', 'B_hof',
+       'B_hov', 'B_En', 'B_at_num', 'B_period', 'X_ion_rad', 'X_BP',
+       'X_MP', 'X_dens', 'X_at_wt', 'X_EA', 'X_IE', 'X_hof', 'X_hov',
+       'X_En', 'X_at_num', 'X_period']
+  pdf_compu_prop = pd.DataFrame(StandardScaler().fit_transform(mannodi_df[prop_cols].dropna()),
+                                index = mannodi_df[prop_cols].dropna().index, columns = mannodi_df[prop_cols].columns)
+  prop_label = pdf_compu_prop.columns.values
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  pcaxis = PCA(n_components = min(pdf_compu_prop.shape), svd_solver = 'full')
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  PCs = ['pc_%i' % i for i in range(pcaxis.n_components)]
+  pdf_pcmodel = pd.DataFrame(pcaxis.fit_transform(pdf_compu_prop), index=pdf_compu_prop.index, columns=PCs)
+  #pdf_pcmodel_plus = pd.concat([pdf_pcmodel, pdf_pse[["Formula"]]], axis=1)
+  #scdf_pcmodel_plus
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  #Obtain PC axes and name them nicely
+  scree = pcaxis.explained_variance_ratio_
+  screefig = plt.figure(figsize = [15,5])
+  plt.plot(PCs, scree, '*')
+  plt.title('Proportion of Variance explained by Principal Components')
+  plt.ylabel('Fraction of Variance')
+  plt.show()
+#+end_src
+
+#+RESULTS:
+*** mannodi projection
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  #Call the function. Use only the 2 PCs at a time.
+  fig, ax1 = plt.subplots(1,1, figsize=(6,6))
+
+  plane = biplot([0,1], pdf_pcmodel, pcaxis.components_, dim_labels=prop_label, ax=ax1, N_labels=mannodi_df["SLME_5um"].dropna())
+  plt.show()
+#+end_src
+
+#+RESULTS:
+*** PCA op almora
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  al_prop_cols = ['A_ion_rad_Å', 'A_Boiling_Point_K', 'A_Melting_Point_K',
+       'A_dens_g/cc', 'A_at_wt_u', 'A_El_aff_kJ/mol', 'A_IonE_kJ/mol',
+       'A_Heat_of_fusion_kJ/mol', 'A_Heat_of_vap_kJ/mol', 'A_En',
+       'A_at_num', 'A_period', 'B_ion_rad_Å', 'B_Boiling_Point_K',
+       'B_Melting_Point_K', 'B_dens_g/cc', 'B_at_wt_u', 'B_El_aff_kJ/mol',
+       'B_IonE_kJ/mol', 'B_Heat_of_fusion_kJ/mol', 'B_Heat_of_vap_kJ/mol',
+       'B_En', 'B_at_num', 'B_period', 'X_ion_rad_Å', 'X_Boiling_Point_K',
+       'X_Melting_Point_K', 'X_dens_g/cc', 'X_at_wt_u', 'X_El_aff_kJ/mol',
+       'X_IonE_kJ/mol', 'X_Heat_of_fusion_kJ/mol', 'X_Heat_of_vap_kJ/mol',
+       'X_En', 'X_at_num', 'X_period']
+  pdf_exp_prop = pd.DataFrame(StandardScaler().fit_transform(almora_df[al_prop_cols].dropna()),
+                                index = almora_df[al_prop_cols].dropna().index, columns = almora_df[al_prop_cols].columns)
+  al_prop_label = pdf_exp_prop.columns.values
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  pcaxis = PCA(n_components = min(pdf_exp_prop.shape), svd_solver = 'full')
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  PCs = ['pc_%i' % i for i in range(pcaxis.n_components)]
+  pdf_pcmodel = pd.DataFrame(pcaxis.fit_transform(pdf_exp_prop), index=pdf_exp_prop.index, columns=PCs)
+  #pdf_pcmodel_plus = pd.concat([pdf_pcmodel, pdf_pse[["Formula"]]], axis=1)
+  #scdf_pcmodel_plus
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  #Obtain PC axes and name them nicely
+  scree = pcaxis.explained_variance_ratio_
+  screefig = plt.figure(figsize = [15,5])
+  plt.plot(PCs, scree, '*')
+  plt.title('Proportion of Variance explained by Principal Components')
+  plt.ylabel('Fraction of Variance')
+  plt.show()
+#+end_src
+
+#+RESULTS:
+*** almora projection
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  #Call the function. Use only the 2 PCs at a time.
+  fig, ax1 = plt.subplots(1,1, figsize=(6,6))
+
+  plane = biplot([0,1], pdf_pcmodel, pcaxis.components_, dim_labels=al_prop_label, ax=ax1, N_labels=almora_df["EMP_bg_eV"].dropna())
+  plt.show()
+#+end_src
+
+#+RESULTS:
+
+** output space                                                    :B_frame:
+:PROPERTIES:
+:BEAMER_env: frame
+:BEAMER_opt: allowframebreaks
+:END:
+*** HSE PCA op
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  hse_outs = ['HSE_LC', 'HSE_bg_eV', 'HSE_dbg_eV', 'HSE_FormE_eV', 'HSE_DecoE_eV']
+  pdf_hse = pd.DataFrame(StandardScaler().fit_transform(mannodi_df[hse_outs].dropna()),
+                         index = mannodi_df[hse_outs].dropna().index, columns = mannodi_df[hse_outs].columns)
+  hse_label = pdf_hse.columns.values
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  pcaxis = PCA(n_components = min(pdf_hse.shape), svd_solver = 'full')
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  PCs = ['pc_%i' % i for i in range(pcaxis.n_components)]
+  pdf_pcmodel = pd.DataFrame(pcaxis.fit_transform(pdf_hse), index=pdf_hse.index, columns=PCs)
+  #pdf_pcmodel_plus = pd.concat([pdf_pcmodel, pdf_pse[["Formula"]]], axis=1)
+  #scdf_pcmodel_plus
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  #Obtain PC axes and name them nicely
+  scree = pcaxis.explained_variance_ratio_
+  screefig = plt.figure(figsize = [15,5])
+  plt.semilogy(PCs, scree, '*')
+  plt.title('Proportion of Variance explained by Principal Components')
+  plt.ylabel('Fraction of Variance')
+  plt.show()
+#+end_src
+
+#+RESULTS:
+*** HSE projection
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  #Call the function. Use only the 2 PCs at a time.
+  fig, (ax1, ax2) = plt.subplots(1,2, figsize=(16,6))
+
+  plane_LC = biplot([0,1], pdf_pcmodel, pcaxis.components_, dim_labels=hse_label, ax=ax1, N_labels=mannodi_df["HSE_LC"].dropna())
+  plane_bg = biplot([0,1], pdf_pcmodel, pcaxis.components_, dim_labels=hse_label, ax=ax2, N_labels=mannodi_df["HSE_bg_eV"].dropna())
+  plt.show()
+#+end_src
+
+#+RESULTS:
+*** PBE PCA op
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  pbe_outs = ['PBE_LC', 'PBE_bg_eV', 'PBE_dbg_eV', 'PBE_FormE_eV', 'PBE_DecoE_eV', 'dielc', 'PV_FOM', 'SLME_5um', 'SLME_100um']
+  pdf_pbe = pd.DataFrame(StandardScaler().fit_transform(mannodi_df[pbe_outs].dropna()),
+                         index = mannodi_df[pbe_outs].dropna().index, columns = mannodi_df[pbe_outs].columns)
+  pbe_label = pdf_pbe.columns.values
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  pcaxis = PCA(n_components = min(pdf_pbe.shape), svd_solver = 'full')
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  PCs = ['pc_%i' % i for i in range(pcaxis.n_components)]
+  pdf_pcmodel = pd.DataFrame(pcaxis.fit_transform(pdf_pbe), index=pdf_pbe.index, columns=PCs)
+  #pdf_pcmodel_plus = pd.concat([pdf_pcmodel, pdf_pse[["Formula"]]], axis=1)
+  #scdf_pcmodel_plus
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  #Obtain PC axes and name them nicely
+  scree = pcaxis.explained_variance_ratio_
+  screefig = plt.figure(figsize = [15,5])
+  plt.plot(PCs, scree, '*')
+  plt.title('Proportion of Variance explained by Principal Components')
+  plt.ylabel('Fraction of Variance')
+  plt.show()
+#+end_src
+
+#+RESULTS:
+[[file:./.ob-jupyter/5a38eb5c005c7aa7507f7ffae959cf86247ee0f8.png]]
+*** PBE projection
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  #Call the function. Use only the 2 PCs at a time.
+  fig, (ax1, ax2) = plt.subplots(1,2, figsize=(16,6))
+
+  plane_LC = biplot([0,1], pdf_pcmodel, pcaxis.components_, dim_labels=pbe_label, ax=ax1, N_labels=mannodi_df["PBE_LC"].dropna())
+  plane_bg = biplot([0,1], pdf_pcmodel, pcaxis.components_, dim_labels=pbe_label, ax=ax2, N_labels=mannodi_df["PBE_bg_eV"].dropna())
+  plt.show()
+#+end_src
+
+#+RESULTS:
+[[file:./.ob-jupyter/174085f74b5bfb70922e3d943386bd6e9f20057a.png]]
+* TODO TSNE projections
+** mannodi chemical space
+recover information loss plot
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  comp_cols = ['K', 'Rb', 'Cs', 'MA', 'FA', 'Ca', 'Sr', 'Ba', 'Ge', 'Sn', 'Pb', 'Cl', 'Br', 'I']
+  perplexities = [5, 30, 50, 100]
+  fig, subplots = plt.subplots(1, len(perplexities)+1, figsize=(15, 3))
+
+  ax = subplots[0]
+  comp_matrix = mannodi_df.loc[:, comp_cols].dropna().to_numpy().T
+
+  ax.scatter(comp_matrix[0],comp_matrix[1])
+  ax.set_xlabel("# K in unit cell")
+  ax.set_ylabel("# Rb in unit cell")
+
+  for i, perplexity in enumerate(perplexities):
+    ax = subplots[i + 1]
+    tsne = manifold.TSNE(n_components=2, init="pca", learning_rate=200,
+                         random_state=1, perplexity=perplexity)
+    Warped = tsne.fit_transform(StandardScaler().fit_transform(X=comp_matrix.T))
+    ax.set_title("Perplexity={p}".format(p = perplexity))
+    ax.set() # show the color bar and set the aspect ratio square
+    ax.scatter(Warped.T[0], Warped.T[1]) #colorscale should not warped when physical
+    ax.xaxis.set_major_formatter(NullFormatter())
+    ax.yaxis.set_major_formatter(NullFormatter())
+    ax.axis('tight')
+#+end_src
+
+#+RESULTS:
+[[file:./.ob-jupyter/ed0e9ec5f8890bd5b8af2a8a8e6c521ec66e430d.png]]
+
+** properties space
+** chemical space warped by addendum
+ #+begin_src jupyter-python :session "py" :exports both :results raw drawer 
+   perplexities = [5, 30, 50, 100]
+   fig, subplots = plt.subplots(1, len(perplexities)+1, figsize=(15, 3))
+   
+   ax = subplots[0]
+   Xmix_array = mannodi_df[[*cols,"PBE_DecoE_eV"]].dropna().to_numpy().T
+   
+   ax.scatter(Xmix_array[11],Xmix_array[12])
+   ax.set_xlabel("# Cl in unit cell")
+   ax.set_ylabel("# Br in unit cell")
+   
+   Xmix_array.shape
+   
+   for i, perplexity in enumerate(perplexities):
+     ax = subplots[i + 1]
+   
+     tsne = manifold.TSNE(n_components=2, init='random',
+                          random_state=0, perplexity=perplexity)
+     Warped = tsne.fit_transform(StandardScaler().fit_transform(X=Xmix_array.T)) #just really be
+                                                    #careful about the
+                                                    #orientation of the
+                                                    #training data. Dimensions should be
+                                                    #columns. Observations should be rows.
+   
+     #scatter takes X and Y conveniently when rows are transpposed to
+     #ax0, so it can be confusing in the set up.
+   
+     #Look into plotting this directly from the datafram.
+   
+     ax.set_title("Perplexity={p}".format(p = perplexity))
+     ax.set() # show the color bar and set the aspect ratio square
+     ax.scatter(Warped.T[0], Warped.T[1], c=Xmix_array[-1]) #colorscale should not warped when physical
+     ax.xaxis.set_major_formatter(NullFormatter())
+     ax.yaxis.set_major_formatter(NullFormatter())
+     ax.axis('tight')
+#+end_src
+
+#+RESULTS:
+[[file:./.ob-jupyter/bf7994e6efd2ee2e90307d070a79e92cbf31a6f3.png]]
+* MDS
+
+* ISOMAP
+
+* UMAP
+
 * Results and discussion
 :PROPERTIES:
 :CUSTOM_ID: results-and-discussion
@@ -183,12 +1013,6 @@ show distributions of measured outputs vs time and vs composition ratios
 :END:
 ...\\
 \newpage
-* Perspective and Future Work
-:PROPERTIES:
-:CUSTOM_ID: perspective-and-future-work
-:CLASS: unnumbered
-:END:
-
 
 * figure ideas
 
