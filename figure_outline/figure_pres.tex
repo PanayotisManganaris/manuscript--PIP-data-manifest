@@ -1,6 +1,6 @@
-% Created 2022-01-27 Thu 14:17
+% Created 2022-01-27 Thu 21:59
 % Intended LaTeX compiler: pdflatex
-\documentclass[9pt, compress]{beamer}
+\documentclass[8pt, compress]{beamer}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
@@ -37,7 +37,7 @@
   \insertshorttitle\hfill
   \insertframenumber\,/\,\inserttotalframenumber}
 \section{Methodology}
-\label{sec:org9cf44e5}
+\label{sec:orge2d4d74}
 \begin{frame}[allowframebreaks]{DFT simulation premise}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
@@ -52,7 +52,7 @@
 \begin{column}{0.5\columnwidth}
 \begin{block}{Perovskite Chemical Domain}
 \begin{table}[htbp]
-\caption{\label{tab:org596eb89}\label{tbl:chem} ABX\textsubscript{3} Chemical Domain}
+\caption{\label{tab:org47d6b08}\label{tbl:chem} ABX\textsubscript{3} Chemical Domain}
 \centering
 \begin{tabular}{lll}
 A-site & B-site & X-site\\
@@ -83,6 +83,7 @@ K & Sr & \\
 \end{frame}
 
 \begin{frame}[allowframebreaks]{Composition Space Sampling}
+reconstruct pie charts to show representation of elements in A/B/X sites
 \begin{block}{construction of simulations}
 \begin{table}[htbp]
 \caption{\label{tbl:mixing} Mix Table}
@@ -150,9 +151,14 @@ data sourced from \cite{almora-2020-devic-perfor}.
 \end{block}
 \end{frame}
 \section{Results}
-\label{sec:orgc210d14}
+\label{sec:org4e51dd4}
 \begin{frame}[allowframebreaks]{Computational vs Experimental}
 \begin{block}{Band Gaps}
+label outliers directly.
+
+notice no strong approximation functions, no spin orbit coupling. (PBE accidentally approximates HSE + SOC)
+
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=225]{./.ob-jupyter/BGcorrob.png}
@@ -177,7 +183,7 @@ data sourced from \cite{almora-2020-devic-perfor}.
 \end{block}
 \end{frame}
 \section{Modeling:}
-\label{sec:org553edfb}
+\label{sec:org1a61c45}
 \begin{frame}[allowframebreaks]{Directive:}
 Try to find some reliable clustering in crystal properties/composition
 features that predict photovoltaic performance.
@@ -197,14 +203,14 @@ features that predict photovoltaic performance.
 \end{block}
 \end{frame}
 
-\begin{frame}[label={sec:orgdebe79a}]{Plans:}
+\begin{frame}[label={sec:org5ab196f}]{Plans:}
 Due to the demonstrable topology in the input spaces sampled by these
 experiments, tSNE or U-Map projection techniques will be explored for
 possible cluster representations.
 \end{frame}
 \section{reference}
-\label{sec:org1ac50a4}
-\begin{frame}[label={sec:org94a0c7d}]{citations}
+\label{sec:org60baee8}
+\begin{frame}[label={sec:org3354546}]{citations}
 \bibliographystyle{plain}
 \bibliography{../../../../org/bibliotex/bibliotex}
 \end{frame}

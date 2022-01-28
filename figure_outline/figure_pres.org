@@ -13,7 +13,7 @@
 #+creator: Emacs 27.2 (Org mode 9.5)
 #+startup: beamer
 #+LaTeX_CLASS: beamer
-#+LaTeX_CLASS_OPTIONS: [9pt, compress]
+#+LaTeX_CLASS_OPTIONS: [8pt, compress]
 #+BEAMER_FRAME_LEVELS: 2
 #+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
 #+latex_header: \institute[Mannodi Group]{Mannodi Group - Purdue MSE}
@@ -52,30 +52,22 @@
 #+caption: label:tbl:chem ABX_3 Chemical Domain
 | A-site | B-site | X-site |
 |--------+--------+--------|
-| MA     | Pb     | I      |
-| FA     | Sn     | Br     |
-| Cs     | Ge     | Cl     |
-| Rb     | Ba     |        |
-| K      | Sr     |        |
-|        | Ca     |        |
-|        | Be     |        |
-|        | Mg     |        |
-|        | Si     |        |
-|        | V      |        |
-|        | Cr     |        |
-|        | Mn     |        |
-|        | Fe     |        |
-|        | Ni     |        |
-|        | Zn     |        |
-|        | Pd     |        |
-|        | Cd     |        |
-|        | Hg     |        |
+| MA     | Pb  V  | I      |
+| FA     | Sn  Cr | Br     |
+| Cs     | Ge  Mn | Cl     |
+| Rb     | Ba  Fe |        |
+| K      | Sr  Ni |        |
+|        | Ca  Zn |        |
+|        | Be  Pd |        |
+|        | Mg  Cd |        |
+|        | Si  Hg |        |
 
 ** Composition Space Sampling                                      :B_frame:
 :PROPERTIES:
 :BEAMER_env: frame
 :BEAMER_opt: allowframebreaks
 :END:
+reconstruct pie charts to show representation of elements in A/B/X sites
 *** construction of simulations                                   :B_block:
 :PROPERTIES:
 :BEAMER_env: block
@@ -113,13 +105,6 @@ data sourced from [[cite:&almora-2020-devic-perfor]].
 :BEAMER_env: frame
 :BEAMER_opt: allowframebreaks
 :END:
-*** PCA projection of Mannodi compositions                        :B_block:
-:PROPERTIES:
-:BEAMER_env: block
-:END:
-#+caption: Definite Prismatic Topology in the Chemical Sample
-#+attr_latex: :width 160
-[[file:./.ob-jupyter/5902b5ff1d6349e8f36ce1aabaede144c396a274.png]]
 *** computation samples Variance shares                           :B_block:
 :PROPERTIES:
 :BEAMER_env: block
@@ -127,6 +112,13 @@ data sourced from [[cite:&almora-2020-devic-perfor]].
 #+caption: Variance in chemical ratios is fairly evenly spread. So, we expect little domain bias in future model training.
 #+attr_latex: :width 200
 [[file:./.ob-jupyter/8b50fbbee4a1d9a4c730d46e9dca6d5e2495cf26.png]]
+*** PCA projection of Mannodi compositions                        :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+#+caption: Definite Prismatic Topology in the Chemical Sample
+#+attr_latex: :width 160
+[[file:./.ob-jupyter/5902b5ff1d6349e8f36ce1aabaede144c396a274.png]]
 ** Topology of Experimental Composition Space                      :B_frame:
 :PROPERTIES:
 :BEAMER_env: frame
@@ -159,6 +151,11 @@ data sourced from [[cite:&almora-2020-devic-perfor]].
 :PROPERTIES:
 :BEAMER_env: block
 :END:
+label outliers directly.
+
+notice no strong approximation functions, no spin orbit coupling. (PBE accidentally approximates HSE + SOC)
+
+
 #+caption: label:fig:bg_corr HSE and PBE bandgaps vs experimental measures show clearly computation methods need improvement
 #+attr_latex: :width 225
 [[file:./.ob-jupyter/BGcorrob.png]]
