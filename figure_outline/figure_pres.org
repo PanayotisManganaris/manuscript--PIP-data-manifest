@@ -42,7 +42,7 @@
 #+DOWNLOADED: screenshot @ 2022-01-24 19:23:38
 #+caption: label:fig:struct ABX_3 Cubic Perovskite Structure 
 #+attr_latex: :width 100
-[[file:Methodology/2022-01-24_19-23-38_screenshot.png]]
+[[file:Methodology/cubic_perovskite.png]]
 *** Perovskite Chemical Domain                                    :B_block:
 :PROPERTIES:
 :BEAMER_env: block
@@ -72,18 +72,17 @@ reconstruct pie charts to show representation of elements in A/B/X sites
 :PROPERTIES:
 :BEAMER_env: block
 :END:
-
 #+CAPTION: label:tbl:mixing Mix Table
-| cell construct               | trials |
-|------------------------------+--------|
-| 2x2x2 Supercell A-site mixed |    126 |
-| 2x2x2 B & X-site mixed       |      5 |
-| 2x2x2 Supercell B-site mixed |    151 |
-| 3x3x3 Supercell B-site mixed |      5 |
-| 4x4x4 Supercell B-site mixed |     10 |
-| Alternative B-site elements  |     36 |
-| 2x2x2 Pure                   |     90 |
-| 2x2x2 X-site mixed           |    127 |
+| Cell Size and Mix Site | Runs |
+|------------------------+------|
+| 2x2x2 Supercell A-site |  126 |
+| 2x2x2 B & X-site       |    5 |
+| 2x2x2 Supercell B-site |  151 |
+| 3x3x3 Supercell B-site |    5 |
+| 4x4x4 Supercell B-site |   10 |
+| Alternative B-site     |   36 |
+| 2x2x2 Pure             |   90 |
+| 2x2x2 X-site           |  127 |
 *** Sampling in DFT dataset                                       :B_block:
 :PROPERTIES:
 :BEAMER_env: block

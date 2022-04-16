@@ -58,25 +58,12 @@
 #+end_src
 
 * COMMENT interactive
-#+begin_src jupyter-python :session "py" :exports "results" :results "raw drawer"
+#+begin_src jupyter-python :session "py" :exports "none" :results "raw drawer"
   #optionally use interactive qt canvas -- not set up nicely yet.
-  %gui qt
-  %matplotlib qt
-
-  mplcursors.cursor(multiple = True).connect("add", lambda sel: sel.annotation.set_text(
-      both_df.Formula_mannodi.values[sel.target.index]))
-#+end_src
-
-#+RESULTS:
-: <function __main__.<lambda>(sel)>
-* COMMENT inline
-#+begin_src jupyter-python :session "py" :exports "results" :results "raw drawer"
-  %gui inline
   %matplotlib qt
 #+end_src
 
 #+RESULTS:
-
 * COMMENT load data
 #+begin_src jupyter-python :session "py" :exports "both" :results "raw drawer"
   conn = sqlite3.connect("/home/panos/MannodiGroup/data/perovskites.db")
@@ -231,7 +218,7 @@ cutdown almora to definite comparables - exclude conjugate ratios described allo
 #+DOWNLOADED: screenshot @ 2022-01-24 19:23:38
 #+caption: label:fig:struct ABX_3 Cubic Perovskite Structure 
 #+attr_org: :width 200
-[[file:Methodology/2022-01-24_19-23-38_screenshot.png]]
+[[file:Methodology/cubic_perovskite.png]]
 *** Perovskite Chemical Domain                                    :B_block:
 :PROPERTIES:
 :BEAMER_env: block
@@ -269,7 +256,6 @@ cutdown almora to definite comparables - exclude conjugate ratios described allo
 :BEAMER_env: block
 :END:
 #+begin_src jupyter-python :session "py" :exports "results" :results "raw drawer"
-  %matplotlib inline
   fig = plt.figure(figsize=[12,6])
   gs = fig.add_gridspec(2,3)
   ax1 = fig.add_subplot(gs[0, 0])
@@ -422,6 +408,10 @@ dataset is not yet large enough to fully explore it.
   fig, ax1 = plt.subplots(1,1, figsize=(6,6))
 
   plane = biplot([0,1], pdf_pcmodel, pcaxis.components_, dim_labels=comp_label, ax=ax1,)
+
+  mplcursors.cursor(multiple = True).connect("add", lambda sel: sel.annotation.set_text(
+      mannodi_df.Formula.values[sel.target.index]))
+
   plt.show()
 #+end_src
 
