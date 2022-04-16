@@ -196,7 +196,7 @@
 
 \begin{figure*}[h]
 \centering
-\includegraphics[width=0.99\linewidth]{Figure1.pdf}
+\includegraphics[width=0.99\linewidth]{Figure1.png}
 \caption{\label{Fig:outline} 
 (a) Chemical space of ABX$_3$ perovskites. (b) Pie charts showing the amounts of various atomic and molecular species as well as types of mixing in the DFT dataset. (c) Detailed outline of this work.}
 \end{figure*}
@@ -204,7 +204,7 @@
 
 \begin{figure*}[h]
 \centering
-\includegraphics[width=0.99\linewidth]{Figure2.pdf}
+\includegraphics[width=0.99\linewidth]{Figure2.png}
 \caption{\label{Fig:outline} 
 Visualization of DFT data: PBE and HSE properties; lattice constants, decomposition energies, band gaps, photovoltaic figure of merit.}
 \end{figure*}
@@ -220,7 +220,7 @@ Comparison of PBE and HSE computed properties with collected experimental measur
 
 \begin{figure*}[h]
 \centering
-\includegraphics[width=0.99\linewidth]{Figure4.pdf}
+\includegraphics[width=0.99\linewidth]{Figure4.png}
 \caption{\label{Fig:outline} 
 Pearson linear correlation coefficients between 50 composition and elemental descriptors and (a) 6 PBE computed properties, and (b) 4 HSE computed properties.}
 \end{figure*}
@@ -236,7 +236,7 @@ Data visualization / dimensionality reduction / importance of features / trends 
 
 \begin{figure*}[h]
 \centering
-\includegraphics[width=0.99\linewidth]{Figure6.pdf}
+\includegraphics[width=0.99\linewidth]{Figure6.png}
 \caption{\label{Fig:outline} 
 Computed band structure, density of states, and optical absorption spectrum of 6 selected promising mixed composition perovskites.}
 \end{figure*}
@@ -247,18 +247,29 @@ Computed band structure, density of states, and optical absorption spectrum of 6
 
 
 \section*{Methodology}
-
-\subsection*{DFT Details}
-
 % \begin{equation}\label{eqn-0}
 % \begin{multlined}
 % FOM = \sum_{\lambda_i} \alpha(\lambda_i) * I_s(\lambda_i) * (\lambda_{i+1} - \lambda_i) / \sum_{\lambda_i} I_s(\lambda_i) * (\lambda_{i+1} - \lambda_i)
 % \end{multlined}
 % \end{equation}
+\subsection*{Building Perovskite Dataset}
+Firstly, we start with known pure perovskite structures from public data base. 90 pure perovskites are constructed and DFT optimization are applied to get relaxed structures. Based on the pure perovskite structures, we add mixing for A, B, and X sites. To create mixing, for example in B sites, we first select possible B sites mixing elements. Then SQS methods are applied to generate random doping sties for given mixing concentrations. Thus, we constructed 126 A-site mixing samples, 151 B-site mixing samples and 127 X-site mixing samples. All samples are optimized by DFT calculations.
 
-\subsection*{Accessing and Analyzing DFT Data}
+\subsection*{DFT Calculation Details}
+DFT calculations are performed with Vienna Ab initio Simulation Package (VASP) version 5.4. The projector augmented wave (PAW) potentials were used The generalized gradient approximation (GGA) of Perdew, Burke and Ernzerhof (PBE) is used as exchange-correlation energy. The energy cutoff for the plane-wave basis is set to 500 eV. The Brillouin zone was sampled by Monkhorst-Pack k-point mesh, with a reciprocal mesh as 3x3x3. The structural force convergence threhold is set to be 0.025 eV/Å.
 
-\subsection*{Data Visualization Methods}
+\subsection*{Properties Analysis}
+\subsubsection*{Decomposition Energy}
+The decomposition energy is an important property showing the stability of perovskite. To calculate the decomposition energy for ABX3 perovskite, we assume it will decompose to two phases, AX and BX2. Using DFT calculations, we can get the optimized energy of perovskite and its decomposed compounds.
+%equation for decomposition energy
+The equation is presenting the details calculation for decomposition energy. For PBE decomposition energy, we use DFT energy results from PBE level calculation. For HSE decomposition energy, we use the energy from HSE level calculations.
+\subsubsection{Band Gap and Band Structure}
+
+\subsubsection{LOPTICS Calculations and Absorption Spectrum}
+
+\subsubsection{SLME Package}
+
+\subsubsection{Dielectric Constant }
 
 \newpage
 
