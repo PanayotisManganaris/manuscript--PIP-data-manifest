@@ -272,13 +272,13 @@ DFT calculations are performed with Vienna Ab initio Simulation Package (VASP) v
 The decomposition energy is an important property showing the stability of perovskite. To calculate the decomposition energy for ABX3 perovskite, we assume it will decompose to two phases, AX and BX2. Using DFT calculations, we can get the optimized energy of perovskite and its decomposed compounds.
 %equation for decomposition energy
 The equation is presenting the details calculation for decomposition energy. For PBE decomposition energy, we use DFT energy results from PBE level calculation. For HSE decomposition energy, we use the energy from HSE level calculations.
-\subsubsection{Band Gap and Band Structure}
+\subsubsection*{Band Gap and Band Structure}
 
-\subsubsection{LOPTICS Calculations and Absorption Spectrum}
+\subsubsection*{LOPTICS Calculations and Absorption Spectrum}
 
-\subsubsection{SLME Package}
+\subsubsection*{SLME Package}
 
-\subsubsection{Dielectric Constant }
+\subsubsection*{Dielectric Constant }
 
 \newpage
 
@@ -287,13 +287,35 @@ The equation is presenting the details calculation for decomposition energy. For
 
 \section*{Results and discussion}
 
-\subsection*{Visualization of DFT Data / Explanation of Trends}
+\subsection*{Visualization of DFT Data}
 
+Fig 2 shows plots for critical properties of perovskites in the datasets.
+
+\subsubsection*{Lattice constant PBE vs HSE}
+Fig 2(a) presents the lattice parameter comparison of PBE calculation and HSE calculations. Most of the samples have close HSE lattice parameters and PBE lattice parameters. This indicates that the accuracy of PBE on lattice and structure is enough for most of the perovskite samples. Some samples are observed significantly different lattice parameters. By checking the optimized structures, we found that the perovskite structure is largely deformed and no longer keep the octahedral structures. Thus, we removed these 3 points for following analysis.
+\subsubsection*{Decomposition energy vs band gap PBE & HSE}
+Fig 2(b) is showing the PBE band gap compared to the PBE decomposition energy. It presents the diversity of our perovskite dataset. The data sets cover a large range of band gap and decomposition energy. For example, we have perovskite with low decomposition energy (good stability) and suitable band gap value (between 1 eV to 2.5 eV for PBE calculations). And we can also find samples with low stability and large band gap. The distribution of band gap and decomposition energy shows a great diversity of all perovskite samples and indicates that our data set can statistically represent a sufficient perovskite space.
+Fig 2(c) shows the plot of HSE band gaps and HSE decomposition energy. Since we applied HSE calculations for part of the samples, it shows some grouping on low decomposition energy. Compared to PBE plot, more data should be added in high decomposition energy region and suitable band gap region.
+\subsubsection*{Spectroscopic Limited Maximum Efficiency (SLME) vs PBE Band gap}
+Fig 2(d) presents the Spectroscopic Limited Maximum Efficiency (SLME) values related to the PBE band gap. Spectroscopic Limited Maximum Efficiency (SLME) is a very important properties for photovoltaic performance. SLME measures the absorption efficiency of light for the perovskite. As Fig 2(d) showing, a peak around 1.5 eV is obvious. The peak indicates that these samples with 1.5 eV PBE band gap will also have best absorption efficiency as photovoltaic materials. As the band gap increases, the SLME value decreases and eventually goes to zero due to the high band gap values.
 \subsection*{Pearson Correlation Results}
 
 \subsection*{PCA / MDS / T-SNE / Isomap Results}
 
-\subsection*{Band Structure and Absorption Spectrum of Selected Compounds}
+\subsection*{Screening process of all samples in database}
+A high-throughput DFT calculation leads to a sufficient perovskite database. From the database, we can screen over all samples with certain properties and obtain some promising perovskites for further DFT calculations and experiments. A great perovskite material should have low deformation level, strong stability, and proper band gap. To fully screen our database, we will investigate the deviation of cubicity, octahedral factor, tolerance factor, Bartel tolerance factor, decomposition energy, and band gap. The following sections will discuss the details of each aspect.
+\subsubsection*{Deviation of Cubicity}
+For all the compositions we tested in our data set, some of them will have large strain and deformation because of the combination of elements. For these largely deformed samples, they are no longer remain a cubic perovskite structure. In this section, we want to analyst how the structure is apart from the cubic perovskite structure and rule out these largely deformed samples.
+Firstly, we need to define deviation of cubicity. For each perovskite sample, we measure the difference between b, c lattice parameter against a lattice, showing in Equation X. If the lattice deviation of cubicity is larger than 10\%, we will consider this perovskite is no longer remain a cubic perovskite and exclude it.
+Similarly, we also need to consider 3 angles, α, β and γ, to make sure the angle also remain 90 degrees. We calculated the difference of α, β and γ versus 90 degrees, showing in Equation X, and take this as angular deviation of cubicity. We also consider the samples that have more than 5\% of angular deviation of cubicity are not cubic perovskites and exclude them.
+Fig 7 (d) shows the screening results for α angle deviation of cubicity. SI Fig X shows the screening results for b, c lattice and β, γ angle. Most of the samples with non-cubic perovskites structures are organic-inorganic hybrid perovskites. A large part of the excluded samples are A-mixing hybrid perovskites. It indicates that organic ligands in A site sometimes increase the lattice along some direction and make the perovskite deformed.
+\subsubsection*{Octahedral factor, tolerance factor, and Bartel tolerance factor}
+The stability of perovskite can be predicted by using the atom radius of all components. There are 3 types of factors are usually considered, Octahedral factor, tolerance factor, and Bartel tolerance factor. The formula of these three factors are shown in equation XXX. In our screening process, we set the criteria for Octahedral factor as 0.442 – 0.895. The criteria for tolerance factor is set to be 0.813 – 1.107. The criteria for Bartel tolerance factor is set to be less than 4.18.
+Fig 7 (a) shows the Octahedral factor versus decomposition energy plot. Fig 7 (b) shows the tolerance factor versus decomposition energy plot. The tolerance factor shows a trend that as the tolerance factor increases, the decomposition energy decreases. Fig 7 (c) shows the Bartel tolerance factor versus decomposition energy plot. Within the criteria of Bartel tolerance factor, the decomposition energy is rapidly decreased.
+\subsubsection*{Screening Results}
+
+
+
 
 ... \\
 
