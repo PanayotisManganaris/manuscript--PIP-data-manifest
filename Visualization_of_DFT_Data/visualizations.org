@@ -1,21 +1,8 @@
 #+TITLE: Visualizing Perovskite Dataset
 #+AUTHOR: Panayotis Manganaris
 #+EMAIL: pmangana@purdue.edu
-#+PROPERTY: header-args :session aikit :kernel mrg :async yes :pandoc org
-* dependencies
-clone the following repositories into your home "src" directory to use
-this notebook with the most recent tools
-
-https://github.com/PanayotisManganaris/cmcl
-https://github.com/PanayotisManganaris/yogi
-https://github.com/PanayotisManganaris/spyglass
-
-if something does not work due to one of these libraries, be sure to
-pull updates both for the above repositories and for this notebook. If
-the error persists, contact me.
-
-Alternatively, use the curated tool hosted by nanoHUB at
-https://nanohub.org/tools/mrsicmsnotes
+#+PROPERTY: header-args :session mrg :kernel mrg :async yes :pandoc org
+* COMMENT DEV dependencies
 #+begin_src jupyter-python :exports results :results raw drawer
   %load_ext autoreload
   %autoreload 2
@@ -24,20 +11,39 @@ https://nanohub.org/tools/mrsicmsnotes
 #+begin_src jupyter-python :exports results :results raw drawer
   import sys, os
   sys.path.append(os.path.expanduser("~/src/cmcl"))
-  # featurization
-  import cmcl
-  from cmcl import Categories
+  sys.path.append(os.path.expanduser("~/src/yogi")) # for frame transformers...
+  sys.path.append(os.path.expanduser("~/src/spyglass"))
 #+end_src
 
 #+begin_src jupyter-python :exports results :results raw drawer
+  # featurization
+  import cmcl
+  from cmcl import Categories
+  # visualization convenience
+  from spyglass.model_imaging import parityplot
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  from sklearnex import patch_sklearn
+  patch_sklearn()
+#+end_src
+  
+#+begin_src jupyter-python :exports results :results raw drawer
   # data tools
+  import sqlite3
   import pandas as pd
   import numpy as np
-  # preprocessing
-  from sklearn.preprocessing import Normalizer, StandardScaler
-  # visualization
+  # feature engineering
+  from sklearn.impute import SimpleImputer
+  from sklearn.preprocessing import OrdinalEncoder, Normalizer, StandardScaler
+  #transformers
+  #visualization
+  from sklearn import set_config
   import matplotlib.pyplot as plt
   import seaborn as sns
+  # ignore all FutureWarnings -- handling coming in a future version of yogi
+  from warnings import simplefilter
+  simplefilter(action='ignore', category=FutureWarning)
 #+end_src
 
 * load data
@@ -175,12 +181,12 @@ Here, uni-variate distributions over finite bounds on composition
 ratios are explored with respect to the alloy class.
 
 #+begin_src jupyter-python :exports results :results raw drawer
-  nmc = pd.melt(
-      pd.DataFrame(
+  pmc = pd.DataFrame(
           mc.fillna(0).pipe(Normalizer(norm="l1").fit_transform), #normalizing the data by each vector's manhattan length gives proportional quantities
           columns=mc.columns,
           index=mc.index).assign(mix=mix),
-      id_vars="mix").replace(0, np.NaN).dropna() # eliminate the "zeros" (missing values) to focus on the meaningful data
+
+  nmc = pd.melt(pmc, id_vars="mix").replace(0, np.NaN).dropna() # eliminate the "zeros" (missing values) to focus on the meaningful data
 #+end_src
 
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -193,12 +199,13 @@ ratios are explored with respect to the alloy class.
 #+begin_src jupyter-python :exports results :results raw drawer
   dxr = pd.IndexSlice
   some_axes = mp.loc[:, dxr[:, mp.columns.get_level_values(1)[0:4]]] #change these level value slices to focus on different site axes or remove slicing to see all
-  smp = pd.melt(
-      pd.DataFrame(
+
+  pmp = pd.DataFrame(
           some_axes.pipe(StandardScaler().fit_transform), #Z transform scales dimensions so they are comparable
           columns=some_axes.columns,
           index=some_axes.index).assign(mix=mix),
-      id_vars="mix").replace(0, np.NaN).dropna() # eliminate "zeros" (missing values) to focus on the meaningful data
+
+  smp = pd.melt(pmp, id_vars="mix").replace(0, np.NaN).dropna() # eliminate "zeros" (missing values) to focus on the meaningful data
 #+end_src
 
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -217,10 +224,10 @@ Then, if any exist, they will be plotted in detail.
 
 ** targets vs composition
 #+begin_src jupyter-python :exports results :results raw drawer
-  mc_v_targets = pd.concat([my, mc], axis=1).select_dtypes(np.number).fillna(0)
-  pearson = pd.DataFrame(np.corrcoef(mc_v_targets, rowvar=False),
-                         columns=mc_v_targets.columns,
-                         index=mc_v_targets.columns)
+  mcvt = pd.concat([my, pmc], axis=1).select_dtypes(np.number).fillna(0)
+  pearson = pd.DataFrame(np.corrcoef(mcvt, rowvar=False),
+                         columns=mcvt.columns,
+                         index=mcvt.columns)
   subset = pearson.filter(regex=r"PBE|dielc|SLME", axis=0).filter(regex=r"^(?!PBE|HSE|SLME|dielc|PV_FOM)")
   #first filter picks targets, second selects bases
   p = sns.heatmap(subset, vmax=1.0, vmin=-1.0, cmap="seismic")
@@ -230,10 +237,10 @@ Then, if any exist, they will be plotted in detail.
 
 ** targets vs site-averaged properties
 #+begin_src jupyter-python :exports results :results raw drawer
-  mp_v_targets = pd.concat([my, mp], axis=1).select_dtypes(np.number).fillna(0)
-  pearson = pd.DataFrame(np.corrcoef(mp_v_targets, rowvar=False),
-                         columns=mp_v_targets.columns,
-                         index=mp_v_targets.columns)
+  mpvt = pd.concat([my, mp], axis=1).select_dtypes(np.number).fillna(0)
+  pearson = pd.DataFrame(np.corrcoef(mpvt, rowvar=False),
+                         columns=mpvt.columns,
+                         index=mpvt.columns)
   subset = pearson.filter(regex=r"PBE|dielc|SLME", axis=0).filter(regex=r"^(?!PBE|HSE|SLME|dielc|PV_FOM)")
   #first filter picks targets, second selects bases
   p = sns.heatmap(subset, vmax=1.0, vmin=-1.0, cmap="seismic")
@@ -242,8 +249,64 @@ Then, if any exist, they will be plotted in detail.
 #+end_src
 
 ** correlated axes
+#+begin_src jupyter-python :exports results :results raw drawer
+  sns.relplot(x=("X","dens_g/cc"), y="PBE_bg_eV", data=mp_v_targets, hue="mix")
+#+end_src
+
 * Multivariate relations
-unsurprisingly no simple explanations exist. to get a better idea of
-what structures statistical models might be able to find in the
-complete dataset, the structure and effects of many variables at a
-time must be inspected.
+To get a better idea of what structures statistical models might be
+able to find in the complete dataset, the structure and effects of
+many variables at a time must be inspected.
+
+Principal Component Analysis is a method of projecting high
+dimensional data onto a plane defined by the two linear combinations
+of axes that explain as much of the variance as possible.
+
+The method of PCA is the Singular Value Decomposition, a Unitary
+Transform which generalizes the familiar
+eigendecomposition. Essentially, that means PCA will "rotate" the n
+data points in m-D space until you can see them at their widest in 2D.
+
+#+begin_src jupyter-python :exports results :results raw drawer
+def biplot(choose, PCs, transform_matrix):
+    #a much better and more user friendly version of this function will be available in a future version of spyglass. stay tuned.
+    ax = plt.gca()
+    n = transform_matrix.shape[0]
+    xs = PCs.iloc[:,choose[0]]
+    ys = PCs.iloc[:,choose[1]]
+    scalex = 1.0/(xs.max() - xs.min())
+    scaley = 1.0/(ys.max() - ys.min())
+    scatterplane = ax.scatter(xs * scalex, ys * scaley, c = 'k')
+    slice1 = transform_matrix[choose[0]]
+    slice2 = transform_matrix[choose[1]]
+    proj_slice_transposed = np.stack([slice1, slice2], axis=1)
+    xs_weight = proj_slice_transposed[:,0]
+    ys_weight = proj_slice_transposed[:,1]
+    for i in range(n):
+        ax.arrow(0, 0, xs_weight[i], ys_weight[i], color = 'r', alpha = 0.5)
+        ax.text(xs_weight[i] * 1.2, ys_weight[i] * 1.2, df.columns[i], color = 'g', ha = 'center', va = 'center')
+    ax.set_xlabel("PC{}".format(choose[0]))
+    ax.set_ylabel("PC{}".format(choose[1]))
+    ax.grid()
+    return ax
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  df = pmc.select_dtypes(np.number) #change out pmc for other dataframes created above to explore how various dimensions contribute to the data space.
+
+  pcaxis = PCA(n_components = min(df.shape), svd_solver = 'full') #pca can be truncated for speed, but with these dimensions it is not necessary.
+  pcadf = pd.DataFrame(pcaxis.fit_transform(df), index=df.index, columns=['pc_%i' % i for i in range(pcaxis.n_components)])
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  p = biplot(choose=[0,1], PCs=pcadf, transform_matrix=pcaxis.components_)
+  #change the two numbers in the choose list to view other principal components orthogonal to the first two
+#+end_src
+
+At this point it is readily apparent that this dataset is highly
+topological. The data exists on a mostly bounded domain in high
+dimensions, so there is some geometry the features constitute.
+
+Our models will prefer to use this this geometric structure in their
+explaination for why perovskite properties vary, this can be useful
+for accuracy, it can also be a bias-inducing hinderance.
