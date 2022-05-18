@@ -1,0 +1,521 @@
+#+TITLE: Visualizing Perovskite Dataset
+#+AUTHOR: Panayotis Manganaris
+#+EMAIL: pmangana@purdue.edu
+#+PROPERTY: header-args :session mrg :kernel mrg :async yes :pandoc org
+* COMMENT DEV dependencies
+#+begin_src jupyter-python :exports results :results raw drawer
+  %load_ext autoreload
+  %autoreload 2
+#+end_src
+  
+#+begin_src jupyter-python :exports results :results raw drawer
+  import sys, os
+  sys.path.append(os.path.expanduser("~/src/cmcl"))
+  sys.path.append(os.path.expanduser("~/src/yogi")) # for frame transformers...
+  sys.path.append(os.path.expanduser("~/src/spyglass"))
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  # featurization
+  import cmcl
+  from cmcl import Categories
+  # visualization convenience
+  from spyglass.model_imaging import parityplot
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  from sklearnex import patch_sklearn
+  patch_sklearn()
+#+end_src
+  
+#+begin_src jupyter-python :exports results :results raw drawer
+  # data tools
+  import sqlite3
+  import pandas as pd
+  import numpy as np
+  from functools import partial
+  # feature engineering
+  from sklearn.impute import SimpleImputer
+  from sklearn.preprocessing import OrdinalEncoder, Normalizer, StandardScaler
+  #transformers
+  from sklearn.decomposition import PCA
+  from sklearn.manifold import TSNE
+  #visualization
+  from sklearn import set_config
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  # ignore all FutureWarnings -- handling coming in a future version of yogi
+  from warnings import simplefilter
+  simplefilter(action='ignore', category=FutureWarning)
+#+end_src
+
+* load data
+#+begin_src jupyter-python :exports results :results raw drawer
+  sqlbase = """SELECT *
+              FROM mannodi_base"""
+  sqlref = """SELECT *
+              FROM mannodi_ref_elprop"""
+  sqlalmora = """SELECT *
+                 FROM almora_agg"""
+  sqlother = """SELECT *
+                FROM mannodi_ref_emp"""
+  with sqlite3.connect("/home/panos/src/cmcl/cmcl/db/perovskites.db") as conn:
+      mannodi = pd.read_sql(sqlbase, conn, index_col="index")
+      lookup = pd.read_sql(sqlref, conn, index_col='index')
+      almora = pd.read_sql(sqlalmora, conn, index_col='index')
+      other = pd.read_sql(sqlother, conn, index_col='index')
+#+end_src
+
+* Prepare Data and Compute Feature Domains
+** Clean Data and Compute Composition Vectors
+#+begin_src jupyter-python :exports results :results raw drawer
+  lookup = lookup.set_index("Formula")
+  mannodi = mannodi.set_index(["Formula", "sim_cell"], append=True)
+#+end_src
+
+*** compute composition vectors and subset keys
+- drop formula with large lattice parameter difference between HSE and PBE (calculation to be rerun)
+- large structural deformation identified by observing cubicity metric -- well outside of 5-10% spec?
+#+begin_src jupyter-python :exports results :results raw drawer
+  mannodi = mannodi.drop(index=["Rb0.375Cs0.625GeBr3", "RbGeBr1.125Cl1.875", "K0.75Cs0.25GeI3", "K8Sn8I9Cl15"], level=1)
+  maincomp = mannodi.ft.comp().iloc[:, :14:] #compute and subset
+#+end_src
+
+*** auto subset index
+The abx function of the collect accessor is a convenience function for
+grouping the resulting composition constituents by site membership
+#+begin_src jupyter-python :exports results :results raw drawer
+  size = mannodi.index.isin(["2x2x2"], level="sim_cell")
+  maincomp = maincomp.collect.abx()
+  mcg = maincomp.groupby(level=0, axis=1).sum()
+  mvB, mvX, mvA, = mcg.A.isin([1, 8]), mcg.B.isin([1, 8]), mcg.X.isin([3, 24])
+  #subset indexes
+  mfocus = size*mvB*mvA*mvX
+#+end_src
+
+*** apply subsets to domains and targets
+#+begin_src jupyter-python :exports results :results raw drawer
+  mc = maincomp[mfocus]
+  my = mannodi[mfocus]
+#+end_src
+
+*** generate mix categories
+#+begin_src jupyter-python :exports results :results raw drawer
+  mixlog = mc.groupby(level=0, axis=1).count()
+  mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
+  mc = mc.assign(mix=mix).set_index("mix", append=True)
+  my = my.assign(mix=mix).set_index("mix", append=True)
+#+end_src
+
+** Compute Properties Vectors
+the derive_from function performs a three-way N-to-N table join,
+performs a weighted averaging of any resulting redundant entries, and
+finally reshapes the results to be consistent with the outermost
+indices of the accessed data frame. Hence, to obtain the site averaged
+properties, the composition table column labels must be collected
+first, as above.
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  mp = mc.ft.derive_from(lookup, "element", "Formula")
+#+end_src
+
+* Target space
+properties collected from DFT computations using the PBE and HSE
+functionals can be explored here.
+
+These properties are targets for modeling. Ideally, an empirical model
+can be found that fits to the underlying quantum mechanics, thereby
+acting as a surrogate for the DFT function in an active learning
+strategy which can quickly recommend compositions as high-performing
+candidates for further DFT calculation.
+
+The target space is briefly summarized in both uni-variate and bi-variate views
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  plt.style.use('dark_background')
+  p = sns.pairplot(my.filter(regex=r"PBE|dielc").drop("PBE_dbg_eV", axis=1).assign(mix=mix), hue='mix')
+  p.figure.show()
+#+end_src
+
+* Computed Targets vs Experimental Targets
+Here, a selection of experimentally obtained Perovskite bandgaps
+aggregated for twelve different compounds by Almora et.al.
+[[cite:&almora-2020-devic-perfor]] are compared to computed band gaps
+
+Almora measured the bandgap and computed the Power Conversion
+Efficiency of a variety of solar cell devices from published
+measurements of the short circuit current density, open circuit
+voltage, and "Fill Factor." 
+
+** Mannodi vs Almora
+#+begin_src jupyter-python :session "py" :exports "none" :results "raw drawer"
+  union_df = pd.merge(mc, ac, on=ac.columns, how='outer', indicator=False, suffixes=("_mannodi", "_almora")) #get a joined index
+  both_df = union_df[union_df._merge=="both"]
+#+end_src
+
+parity comparisons indicate PBE underestimates bandgaps and HSE
+overestimates bandgaps systematically
+
+#+begin_src jupyter-python :session "py" :exports "results" :results "raw drawer" :file ./.ob-jupyter/BGcorrob.png
+
+#+end_src
+
+*** table
+#+begin_src jupyter-python :session "py" :exports "both" :results "raw drawer"
+  both_df[["Formula_mannodi", "EMP_bg_eV", "PBE_bg_eV", "HSE_bg_eV"]]
+#+end_src
+
+** Mannodi vs Materials Zone
+* Pie Charts
+How datasets under consideration distribute their sample of the alloy axes
+** make and label shares
+#+begin_src jupyter-python :exports results :results raw drawer
+  PBE_comp = mc
+  HSE_comp = mc.reindex(index=my.dropna(how="any", axis=0).index)
+#+end_src
+
+*** alloy shares
+#+begin_src jupyter-python :exports results :results raw drawer
+  PBE_alloy_group = PBE_comp.groupby(level=["mix"])
+  HSE_alloy_group = HSE_comp.groupby(level=["mix"])
+  PBE_alloy_share = PBE_alloy_group.apply(len)
+  PBE_alloy_share.name=""
+  HSE_alloy_share = HSE_alloy_group.apply(len)
+  HSE_alloy_share.name=""
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  mz_as = mz_ag.apply(len)
+  mz_ag = mz.groupby(level=["mix"])
+#+end_src
+
+*** total comp
+#+begin_src jupyter-python :exports results :results raw drawer :pandoc org
+  PBE_total = PBE_comp.count()
+  PBE_total.name = "Total"
+  HSE_total = HSE_comp.count()
+  HSE_total.name = "Total"
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer :pandoc org
+  mz_total = mz.count()
+  mz_total.name="Total"
+#+end_src
+
+*** comp per group
+#+begin_src jupyter-python :exports results :results raw drawer :pandoc org
+  PBE_total_group = PBE_alloy_group.count()
+  HSE_total_group = HSE_alloy_group.count()
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer :pandoc org
+  mz_total_group = mz_ag.count()
+#+end_src
+
+** plot shares
+*** define plot functions
+#+begin_src jupyter-python :exports results :results raw drawer
+  mydpi=192
+  titlefont = {'family': 'Arial', 'color': 'black', 'weight': 'bold', 'size': 32}
+  titlefont2 = {'family': 'Arial', 'weight': 'bold', 'size': 17}
+  labelfont = {'family': 'Arial', 'color': 'black', 'weight': 'normal', 'size': 30}
+  annotfont = {'family': 'Arial', 'color': 'black', 'weight': 'normal', 'size': 20}
+  annotfont2 = {'family': 'Arial', 'color': 'black', 'weight': 'normal', 'size': 14}
+
+  def absolute_value(val, series):
+      a  = np.round(val/100.*series.values.sum(), 0)
+      return int(a)
+
+  def plot_alloy_shares(df):
+      dfav = partial(absolute_value, series = df)
+      fig, ax = plt.subplots(1,1, figsize=(1600/mydpi, 1600/mydpi), dpi=mydpi)
+      ax = df.plot.pie(ax=ax, autopct=dfav, textprops=annotfont)
+      ax.set_title("Alloy Representation", fontdict=titlefont)
+      ax.set_xlabel("", fontdict=labelfont)
+      ax.set_ylabel("")
+      return fig
+
+  def plot_const_shares(df):
+      fig, ax = plt.subplots(1,1, figsize=(1600/mydpi, 1600/mydpi), dpi=mydpi)
+      ax = df.plot.pie(ax=ax, autopct=lambda x: f"{x:.2f}" + "%", pctdistance=0.8, textprops=annotfont)
+      ax.set_title("Constituent Representation", fontdict=titlefont)
+      ax.set_xlabel(ax.get_ylabel(), fontdict=labelfont)
+      ax.set_ylabel("")
+      return fig
+
+  def plot_const_per_alloy(df):
+      fig, axar = plt.subplots(2,2, figsize=(2400/mydpi, 2400/mydpi), dpi=mydpi)
+      axar = df.plot.pie(ax=axar, subplots=True, autopct=lambda x: f"{x:.2f}" + "%",
+                         pctdistance=0.8, radius=1.05, legend=False, textprops=annotfont2)
+      for ax in axar:
+          ax.set_xlabel(ax.get_ylabel(), fontdict=labelfont)
+          ax.set_ylabel("")
+      fig.tight_layout()
+      fig.suptitle("Constituent Representation\nby Alloy Scheme")
+      return fig
+#+end_src
+
+*** PBE
+#+begin_src jupyter-python :exports results :results raw drawer
+  fig1 = plot_alloy_shares(PBE_alloy_share)
+  fig2 = plot_const_shares(PBE_total)
+  fig3 = plot_const_per_alloy(PBE_total_group.T.drop("BandX", axis=1))
+
+  fig1.show()
+  fig2.show()
+  fig3.show()
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  fig1.savefig("./PBE_Alloy_Representations.png", dpi = mydpi, transparent=True)
+  fig2.savefig("./PBE_Constituent_Representations.png", dpi = mydpi, transparent=True)
+  fig3.savefig("./PBE_Constituent_Representations_per_Scheme.png", dpi = mydpi, transparent=True)
+
+  plt.show()
+#+end_src
+
+*** HSE
+#+begin_src jupyter-python :exports results :results raw drawer
+  fig1 = plot_alloy_shares(HSE_alloy_share)
+  fig2 = plot_const_shares(HSE_total)
+  fig3 = plot_const_per_alloy(HSE_total_group.T)
+
+  fig1.show()
+  fig2.show()
+  fig3.show()
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  fig1.savefig("./HSE_Alloy_Representations.png", dpi = mydpi, transparent=True)
+  fig2.savefig("./HSE_Constituent_Representations.png", dpi = mydpi, transparent=True)
+  fig3.savefig("./HSE_Constituent_Representations_per_Scheme.png", dpi = mydpi, transparent=True)
+
+  plt.show()
+#+end_src
+
+*** material zone
+#+begin_src jupyter-python :exports results :results raw drawer
+  fig1 = plot_alloy_shares(mz_as)
+  fig2 = plot_const_shares(mz_total)
+  #fig3 = plot_const_per_alloy(mz_total_group)
+
+  fig1.show()
+  fig2.show()
+  fig3.show()
+#+end_src
+
+* Feature space
+** Composition Distributions
+composition vectors are a set of primary descriptors for the
+Perovskites being examined -- most other meaningful features are at
+least partially derived from them. Another primary descriptor is the
+crystal structure. For now, it is understood that the 496 records
+being examined are all cubic perovskites (within a tolerance). They
+differ firstly in composition and secondly in alloy character. Alloy
+character as a metric is completely encapsulated in the composition
+vectors, but nonetheless represents an important consideration in
+ensuring the model's generality.
+
+It will be a goal of modeling to create regressions that will be able
+to extrapolate targets between the existing alloy character classes.
+(e.g. AandBandX-site alloys).
+
+Here, uni-variate distributions over finite bounds on composition
+ratios are explored with respect to the alloy class.
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  pmc = pd.DataFrame(
+          mc.fillna(0).pipe(Normalizer(norm="l1").fit_transform), #normalizing the data by each vector's manhattan length gives proportional quantities
+          columns=mc.columns,
+          index=mc.index).assign(mix=mix)
+
+  nmc = pd.melt(pmc, id_vars="mix").replace(0, np.NaN).dropna() # eliminate the "zeros" (missing values) to focus on the meaningful data
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  with sns.plotting_context("poster"):
+      p = sns.catplot(x="value", col="element", data=nmc, col_wrap=5, kind="count", hue="mix",
+                      col_order=["Ba", "Ge", "Cl", "Br", "I", "Sn", "Pb", "Cs", "FA", "MA", "Sr", "Ca", "Rb", "K"])
+      (p.set_xticklabels(rotation=90))
+#+end_src
+
+** Site-Averaged Properties Distributions 
+#+begin_src jupyter-python :exports results :results raw drawer
+  dxr = pd.IndexSlice
+  some_axes = mp.loc[:, dxr[:, mp.columns.get_level_values(1)[0:4]]] #change these level value slices to focus on different site axes or remove slicing to see all
+
+  pmp = pd.DataFrame(
+          some_axes.pipe(StandardScaler().fit_transform), #Z transform scales dimensions so they are comparable
+          columns=some_axes.columns,
+          index=some_axes.index).assign(mix=mix)
+
+  smp = pd.melt(pmp, id_vars="mix").replace(0, np.NaN).dropna() # eliminate "zeros" (missing values) to focus on the meaningful data
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  with sns.plotting_context("notebook"):
+      p = sns.displot(x="value", col=smp.iloc[:,2], row="site", data=smp, kind="hist", hue="mix", multiple='stack')
+#+end_src
+
+* Bi-variate relations
+it is unlikely that any of the targets is full explained by a single
+composition or composition derived axis. But there are probably
+relations.
+
+A Pearson correlation map will be produced to check for strong
+relations.
+
+Then, if any exist, they will be plotted in detail.
+
+** targets vs composition
+#+begin_src jupyter-python :exports results :results raw drawer
+  mcvt = pd.concat([my, pmc], axis=1).select_dtypes(np.number).fillna(0)
+  pearson = pd.DataFrame(np.corrcoef(mcvt, rowvar=False),
+                         columns=mcvt.columns,
+                         index=mcvt.columns)
+  subset = pearson.filter(regex=r"PBE|dielc|SLME", axis=0).filter(regex=r"^(?!PBE|HSE|SLME|dielc|PV_FOM)")
+  #first filter picks targets, second selects bases
+  p = sns.heatmap(subset, vmax=1.0, vmin=-1.0, cmap="seismic")
+  p.set_xticklabels(p.get_xticklabels(), rotation=45, horizontalalignment='right')
+  p.figure.show()
+#+end_src
+
+** targets vs site-averaged properties
+#+begin_src jupyter-python :exports results :results raw drawer
+  mpvt = pd.concat([my, mp], axis=1).select_dtypes(np.number).fillna(0)
+  pearson = pd.DataFrame(np.corrcoef(mpvt, rowvar=False),
+                         columns=mpvt.columns,
+                         index=mpvt.columns)
+  subset = pearson.filter(regex=r"PBE|dielc|SLME", axis=0).filter(regex=r"^(?!PBE|HSE|SLME|dielc|PV_FOM)")
+  #first filter picks targets, second selects bases
+  plt.figure(figsize=(13,7))
+  p = sns.heatmap(subset, vmax=1.0, vmin=-1.0, cmap="seismic")
+  p.set_xticklabels(p.get_xticklabels(), rotation=45, horizontalalignment='right')
+  p.figure.show()
+#+end_src
+
+** correlated axes
+#+begin_src jupyter-python :exports results :results raw drawer
+  sns.relplot(x=("B","En"), y="SLME_5um", data=mpvt, hue="mix")
+#+end_src
+
+* Multivariate relations
+To get a better idea of what structures statistical models might be
+able to find in the complete dataset, the structure and effects of
+many variables at a time must be inspected.
+
+Principal Component Analysis is a method of projecting high
+dimensional data onto a plane defined by the two linear combinations
+of axes that explain as much of the variance as possible.
+
+The method of PCA is the Singular Value Decomposition, a Unitary
+Transform which generalizes the familiar
+eigendecomposition. Essentially, that means PCA will "rotate" the n
+data points in m-D space until you can see them at their widest in 2D.
+* PCA
+#+begin_src jupyter-python :exports results :results raw drawer
+def biplot(choose, PCs, transform_matrix):
+    #a much better and more user friendly version of this function will be available in a future version of spyglass. stay tuned.
+    ax = plt.gca()
+    n = transform_matrix.shape[0]
+    xs = PCs.iloc[:,choose[0]]
+    ys = PCs.iloc[:,choose[1]]
+    scalex = 1.0/(xs.max() - xs.min())
+    scaley = 1.0/(ys.max() - ys.min())
+    scatterplane = ax.scatter(xs * scalex, ys * scaley, c = 'k')
+    slice1 = transform_matrix[choose[0]]
+    slice2 = transform_matrix[choose[1]]
+    proj_slice_transposed = np.stack([slice1, slice2], axis=1)
+    xs_weight = proj_slice_transposed[:,0]
+    ys_weight = proj_slice_transposed[:,1]
+    for i in range(n):
+        ax.arrow(0, 0, xs_weight[i], ys_weight[i], color = 'r', alpha = 0.5)
+        ax.text(xs_weight[i] * 1.2, ys_weight[i] * 1.2, df.columns[i], color = 'g', ha = 'center', va = 'center')
+    ax.set_xlabel("PC{}".format(choose[0]))
+    ax.set_ylabel("PC{}".format(choose[1]))
+    ax.grid()
+    return ax
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  df = pmc.select_dtypes(np.number) #change out pmc for other dataframes created above to explore how various dimensions contribute to the data space.
+
+  pcaxis = PCA(n_components = min(df.shape), svd_solver = 'full') #pca can be truncated for speed, but with these dimensions it is not necessary.
+  pcadf = pd.DataFrame(pcaxis.fit_transform(df), index=df.index, columns=['pc_%i' % i for i in range(pcaxis.n_components)])
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  p = biplot(choose=[0,1], PCs=pcadf, transform_matrix=pcaxis.components_)
+  #change the two numbers in the choose list to view other principal components orthogonal to the first two
+#+end_src
+
+At this point it is readily apparent that this dataset is highly
+topological. The data exists on a mostly bounded domain in high
+dimensions, so there is some geometry the features constitute.
+
+Our models will prefer to use this this geometric structure in their
+explaination for why perovskite properties vary, this can be useful
+for accuracy, it can also be a bias-inducing hinderance.
+
+* TSNE projections
+#+begin_src jupyter-python :exports results :results raw drawer
+def tsne_biplot(estimator, data):
+    #a much better and more user friendly version of this function will be available in a future version of spyglass. stay tuned.
+    ax = plt.gca()
+    n = transform_matrix.shape[0]
+    xs = PCs.iloc[:,choose[0]]
+    ys = PCs.iloc[:,choose[1]]
+    scalex = 1.0/(xs.max() - xs.min())
+    scaley = 1.0/(ys.max() - ys.min())
+    scatterplane = ax.scatter(xs * scalex, ys * scaley, c = 'k')
+    slice1 = transform_matrix[choose[0]]
+    slice2 = transform_matrix[choose[1]]
+    proj_slice_transposed = np.stack([slice1, slice2], axis=1)
+    xs_weight = proj_slice_transposed[:,0]
+    ys_weight = proj_slice_transposed[:,1]
+    for i in range(n):
+        ax.arrow(0, 0, xs_weight[i], ys_weight[i], color = 'r', alpha = 0.5)
+        ax.text(xs_weight[i] * 1.2, ys_weight[i] * 1.2, df.columns[i], color = 'g', ha = 'center', va = 'center')
+    ax.set_xlabel("PC{}".format(choose[0]))
+    ax.set_ylabel("PC{}".format(choose[1]))
+    ax.grid()
+    return ax
+#+end_src
+
+#+begin_src jupyter-python :session "py" :exports both :results raw drawer
+  comp_cols = ['K', 'Rb', 'Cs', 'MA', 'FA', 'Ca', 'Sr', 'Ba', 'Ge', 'Sn', 'Pb', 'Cl', 'Br', 'I']
+  perplexities = [5, 30, 50, 100]
+  fig, subplots = plt.subplots(1, len(perplexities)+1, figsize=(15, 3))
+
+  ax = subplots[0]
+  comp_matrix = mannodi.loc[:, comp_cols].dropna().to_numpy().T
+
+  ax.scatter(comp_matrix[0],comp_matrix[1])
+  ax.set_xlabel("# K in unit cell")
+  ax.set_ylabel("# Rb in unit cell")
+
+  for i, perplexity in enumerate(perplexities):
+    ax = subplots[i + 1]
+    tsne = manifold.TSNE(n_components=2, init="pca", learning_rate=200,
+                         random_state=1, perplexity=perplexity)
+    Warped = tsne.fit_transform(StandardScaler().fit_transform(X=comp_matrix.T))
+    ax.set_title("Perplexity={p}".format(p = perplexity))
+    ax.set() # show the color bar and set the aspect ratio square
+    ax.scatter(Warped.T[0], Warped.T[1]) #colorscale should not warped when physical
+    ax.xaxis.set_major_formatter(NullFormatter())
+    ax.yaxis.set_major_formatter(NullFormatter())
+    ax.axis('tight')
+#+end_src
+* MDS
+
+* ISOMAP
+
+* UMAP
+
+* figure ideas
+3. show frequency of investigation over time (as in paper)
+4. show change in band gap with multidimensional ratio shift
+* reference
+** citations
+bibliographystyle:plain
+bibliography:~/org/bibliotex/bibliotex.bib
