@@ -59,12 +59,19 @@
                  FROM almora_agg"""
   sqlother = """SELECT *
                 FROM mannodi_ref_emp"""
-  with sqlite3.connect("/home/panos/src/cmcl/cmcl/db/perovskites.db") as conn:
+
+  #best way to obtain un up-to-date database is to clone cmcl
+
+  with sqlite3.connect(os.path.expanduser("~/src/cmcl/cmcl/db/perovskites.db")) as conn:
       mannodi = pd.read_sql(sqlbase, conn, index_col="index")
       lookup = pd.read_sql(sqlref, conn, index_col='index')
       almora = pd.read_sql(sqlalmora, conn, index_col='index')
       other = pd.read_sql(sqlother, conn, index_col='index')
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 * Prepare Data and Compute Feature Domains
 ** Clean Data and Compute Composition Vectors
