@@ -8,6 +8,10 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
   %load_ext autoreload
   %autoreload 2
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
   
 #+begin_src jupyter-python :exports results :results raw drawer
   import sys, os
@@ -15,6 +19,10 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
   sys.path.append(os.path.expanduser("~/src/yogi")) # for frame transformers...
   sys.path.append(os.path.expanduser("~/src/spyglass"))
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 #+begin_src jupyter-python :exports results :results raw drawer
   # featurization
@@ -27,10 +35,21 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
   from spyglass.spyglass import biplot
 #+end_src
 
+#+RESULTS:
+:results:
+: [INFO] 2022-05-23 11:27:02 - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+: [INFO] 2022-05-23 11:27:02 - NumExpr defaulting to 8 threads.
+:end:
+
 #+begin_src jupyter-python :exports results :results raw drawer
   from sklearnex import patch_sklearn
   patch_sklearn()
 #+end_src
+
+#+RESULTS:
+:results:
+: Intel(R) Extension for Scikit-learn* enabled (https://github.com/intel/scikit-learn-intelex)
+:end:
   
 #+begin_src jupyter-python :exports results :results raw drawer
   # data tools
@@ -53,6 +72,10 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
   simplefilter(action='ignore', category=FutureWarning)
 #+end_src
 
+#+RESULTS:
+:results:
+:end:
+
 * load data
 #+begin_src jupyter-python :exports results :results raw drawer
   sqlbase = """SELECT *
@@ -73,12 +96,20 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
       other = pd.read_sql(sqlother, conn, index_col='index')
 #+end_src
 
+#+RESULTS:
+:results:
+:end:
+
 * Prepare Data and Compute Feature Domains
 ** Clean Data and Compute Composition Vectors
 #+begin_src jupyter-python :exports results :results raw drawer
   lookup = lookup.set_index("Formula")
   mannodi = mannodi.set_index(["Formula", "sim_cell"], append=True)
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 *** compute composition vectors and subset keys
 - drop formula with large lattice parameter difference between HSE and PBE (calculation to be rerun)
@@ -87,6 +118,10 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
   mannodi = mannodi.drop(index=["Rb0.375Cs0.625GeBr3", "RbGeBr1.125Cl1.875", "K0.75Cs0.25GeI3", "K8Sn8I9Cl15"], level=1)
   maincomp = mannodi.ft.comp().iloc[:, :14:] #compute and subset
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 *** auto subset index
 The abx function of the collect accessor is a convenience function for
@@ -99,6 +134,10 @@ grouping the resulting composition constituents by site membership
   #subset indexes
   mfocus = size*mvB*mvA*mvX
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 *** apply subsets to domains and targets
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -167,6 +206,10 @@ The target space is briefly summarized in both uni-variate and bi-variate views
   plt.style.use('default')
   %matplotlib qt
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 #+begin_src jupyter-python :exports results :results raw drawer
   df = my.select_dtypes(np.number).filter(regex=r"PBE|dielc", axis=1).filter(regex=r'^(?!SLME|.*dbg)', axis=1).assign(mix=mix).assign(org=org).dropna()
@@ -406,10 +449,6 @@ ratios are explored with respect to the alloy class.
       sns.move_legend(p, bbox_to_anchor=(0.85, 0.15), loc="center")
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 ** Site-Averaged Properties Distributions 
 #+begin_src jupyter-python :exports results :results raw drawer
   dxr = pd.IndexSlice
@@ -452,10 +491,15 @@ Then, if any exist, they will be plotted in detail.
   pearson = pd.DataFrame(np.corrcoef(mcvt, rowvar=False),
                          columns=mcvt.columns,
                          index=mcvt.columns)
-  subset = pearson.filter(regex=r"HSE", axis=0).filter(regex=r"^(?!PBE|HSE|SLME|dielc|PV_FOM)")
+  subset = pearson.filter(regex=r"HSE", axis=0).filter(regex=r"^(?!.*dbg|.*FormE|.*SLME_100)", axis=0).filter(regex=r"^(?!PBE|HSE|SLME|dielc|PV_FOM)")
   #first filter picks targets, second selects bases
-  p = sns.heatmap(subset, vmax=1.0, vmin=-1.0, cmap="seismic", annot=True, square=True)
-  p.set_xticklabels(p.get_xticklabels(), rotation=45, horizontalalignment='right')
+  p = sns.heatmap(subset, vmax=1.0, vmin=-1.0, cmap="seismic", annot=True, square=True,
+                  annot_kws=dict(fontsize=20),
+                  xticklabels=True,
+                  yticklabels = ['Lattice Constant', 'Band Gap', 'Decomposition Energy'],
+                  cbar_kws=dict(shrink=0.5))
+  p.set_xticklabels(p.get_xticklabels(), rotation=45, horizontalalignment='right', fontdict=dict(fontsize=20))
+  p.set_yticklabels(p.get_yticklabels(), rotation=30, verticalalignment='top', fontdict=dict(fontsize=20))  
   p.figure.show()
 #+end_src
 
@@ -464,7 +508,7 @@ Then, if any exist, they will be plotted in detail.
 :end:
 
 #+begin_src jupyter-python :exports results :results raw drawer
-  p.figure.savefig("./HSE_v_comp_pearson.png", transparent=True)
+  p.figure.savefig("./HSE_v_comp_pearson2.png", transparent=True)
 #+end_src
 
 #+RESULTS:
@@ -499,8 +543,13 @@ Then, if any exist, they will be plotted in detail.
 
 ** correlated axes
 #+begin_src jupyter-python :exports results :results raw drawer
-  sns.relplot(x=("B","En"), y="SLME_5um", data=mpvt, hue="mix")
+  sns.relplot(x=("X","I"), y="HSE_LC", data=mcvt, hue="mix")
 #+end_src
+
+#+RESULTS:
+:results:
+: <seaborn.axisgrid.FacetGrid at 0x7f591880fc50>
+:end:
 
 * Multivariate relations
 To get a better idea of what structures statistical models might be
