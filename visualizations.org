@@ -37,8 +37,8 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
 
 #+RESULTS:
 :results:
-: [INFO] 2022-05-23 11:27:02 - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
-: [INFO] 2022-05-23 11:27:02 - NumExpr defaulting to 8 threads.
+: [INFO] 2022-05-23 13:39:59 - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+: [INFO] 2022-05-23 13:39:59 - NumExpr defaulting to 8 threads.
 :end:
 
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -161,6 +161,22 @@ grouping the resulting composition constituents by site membership
 :results:
 :end:
 
+*** filter out BandX
+#+begin_src jupyter-python :exports results :results raw drawer
+  mixfilter = mix.isin(['A', 'B', 'X', 'pure'])
+  mc = mc[mixfilter]
+  my = my[mixfilter]
+#+end_src
+
+#+RESULTS:
+:results:
+: /opt/miniconda3/envs/mrg/lib/python3.7/site-packages/ipykernel_launcher.py:2: UserWarning: Boolean Series key will be reindexed to match DataFrame index.
+:   
+: /opt/miniconda3/envs/mrg/lib/python3.7/site-packages/ipykernel_launcher.py:3: UserWarning: Boolean Series key will be reindexed to match DataFrame index.
+:   This is separate from the ipykernel package so we can avoid doing imports until
+:end:
+
+
 *** generate Organics Categories
 #+begin_src jupyter-python :exports results :results raw drawer
   organics = my.ft.comp().collect.org()
@@ -270,12 +286,18 @@ overestimates bandgaps systematically
 ** Mannodi vs Materials Zone
 ** Mannodi vs Briones
 * Pie Charts
+TODO: remove labels for convenience
+
 How datasets under consideration distribute their sample of the alloy axes
 ** make and label shares
 #+begin_src jupyter-python :exports results :results raw drawer
   PBE_comp = mc
   HSE_comp = mc.reindex(index=my.dropna(how="any", axis=0).index)
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 *** alloy shares
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -286,6 +308,10 @@ How datasets under consideration distribute their sample of the alloy axes
   HSE_alloy_share = HSE_alloy_group.apply(len)
   HSE_alloy_share.name=""
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 #+begin_src jupyter-python :exports results :results raw drawer
   mz_as = mz_ag.apply(len)
@@ -300,6 +326,10 @@ How datasets under consideration distribute their sample of the alloy axes
   HSE_total.name = "Total"
 #+end_src
 
+#+RESULTS:
+:results:
+:end:
+
 #+begin_src jupyter-python :exports results :results raw drawer :pandoc org
   mz_total = mz.count()
   mz_total.name="Total"
@@ -310,6 +340,10 @@ How datasets under consideration distribute their sample of the alloy axes
   PBE_total_group = PBE_alloy_group.count()
   HSE_total_group = HSE_alloy_group.count()
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 #+begin_src jupyter-python :exports results :results raw drawer :pandoc org
   mz_total_group = mz_ag.count()
@@ -358,16 +392,24 @@ How datasets under consideration distribute their sample of the alloy axes
       return fig
 #+end_src
 
+#+RESULTS:
+:results:
+:end:
+
 *** PBE
 #+begin_src jupyter-python :exports results :results raw drawer
   fig1 = plot_alloy_shares(PBE_alloy_share)
   fig2 = plot_const_shares(PBE_total)
-  fig3 = plot_const_per_alloy(PBE_total_group.T.drop("BandX", axis=1))
+  fig3 = plot_const_per_alloy(PBE_total_group.T) #.drop("BandX", axis=1)
 
   fig1.show()
   fig2.show()
   fig3.show()
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 #+begin_src jupyter-python :exports results :results raw drawer
   fig1.savefig("./PBE_Alloy_Representations.png", dpi = mydpi, transparent=True)
@@ -376,6 +418,10 @@ How datasets under consideration distribute their sample of the alloy axes
 
   plt.show()
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 *** HSE
 #+begin_src jupyter-python :exports results :results raw drawer
