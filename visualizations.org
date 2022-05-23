@@ -194,7 +194,12 @@ The target space is briefly summarized in both uni-variate and bi-variate views
 * Computed Targets vs Experimental Targets
 Here, a selection of experimentally obtained Perovskite bandgaps
 aggregated for twelve different compounds by Almora et.al.
-[[cite:&almora-2020-devic-perfor]] are compared to computed band gaps
+[[cite:&almora-2020-devic-perfor]] are compared to computed band gaps.
+
+Also, a body of over 40,000 experimentally measured bandgaps and PCE
+values collected by [[cite:&jacobsson-2021-open-acces]] are examined.
+
+
 
 Almora measured the bandgap and computed the Power Conversion
 Efficiency of a variety of solar cell devices from published
