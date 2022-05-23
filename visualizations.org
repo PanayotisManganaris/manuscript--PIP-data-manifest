@@ -3,6 +3,7 @@
 #+EMAIL: pmangana@purdue.edu
 #+PROPERTY: header-args :session mrg :kernel mrg :async yes :pandoc org
 * COMMENT DEV dependencies
+todo: when fit/transform methods are piped to dataframes the columns should be automatically serialized and de-serialized
 #+begin_src jupyter-python :exports results :results raw drawer
   %load_ext autoreload
   %autoreload 2
@@ -18,9 +19,12 @@
 #+begin_src jupyter-python :exports results :results raw drawer
   # featurization
   import cmcl
+  import yogi
+  #from yogi.data.frame import *
   from cmcl import Categories
   # visualization convenience
   from spyglass.model_imaging import parityplot
+  from spyglass.spyglass import biplot
 #+end_src
 
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -38,7 +42,7 @@
   from sklearn.impute import SimpleImputer
   from sklearn.preprocessing import OrdinalEncoder, Normalizer, StandardScaler
   #transformers
-  from sklearn.decomposition import PCA
+  from sklearn.decomposition import PCA, TruncatedSVD, KernelPCA
   from sklearn.manifold import TSNE
   #visualization
   from sklearn import set_config
@@ -68,10 +72,6 @@
       almora = pd.read_sql(sqlalmora, conn, index_col='index')
       other = pd.read_sql(sqlother, conn, index_col='index')
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 * Prepare Data and Compute Feature Domains
 ** Clean Data and Compute Composition Vectors
@@ -106,6 +106,10 @@ grouping the resulting composition constituents by site membership
   my = mannodi[mfocus]
 #+end_src
 
+#+RESULTS:
+:results:
+:end:
+
 *** generate mix categories
 #+begin_src jupyter-python :exports results :results raw drawer
   mixlog = mc.groupby(level=0, axis=1).count()
@@ -113,6 +117,23 @@ grouping the resulting composition constituents by site membership
   mc = mc.assign(mix=mix).set_index("mix", append=True)
   my = my.assign(mix=mix).set_index("mix", append=True)
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+*** generate Organics Categories
+#+begin_src jupyter-python :exports results :results raw drawer
+  organics = my.ft.comp().collect.org()
+  orglog = organics.groupby(level=0, axis=1).count()
+  org = orglog.pipe(Categories.logif, condition=lambda x: x==1, default="inorganic", catstring="and")
+  mc = mc.assign(org=org).set_index('org', append=True)
+  my = my.assign(org=org).set_index('org', append=True)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 ** Compute Properties Vectors
 the derive_from function performs a three-way N-to-N table join,
@@ -125,6 +146,10 @@ first, as above.
 #+begin_src jupyter-python :exports results :results raw drawer
   mp = mc.ft.derive_from(lookup, "element", "Formula")
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 * Target space
 properties collected from DFT computations using the PBE and HSE
@@ -139,10 +164,32 @@ candidates for further DFT calculation.
 The target space is briefly summarized in both uni-variate and bi-variate views
 
 #+begin_src jupyter-python :exports results :results raw drawer
-  plt.style.use('dark_background')
-  p = sns.pairplot(my.filter(regex=r"PBE|dielc").drop("PBE_dbg_eV", axis=1).assign(mix=mix), hue='mix')
+  plt.style.use('default')
+  %matplotlib qt
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  df = my.select_dtypes(np.number).filter(regex=r"PBE|dielc", axis=1).filter(regex=r'^(?!SLME|.*dbg)', axis=1).assign(mix=mix).assign(org=org).dropna()
+  p = sns.pairplot(df, hue='mix',
+                   plot_kws=dict(
+                       hue=df['mix'],
+                       #palette="blend:gold,dodgerblue",
+                       style=df['org']
+                   ))
   p.figure.show()
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  p.figure.savefig('./PBE_pairplot.png', transparent=True)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 * Computed Targets vs Experimental Targets
 Here, a selection of experimentally obtained Perovskite bandgaps
@@ -173,6 +220,7 @@ overestimates bandgaps systematically
 #+end_src
 
 ** Mannodi vs Materials Zone
+** Mannodi vs Briones
 * Pie Charts
 How datasets under consideration distribute their sample of the alloy axes
 ** make and label shares
@@ -222,7 +270,7 @@ How datasets under consideration distribute their sample of the alloy axes
 ** plot shares
 *** define plot functions
 #+begin_src jupyter-python :exports results :results raw drawer
-  mydpi=192
+  mydpi=96
   titlefont = {'family': 'Arial', 'color': 'black', 'weight': 'bold', 'size': 32}
   titlefont2 = {'family': 'Arial', 'weight': 'bold', 'size': 17}
   labelfont = {'family': 'Arial', 'color': 'black', 'weight': 'normal', 'size': 30}
@@ -235,7 +283,7 @@ How datasets under consideration distribute their sample of the alloy axes
 
   def plot_alloy_shares(df):
       dfav = partial(absolute_value, series = df)
-      fig, ax = plt.subplots(1,1, figsize=(1600/mydpi, 1600/mydpi), dpi=mydpi)
+      fig, ax = plt.subplots(1,1, figsize=(800/mydpi, 800/mydpi), dpi=mydpi)
       ax = df.plot.pie(ax=ax, autopct=dfav, textprops=annotfont)
       ax.set_title("Alloy Representation", fontdict=titlefont)
       ax.set_xlabel("", fontdict=labelfont)
@@ -243,7 +291,7 @@ How datasets under consideration distribute their sample of the alloy axes
       return fig
 
   def plot_const_shares(df):
-      fig, ax = plt.subplots(1,1, figsize=(1600/mydpi, 1600/mydpi), dpi=mydpi)
+      fig, ax = plt.subplots(1,1, figsize=(800/mydpi, 800/mydpi), dpi=mydpi)
       ax = df.plot.pie(ax=ax, autopct=lambda x: f"{x:.2f}" + "%", pctdistance=0.8, textprops=annotfont)
       ax.set_title("Constituent Representation", fontdict=titlefont)
       ax.set_xlabel(ax.get_ylabel(), fontdict=labelfont)
@@ -251,7 +299,7 @@ How datasets under consideration distribute their sample of the alloy axes
       return fig
 
   def plot_const_per_alloy(df):
-      fig, axar = plt.subplots(2,2, figsize=(2400/mydpi, 2400/mydpi), dpi=mydpi)
+      fig, axar = plt.subplots(2,2, figsize=(1200/mydpi, 1200/mydpi), dpi=mydpi)
       axar = df.plot.pie(ax=axar, subplots=True, autopct=lambda x: f"{x:.2f}" + "%",
                          pctdistance=0.8, radius=1.05, legend=False, textprops=annotfont2)
       for ax in axar:
@@ -332,19 +380,30 @@ ratios are explored with respect to the alloy class.
 
 #+begin_src jupyter-python :exports results :results raw drawer
   pmc = pd.DataFrame(
-          mc.fillna(0).pipe(Normalizer(norm="l1").fit_transform), #normalizing the data by each vector's manhattan length gives proportional quantities
-          columns=mc.columns,
-          index=mc.index).assign(mix=mix)
-
-  nmc = pd.melt(pmc, id_vars="mix").replace(0, np.NaN).dropna() # eliminate the "zeros" (missing values) to focus on the meaningful data
+      mc.fillna(0).pipe(Normalizer(norm="l1").fit_transform),
+      index=mc.index,
+      columns=mc.columns
+  ).assign(mix=mix).assign(org=org)
+  #normalizing the data by each vector's manhattan length gives proportional quantities
+  nmc = pd.melt(pmc, id_vars=["mix", "org"]).replace(0, np.NaN).dropna()
+  # eliminate the "zeros" (missing values) to focus on the meaningful data
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 #+begin_src jupyter-python :exports results :results raw drawer
   with sns.plotting_context("poster"):
       p = sns.catplot(x="value", col="element", data=nmc, col_wrap=5, kind="count", hue="mix",
                       col_order=["Ba", "Ge", "Cl", "Br", "I", "Sn", "Pb", "Cs", "FA", "MA", "Sr", "Ca", "Rb", "K"])
       (p.set_xticklabels(rotation=90))
+      sns.move_legend(p, bbox_to_anchor=(0.85, 0.15), loc="center")
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 ** Site-Averaged Properties Distributions 
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -354,15 +413,23 @@ ratios are explored with respect to the alloy class.
   pmp = pd.DataFrame(
           some_axes.pipe(StandardScaler().fit_transform), #Z transform scales dimensions so they are comparable
           columns=some_axes.columns,
-          index=some_axes.index).assign(mix=mix)
+          index=some_axes.index).assign(mix=mix).assign(org=org)
 
-  smp = pd.melt(pmp, id_vars="mix").replace(0, np.NaN).dropna() # eliminate "zeros" (missing values) to focus on the meaningful data
+  smp = pd.melt(pmp, id_vars=['mix', 'org']).replace(0, np.NaN).dropna() # eliminate "zeros" (missing values) to focus on the meaningful data
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 #+begin_src jupyter-python :exports results :results raw drawer
   with sns.plotting_context("notebook"):
-      p = sns.displot(x="value", col=smp.iloc[:,2], row="site", data=smp, kind="hist", hue="mix", multiple='stack')
+      p = sns.displot(x="value", col=smp.iloc[:,3], row="site", data=smp, kind="hist", hue="mix", multiple='stack')
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 * Bi-variate relations
 it is unlikely that any of the targets is full explained by a single
@@ -380,12 +447,24 @@ Then, if any exist, they will be plotted in detail.
   pearson = pd.DataFrame(np.corrcoef(mcvt, rowvar=False),
                          columns=mcvt.columns,
                          index=mcvt.columns)
-  subset = pearson.filter(regex=r"PBE|dielc|SLME", axis=0).filter(regex=r"^(?!PBE|HSE|SLME|dielc|PV_FOM)")
+  subset = pearson.filter(regex=r"HSE", axis=0).filter(regex=r"^(?!PBE|HSE|SLME|dielc|PV_FOM)")
   #first filter picks targets, second selects bases
-  p = sns.heatmap(subset, vmax=1.0, vmin=-1.0, cmap="seismic")
+  p = sns.heatmap(subset, vmax=1.0, vmin=-1.0, cmap="seismic", annot=True, square=True)
   p.set_xticklabels(p.get_xticklabels(), rotation=45, horizontalalignment='right')
   p.figure.show()
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  p.figure.savefig("./HSE_v_comp_pearson.png", transparent=True)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 ** targets vs site-averaged properties
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -393,13 +472,25 @@ Then, if any exist, they will be plotted in detail.
   pearson = pd.DataFrame(np.corrcoef(mpvt, rowvar=False),
                          columns=mpvt.columns,
                          index=mpvt.columns)
-  subset = pearson.filter(regex=r"PBE|dielc|SLME", axis=0).filter(regex=r"^(?!PBE|HSE|SLME|dielc|PV_FOM)")
+  subset = pearson.filter(regex=r"HSE", axis=0).filter(regex=r"^(?!PBE|HSE|SLME|dielc|PV_FOM)")
   #first filter picks targets, second selects bases
   plt.figure(figsize=(13,7))
-  p = sns.heatmap(subset, vmax=1.0, vmin=-1.0, cmap="seismic")
+  p = sns.heatmap(subset, vmax=1.0, vmin=-1.0, cmap="seismic", annot=True, square=True)
   p.set_xticklabels(p.get_xticklabels(), rotation=45, horizontalalignment='right')
   p.figure.show()
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  p.figure.savefig("./HSE_v_site_prop_pearson.png", transparent=True)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 ** correlated axes
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -415,114 +506,227 @@ Principal Component Analysis is a method of projecting high
 dimensional data onto a plane defined by the two linear combinations
 of axes that explain as much of the variance as possible.
 
-The method of PCA is the Singular Value Decomposition, a Unitary
-Transform which generalizes the familiar
-eigendecomposition. Essentially, that means PCA will "rotate" the n
-data points in m-D space until you can see them at their widest in 2D.
+This PCA is performed by computing the Singular Value Decomposition, a
+Unitary Transform which generalizes the familiar
+eigendecomposition. Essentially, the data cloud is "rotated" in m-D
+space until their widest 2D cross-section is visible.
+
+Various projections are generated
+- the PBE and HSE target spaces are projected independently. No
+  obvious clustering is observed with respect to alloy class.
+- the composition vector space is projected. As expected from the
+  variably histograms, the projection finds the most variability in a
+  linear combination of the X-site axes.
+  - obvious clustering is seen with respect to alloy class, but there
+    is no helpful correlation with a target property.
+- the site-averaged property vector space is more ambiguous. However,
+  some topology is still evident. Again, X-site alloy compounds appear
+  to constitute most of the "spread" in the projection, with other mixed 
+- 
+
+multivariate assemblies:
+#+begin_src jupyter-python :exports results :results none
+  #df = my.filter(regex=r'^(?!HSE|.*dbg|.*PV|SLME)').select_dtypes(np.number) #pbe cascade
+  #df = my.filter(regex=r'^(?!PBE|.*dbg|.*PV|SLME|dielc)').select_dtypes(np.number).dropna() #HSE cascade
+  #df = pmc.select_dtypes(np.number) #rational composition vectors
+  #df = pmp.select_dtypes(np.number) #standardized site-averaged properties or naive subset as defined previously
+  df = mp.select_dtypes(np.number) #site-averaged properties
+  #df = pd.concat([pmc.select_dtypes(np.number), mp.select_dtypes(np.number)], axis=1) #combined rational comp and site properties
+#+end_src
+
+if using a combined assembly, it's likely that further standardization is necessary.
+#+begin_src jupyter-python :exports results :results none
+  df = pd.DataFrame(
+      StandardScaler().fit_transform(df), #optionally standardize. will affect the projection's orientation
+      index=df.index,
+      columns=df.columns
+  )
+#+end_src
 * PCA
-#+begin_src jupyter-python :exports results :results raw drawer
-def biplot(choose, PCs, transform_matrix):
-    #a much better and more user friendly version of this function will be available in a future version of spyglass. stay tuned.
-    ax = plt.gca()
-    n = transform_matrix.shape[0]
-    xs = PCs.iloc[:,choose[0]]
-    ys = PCs.iloc[:,choose[1]]
-    scalex = 1.0/(xs.max() - xs.min())
-    scaley = 1.0/(ys.max() - ys.min())
-    scatterplane = ax.scatter(xs * scalex, ys * scaley, c = 'k')
-    slice1 = transform_matrix[choose[0]]
-    slice2 = transform_matrix[choose[1]]
-    proj_slice_transposed = np.stack([slice1, slice2], axis=1)
-    xs_weight = proj_slice_transposed[:,0]
-    ys_weight = proj_slice_transposed[:,1]
-    for i in range(n):
-        ax.arrow(0, 0, xs_weight[i], ys_weight[i], color = 'r', alpha = 0.5)
-        ax.text(xs_weight[i] * 1.2, ys_weight[i] * 1.2, df.columns[i], color = 'g', ha = 'center', va = 'center')
-    ax.set_xlabel("PC{}".format(choose[0]))
-    ax.set_ylabel("PC{}".format(choose[1]))
-    ax.grid()
-    return ax
+pca can be truncated for speed, but with these dimensions it is not necessary.
+#+begin_src jupyter-python :exports results :results none
+  pcaxis = PCA(n_components = min(df.shape), svd_solver = 'full') 
 #+end_src
 
 #+begin_src jupyter-python :exports results :results raw drawer
-  df = pmc.select_dtypes(np.number) #change out pmc for other dataframes created above to explore how various dimensions contribute to the data space.
-
-  pcaxis = PCA(n_components = min(df.shape), svd_solver = 'full') #pca can be truncated for speed, but with these dimensions it is not necessary.
-  pcadf = pd.DataFrame(pcaxis.fit_transform(df), index=df.index, columns=['pc_%i' % i for i in range(pcaxis.n_components)])
+  p = biplot(pcaxis=pcaxis.fit(df), data=df, x='pc_0', y='pc_1', style='mix', hue='org')
+  sns.move_legend(p, "upper left", bbox_to_anchor=(1, 1))
 #+end_src
+
+#+RESULTS:
+:results:
+: [INFO] 2022-05-22 19:04:21 - sklearn.decomposition.PCA.fit: running accelerated version on CPU
+: [INFO] 2022-05-22 19:04:21 - sklearn.decomposition.PCA.transform: running accelerated version on CPU
+:end:
 
 #+begin_src jupyter-python :exports results :results raw drawer
-  p = biplot(choose=[0,1], PCs=pcadf, transform_matrix=pcaxis.components_)
-  #change the two numbers in the choose list to view other principal components orthogonal to the first two
+  #p.figure.savefig("./comp_ratio_projection.png", transparent=True)
+  p.figure.savefig('./site_avg_properties_projection', transparent=True)
+  #p.figure.savefig("./PBE_cascade.png", transparent=True)
+  #p.figure.savefig("./HSE_cascade.png", transparent=True)
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 At this point it is readily apparent that this dataset is highly
 topological. The data exists on a mostly bounded domain in high
 dimensions, so there is some geometry the features constitute.
 
-Our models will prefer to use this this geometric structure in their
-explaination for why perovskite properties vary, this can be useful
-for accuracy, it can also be a bias-inducing hinderance.
-
-* TSNE projections
+Our models will prefer to use this geometric structure in their
+explanation of Perovskite variation, this can be useful for accuracy,
+it can also be a bias-inducing hindrance.
+* Kernel PCA
 #+begin_src jupyter-python :exports results :results raw drawer
-def tsne_biplot(estimator, data):
-    #a much better and more user friendly version of this function will be available in a future version of spyglass. stay tuned.
-    ax = plt.gca()
-    n = transform_matrix.shape[0]
-    xs = PCs.iloc[:,choose[0]]
-    ys = PCs.iloc[:,choose[1]]
-    scalex = 1.0/(xs.max() - xs.min())
-    scaley = 1.0/(ys.max() - ys.min())
-    scatterplane = ax.scatter(xs * scalex, ys * scaley, c = 'k')
-    slice1 = transform_matrix[choose[0]]
-    slice2 = transform_matrix[choose[1]]
-    proj_slice_transposed = np.stack([slice1, slice2], axis=1)
-    xs_weight = proj_slice_transposed[:,0]
-    ys_weight = proj_slice_transposed[:,1]
-    for i in range(n):
-        ax.arrow(0, 0, xs_weight[i], ys_weight[i], color = 'r', alpha = 0.5)
-        ax.text(xs_weight[i] * 1.2, ys_weight[i] * 1.2, df.columns[i], color = 'g', ha = 'center', va = 'center')
-    ax.set_xlabel("PC{}".format(choose[0]))
-    ax.set_ylabel("PC{}".format(choose[1]))
-    ax.grid()
-    return ax
+  kpcaxis = KernelPCA(n_components=min(df.shape), kernel="rbf", gamma=20, fit_inverse_transform=True, alpha=0.1)
+  kpcaxis.fit(df)
 #+end_src
 
-#+begin_src jupyter-python :session "py" :exports both :results raw drawer
-  comp_cols = ['K', 'Rb', 'Cs', 'MA', 'FA', 'Ca', 'Sr', 'Ba', 'Ge', 'Sn', 'Pb', 'Cl', 'Br', 'I']
-  perplexities = [5, 30, 50, 100]
-  fig, subplots = plt.subplots(1, len(perplexities)+1, figsize=(15, 3))
-
-  ax = subplots[0]
-  comp_matrix = mannodi.loc[:, comp_cols].dropna().to_numpy().T
-
-  ax.scatter(comp_matrix[0],comp_matrix[1])
-  ax.set_xlabel("# K in unit cell")
-  ax.set_ylabel("# Rb in unit cell")
-
-  for i, perplexity in enumerate(perplexities):
-    ax = subplots[i + 1]
-    tsne = manifold.TSNE(n_components=2, init="pca", learning_rate=200,
-                         random_state=1, perplexity=perplexity)
-    Warped = tsne.fit_transform(StandardScaler().fit_transform(X=comp_matrix.T))
-    ax.set_title("Perplexity={p}".format(p = perplexity))
-    ax.set() # show the color bar and set the aspect ratio square
-    ax.scatter(Warped.T[0], Warped.T[1]) #colorscale should not warped when physical
-    ax.xaxis.set_major_formatter(NullFormatter())
-    ax.yaxis.set_major_formatter(NullFormatter())
-    ax.axis('tight')
+  #+RESULTS:
+  :results:
+  : KernelPCA(alpha=0.1, fit_inverse_transform=True, gamma=20, kernel='rbf',
+  :           n_components=14)
+  :end:
+  
+#+begin_src jupyter-python :exports results :results raw drawer
+  kdf = pd.DataFrame(
+      kpcaxis.transform(df),
+      index=df.index,
+      columns=[f'pc_{i}' for i in range(kpcaxis.n_components)]
+  )
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  p = sns.scatterplot(data=kdf, x='pc_0', y='pc_1', style='mix', hue='org')
+  sns.move_legend(p, "upper left", bbox_to_anchor=(1, 1))
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+* Truncated SVD
+A basic method for factor analysis
+#+begin_src jupyter-python :exports results :results none
+  svdaxis = TruncatedSVD(n_components=2, n_iter=15)
+  svdaxis.fit(df)
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  svdf = pd.DataFrame(
+      svdaxis.transform(df),
+      index=df.index,
+      columns=[f'pc_{i}' for i in range(svdaxis.n_components)]
+  )
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  p = sns.scatterplot(data=svdf, x='pc_0', y='pc_1', style='mix', hue='org')
+  p.figure.show()
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+* TSNE
+tSNE method initializes itself using the PCA transformation of the fit
+data. alternative initilizations can be passed manually. Or a random
+initialization may be used.
+
+tSNE metric arg defines method for determining distances between
+instances in the feature array.
+#+begin_src jupyter-python :exports both :results raw drawer
+  perplexities = [5, 10, 15, 25, 30, 35, 50, 100]
+
+  tsnedf_list = []
+  for perp in perplexities:
+      tsne = TSNE(n_components=2, perplexity=perp,
+                  init="pca", metric='hamming',
+                  learning_rate=200, random_state=1)
+      tsnedf = pd.DataFrame(
+          tsne.fit_transform(df),
+          index = df.index,
+          columns = [f'e_{i}' for i in range(tsne.n_components)]
+      ).assign(perplexity=perp)
+
+      tsnedf_list.append(tsnedf)
+
+  tsnedf = pd.concat(tsnedf_list, axis=0)
+#+end_src
+
+#+RESULTS:
+:results:
+#+begin_example
+  [INFO] 2022-05-22 18:48:42 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
+  [INFO] 2022-05-22 18:48:42 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
+  [INFO] 2022-05-22 18:48:43 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
+  [INFO] 2022-05-22 18:48:43 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
+  [INFO] 2022-05-22 18:48:44 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
+  [INFO] 2022-05-22 18:48:44 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
+  [INFO] 2022-05-22 18:48:45 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
+  [INFO] 2022-05-22 18:48:45 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
+  [INFO] 2022-05-22 18:48:46 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
+  [INFO] 2022-05-22 18:48:46 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
+  [INFO] 2022-05-22 18:48:47 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
+  [INFO] 2022-05-22 18:48:47 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
+  [INFO] 2022-05-22 18:48:48 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
+  [INFO] 2022-05-22 18:48:48 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
+  [INFO] 2022-05-22 18:48:50 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
+  [INFO] 2022-05-22 18:48:50 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
+#+end_example
+:end:
+
+#+begin_src jupyter-python :exports both :results raw drawer
+  p = sns.relplot(data=tsnedf, col='perplexity', col_wrap=4, x='e_0', y='e_1', hue='org', style='mix',
+                  height=3.0, aspect=1.0,
+                  facet_kws=dict(sharex=False, sharey=False))
+  p.figure.show()
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+#+begin_src jupyter-python :exports both :results raw drawer
+  p = sns.relplot(data=tsnedf, col='perplexity', col_wrap=4, x='e_0', y='e_1', hue=pd.concat([my.dielc]*8, axis=0), palette='magma', style='mix',
+                  height=3.0, aspect=1.0,
+                  facet_kws=dict(sharex=False, sharey=False))
+  p.figure.show()
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+#+begin_src jupyter-python :exports both :results raw drawer
+  p.figure.savefig('./tsne_comp_DecoE_clusters', transparent=True)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** DecoE clustering
+- hamming distance
+- pca init
+- perplexity 50
+
 * MDS
 
 * ISOMAP
 
 * UMAP
 
-* figure ideas
-3. show frequency of investigation over time (as in paper)
-4. show change in band gap with multidimensional ratio shift
 * reference
-** citations
 bibliographystyle:plain
 bibliography:~/org/bibliotex/bibliotex.bib
