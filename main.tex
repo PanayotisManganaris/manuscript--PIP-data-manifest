@@ -1,8 +1,3 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%This is the LaTeX ARTICLE template for RSC journals
-%Copyright The Royal Society of Chemistry 2016
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \documentclass[twoside,twocolumn,9pt]{article}
 \usepackage{extsizes}
 \usepackage[super,sort&compress,comma]{natbib} 
@@ -210,7 +205,7 @@
       \centering
       \includegraphics[width=0.99\linewidth]{Figure1.png}
       \caption{\label{Fig:outline} 
-        (a) Chemical space of ABX_3 perovskites. (b) Pie charts showing
+        (a) Chemical space of ABX$_3$ perovskites. (b) Pie charts showing
         the amounts of various atomic and molecular species as well as types
         of mixing in the DFT dataset. (c) Detailed outline of this work.
       }
@@ -300,17 +295,21 @@
     mixing samples, 151 B-site mixing samples and 127 X-site mixing
     samples. All samples are optimized by DFT calculations.
 
-    \subsection*{DFT Calculation Details}
-    DFT calculations are performed with Vienna Ab initio Simulation
-    Package (VASP) version 5.4. The projector augmented wave (PAW)
+    \subsection*{Calculation Details}
+    Calculation DFT calculations are performed with Vienna Ab initio Simulation
+    Package (VASP) version 6.1. The projector augmented wave (PAW)
     potentials were used The generalized gradient approximation (GGA) of
-    Perdew, Burke and Ernzerhof (PBE) is used as exchange-correlation
+    Perdew, Burke and Ernzerhof (PBE) and (HSE) is used as exchange-correlation
     energy. The energy cutoff for the plane-wave basis is set to 500
     eV. The Brillouin zone was sampled by Monkhorst-Pack k-point mesh,
-    with a reciprocal mesh as 3x3x3. The structural force convergence
-    threhold is set to be 0.025 eV/Å.
+    with a reciprocal mesh as 4x4x4. The structural force convergence
+    threhold is set to be 0.5 eV/Å.
 
-    \subsection*{Properties Analysis}
+    \subsubsection*{LOPTICS Calculations and Absorption Spectrum}
+
+    \subsubsection*{Dielectric Constant }
+
+    \subsection*{Analysis of DFT Computed Properties}
     \subsubsection*{Decomposition Energy}
     The decomposition energy is an important property showing the
     stability of perovskite. To calculate the decomposition energy for
@@ -322,13 +321,11 @@
     energy. For PBE decomposition energy, we use DFT energy results from
     PBE level calculation. For HSE decomposition energy, we use the energy
     from HSE level calculations.
-    \subsubsection*{Band Gap and Band Structure}
 
-    \subsubsection*{LOPTICS Calculations and Absorption Spectrum}
+    \subsubsection*{Band Gap and Band Structure}
+    figures show computed bangap relations with 
 
     \subsubsection*{SLME Package}
-
-    \subsubsection*{Dielectric Constant }
 
     \newpage
 
@@ -376,9 +373,38 @@
     have best absorption efficiency as photovoltaic materials. As the band
     gap increases, the SLME value decreases and eventually goes to zero
     due to the high band gap values.
-    \subsection*{Pearson Correlation Results}
 
-    \subsection*{PCA / MDS / T-SNE / Isomap Results}
+    \subsection*{Pearson Correlation Results}
+    It is unlikely that any of the targets is fully explained by a single
+    composition or composition derived axis. But there are helpful
+    relations that aid in obtaining a physical understanding.
+
+    as in a Pearson correlation map is produced to check for strong
+    relations. Those that exist, when plotted in detail show some
+    trending, but always with extensive variability. Evidently, an
+    accurate model will have to be formed on a multidimensional
+    domain.
+
+    \subsection*{PCA}
+    Principal Component Analysis is a method of projecting high
+    dimensional data onto a plane defined by the two linear
+    combinations of axes that explain as much of the variance as
+    possible.
+
+    The method of PCA is the Singular Value Decomposition, a Unitary
+    Transform which generalizes the familiar eigendecomposition. PCA
+    will "rotate" the N data points in M-D space until their widest 2D
+    cross section is displayed.
+    
+    At this point it is readily apparent that this dataset is highly
+    topological. The data exists on a mostly bounded domain in high
+    dimensions, so there is some geometry the features constitute.
+
+    Our models will prefer to use this this geometric structure in their
+    explanation for why perovskite properties vary, this can be useful
+    for accuracy, it can also be a bias-inducing hindrance.
+
+    \subsection*{MDS / T-SNE / Isomap Results}
 
     \subsection*{Screening process of all samples in database}
     A high-throughput DFT calculation leads to a sufficient perovskite
@@ -390,49 +416,52 @@
     cubicity, octahedral factor, tolerance factor, Bartel tolerance
     factor, decomposition energy, and band gap. The following sections
     will discuss the details of each aspect.
+
     \subsubsection*{Deviation of Cubicity}
-    For all the compositions we tested in our data set, some of them will
-    have large strain and deformation because of the combination of
-    elements. For these largely deformed samples, they are no longer
-    remain a cubic perovskite structure. In this section, we want to
-    analyst how the structure is apart from the cubic perovskite structure
-    and rule out these largely deformed samples.  Firstly, we need to
-    define deviation of cubicity. For each perovskite sample, we measure
-    the difference between b, c lattice parameter against a lattice,
-    showing in Equation X. If the lattice deviation of cubicity is larger
-    than 10\%, we will consider this perovskite is no longer remain a
-    cubic perovskite and exclude it.  Similarly, we also need to consider
-    3 angles, \alpha, \beta and \gamma, to make sure the angle also remain 90
-    degrees. We calculated the difference of \alpha, \beta and \gamma versus 90 degrees,
-    showing in Equation X, and take this as angular deviation of
-    cubicity. We also consider the samples that have more than 5\% of
-    angular deviation of cubicity are not cubic perovskites and exclude
-    them.  Fig 7 (d) shows the screening results for \alpha angle deviation of
-    cubicity. SI Fig X shows the screening results for b, c lattice and \beta,
-    \gamma angle. Most of the samples with non-cubic perovskites structures are
-    organic-inorganic hybrid perovskites. A large part of the excluded
-    samples are A-mixing hybrid perovskites. It indicates that organic
-    ligands in A site sometimes increase the lattice along some direction
-    and make the perovskite deformed.
+    For all the compositions we tested in our data set, some of them
+    will have large strain and deformation because of the combination
+    of elements. For these largely deformed samples, they are no
+    longer remain a cubic perovskite structure. In this section, we
+    want to analyst how the structure is apart from the cubic
+    perovskite structure and rule out these largely deformed samples.
+    Firstly, we need to define deviation of cubicity. For each
+    perovskite sample, we measure the difference between b, c lattice
+    parameter against a lattice, showing in Equation X. If the lattice
+    deviation of cubicity is larger than 10\%, we will consider this
+    perovskite is no longer remain a cubic perovskite and exclude it.
+    Similarly, we also need to consider 3 angles, \alpha, \beta and
+    \gamma, to make sure the angle also remain 90 degrees. We
+    calculated the difference of \alpha, \beta and \gamma versus 90
+    degrees, showing in Equation X, and take this as angular deviation
+    of cubicity. We also consider the samples that have more than 5\%
+    of angular deviation of cubicity are not cubic perovskites and
+    exclude them.  Fig 7 (d) shows the screening results for \alpha
+    angle deviation of cubicity. SI Fig X shows the screening results
+    for b, c lattice and \beta, \gamma angle. Most of the samples with
+    non-cubic perovskites structures are organic-inorganic hybrid
+    perovskites. A large part of the excluded samples are A-mixing
+    hybrid perovskites. It indicates that organic ligands in A site
+    sometimes increase the lattice along some direction and make the
+    perovskite deformed.
+
     \subsubsection*{Octahedral factor, tolerance factor, and Bartel tolerance factor}
-    The stability of perovskite can be predicted by using the atom radius
-    of all components. There are 3 types of factors are usually
-    considered, Octahedral factor, tolerance factor, and Bartel tolerance
-    factor. The formula of these three factors are shown in equation
-    XXX. In our screening process, we set the criteria for Octahedral
-    factor as 0.442 – 0.895. The criteria for tolerance factor is set to
-    be 0.813 – 1.107. The criteria for Bartel tolerance factor is set to
-    be less than 4.18.  Fig 7 (a) shows the Octahedral factor versus
-    decomposition energy plot. Fig 7 (b) shows the tolerance factor versus
-    decomposition energy plot. The tolerance factor shows a trend that as
-    the tolerance factor increases, the decomposition energy
-    decreases. Fig 7 (c) shows the Bartel tolerance factor versus
-    decomposition energy plot. Within the criteria of Bartel tolerance
-    factor, the decomposition energy is rapidly decreased.
+    The stability of perovskite can be predicted by using the atom
+    radius of all components. There are 3 types of factors are usually
+    considered, Octahedral factor, tolerance factor, and Bartel
+    tolerance factor. The formula of these three factors are shown in
+    equation XXX. In our screening process, we set the criteria for
+    Octahedral factor as 0.442 – 0.895. The criteria for tolerance
+    factor is set to be 0.813 – 1.107. The criteria for Bartel
+    tolerance factor is set to be less than 4.18.  Fig 7 (a) shows the
+    Octahedral factor versus decomposition energy plot. Fig 7 (b)
+    shows the tolerance factor versus decomposition energy plot. The
+    tolerance factor shows a trend that as the tolerance factor
+    increases, the decomposition energy decreases. Fig 7 (c) shows the
+    Bartel tolerance factor versus decomposition energy plot. Within
+    the criteria of Bartel tolerance factor, the decomposition energy
+    is rapidly decreased.
+
     \subsubsection*{Screening Results}
-
-
-
 
     ... \\
 
