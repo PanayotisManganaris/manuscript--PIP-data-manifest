@@ -176,7 +176,6 @@ grouping the resulting composition constituents by site membership
 :   This is separate from the ipykernel package so we can avoid doing imports until
 :end:
 
-
 *** generate Organics Categories
 #+begin_src jupyter-python :exports results :results raw drawer
   organics = my.ft.comp().collect.org()
@@ -313,11 +312,6 @@ How datasets under consideration distribute their sample of the alloy axes
 :results:
 :end:
 
-#+begin_src jupyter-python :exports results :results raw drawer
-  mz_as = mz_ag.apply(len)
-  mz_ag = mz.groupby(level=["mix"])
-#+end_src
-
 *** total comp
 #+begin_src jupyter-python :exports results :results raw drawer :pandoc org
   PBE_total = PBE_comp.count()
@@ -330,11 +324,6 @@ How datasets under consideration distribute their sample of the alloy axes
 :results:
 :end:
 
-#+begin_src jupyter-python :exports results :results raw drawer :pandoc org
-  mz_total = mz.count()
-  mz_total.name="Total"
-#+end_src
-
 *** comp per group
 #+begin_src jupyter-python :exports results :results raw drawer :pandoc org
   PBE_total_group = PBE_alloy_group.count()
@@ -344,10 +333,6 @@ How datasets under consideration distribute their sample of the alloy axes
 #+RESULTS:
 :results:
 :end:
-
-#+begin_src jupyter-python :exports results :results raw drawer :pandoc org
-  mz_total_group = mz_ag.count()
-#+end_src
 
 ** plot shares
 *** define plot functions
@@ -442,17 +427,6 @@ How datasets under consideration distribute their sample of the alloy axes
   plt.show()
 #+end_src
 
-*** material zone
-#+begin_src jupyter-python :exports results :results raw drawer
-  fig1 = plot_alloy_shares(mz_as)
-  fig2 = plot_const_shares(mz_total)
-  #fig3 = plot_const_per_alloy(mz_total_group)
-
-  fig1.show()
-  fig2.show()
-  fig3.show()
-#+end_src
-
 * Feature space
 ** Composition Distributions
 composition vectors are a set of primary descriptors for the
@@ -520,7 +494,6 @@ ratios are explored with respect to the alloy class.
 #+RESULTS:
 :results:
 :end:
-
 * Bi-variate relations
 it is unlikely that any of the targets is full explained by a single
 composition or composition derived axis. But there are probably
