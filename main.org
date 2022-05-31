@@ -1,0 +1,402 @@
+#+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
+#+options: author:nil broken-links:nil c:nil creator:nil
+#+options: d:(not "LOGBOOK") date:t e:t email:nil f:t inline:t num:nil
+#+options: p:nil pri:nil prop:nil stat:t tags:t tasks:nil tex:t
+#+options: timestamp:t title:nil toc:nil todo:t |:t
+#+title: A High-Throughput Computational Dataset of Halide Perovskite Alloys\textsuperscript{\dag}
+#+AUTHOR: Panayotis Manganaris
+#+language: en
+#+select_tags: export
+#+exclude_tags: noexport
+#+creator: Emacs 29.0.50 (Org mode 9.5.3)
+#+cite_export:
+#+latex_class: article
+#+latex_class_options: [twoside, twocolumn, 9pt]
+#+latex_header:
+#+latex_header_extra:
+#+description:
+#+keywords:
+#+subtitle:
+#+latex_compiler: pdflatex
+#+date: \today
+#+SETUPFILE: ~/org/rsc_header.org
+#+INCLUDE: ./frontmatter.org
+
+#+begin_export latex
+\footnotetext{\textsuperscript{a}School of Materials Engineering, Purdue University, West Lafayette, IN 47907, USA; E-mail: amannodi@purdue.edu}
+\footnotetext{\textsuperscript{\dag}Electronic Supplementary Information (ESI) available: https://www.github.com/PanayotisManganaris/REPO_TODO. See DOI: 00.0000/00000000.}
+#+end_export
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:CLASS: unnumbered
+:END:
+
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{Fig:outline} 
+#+CAPTION: (a) Chemical space of ABX_3 perovskites. (b) Pie charts showing
+#+CAPTION: the amounts of various atomic and molecular species as well as types
+#+CAPTION: of mixing in the DFT dataset. (c) Detailed outline of this work.
+[[file:Figure1.png]]
+
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{Fig:pairplots} 
+#+CAPTION: Visualization of DFT data: PBE and HSE properties; lattice constants,
+#+CAPTION: decomposition energies, band gaps, photovoltaic figure of merit.
+[[file:Figure2.png]]
+
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{fig:chemspace_uni}
+#+CAPTION: Plots showing number of Perovskites representing a constituent at a
+#+CAPTION: certain atomic fraction of a complete Perovskite.
+[[file:variability_of_composition_vectors.png]]
+
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{Fig:lot_comp} 
+#+CAPTION: Comparison of PBE and HSE computed properties with collected
+#+CAPTION: experimental measurements: (a) pseudo-cubic lattice constants, and
+#+CAPTION: (b) electronic band gaps.
+[[file:Figure3.pdf]]
+
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{Fig:pearson} 
+#+CAPTION: Pearson linear correlation coefficients between 50 composition and
+#+CAPTION: elemental descriptors and (a) 6 PBE computed properties, and (b) 4
+#+CAPTION: HSE computed properties.
+[[file:Figure4.png]]
+
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{Fig:pca}
+#+CAPTION: PCA
+[[file:comp_ratio_projection_annot.png]]
+
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{Fig:cuts}
+#+CAPTION: placing limits on properties governing viability results in a subset
+#+CAPTION: of the dataset potentially suitable for physical testing.
+[[file:Figure6.png]]
+
+* Methodology
+:PROPERTIES:
+:CUSTOM_ID: methodology
+:CLASS: unnumbered
+:END:
+** Building Perovskite Dataset
+:PROPERTIES:
+:CUSTOM_ID: building-perovskite-dataset
+:CLASS: unnumbered
+:END:
+The dataset we report is based on standard cubic phase ABX_3
+Perovskite structures obtained from public databases. Fourteen common
+Perovskite constituents are selected to form our Halide Perovskite
+composition space \ref{Fig:outline}. Five constituents including
+Methylammonium and Formamidinium cations represent the possible A-site
+occupants. Six heavy metal elements represent the possible B-site
+occupants. Three halides represent the possible X-site occupants.
+
+Each computational run is performed using a 2x2x2 supercell, this
+allows A and B site doping to be modeled in discrete 1/8^th fractions
+of the total site occupancy, and it allows X site doping to be modeled
+in 1/24^th fractions. At this level, it is appropriate to call these
+Perovskites alloys.
+
+The pure (non-alloyed) possibilities are exhaustively sampled using 90
+Perovskites. Based on these pure Perovskite structures, we mix
+candidates for A, B, and X sites systematically. The alloy space sees
+combinatorial scaling and must be sparsely sampled.
+
+To create alloys, for example in B sites, we first select possible B
+sites mixing elements.  Then SQS methods are applied to generate
+random alloys for given mixing concentrations. Thus, we constructed
+126 A-site mixing samples, 151 B-site mixing samples and 127 X-site
+mixing samples. The resulting structures are optimized using a DFT
+variable-cell relaxation.
+
+here the tense must be consistent.
+
+** Calculation Details
+:PROPERTIES:
+:CUSTOM_ID: calculation-details
+:CLASS: unnumbered
+:END:
+Calculation DFT calculations are performed with Vienna Ab initio
+Simulation Package (VASP) version 6.1. The projector augmented wave
+(PAW) potentials were used The generalized gradient approximation (GGA)
+of Perdew, Burke and Ernzerhof (PBE) and (HSE) is used as
+exchange-correlation energy. The energy cutoff for the plane-wave basis
+is set to 500 eV. The Brillouin zone was sampled by Monkhorst-Pack
+k-point mesh, with a reciprocal mesh as 4x4x4. The structural force
+convergence threshold is set to be 0.5 eV/Å.
+
+*** LOPTICS Calculations and Absorption Spectrum
+:PROPERTIES:
+:CUSTOM_ID: loptics-calculations-and-absorption-spectrum
+:CLASS: unnumbered
+:END:
+** Analysis of DFT Computed Properties
+:PROPERTIES:
+:CUSTOM_ID: analysis-of-dft-computed-properties
+:CLASS: unnumbered
+:END:
+*** Decomposition Energy
+:PROPERTIES:
+:CUSTOM_ID: decomposition-energy
+:CLASS: unnumbered
+:END:
+The decomposition energy is an important property showing the stability
+of perovskite. To calculate the decomposition energy for ABX3
+perovskite, we assume it will decompose to two phases, AX and BX2. Using
+DFT calculations, we can get the optimized energy of perovskite and its
+decomposed compounds.
+
+The equation is presenting the details calculation for decomposition
+energy. For PBE decomposition energy, we use DFT energy results from PBE
+level calculation. For HSE decomposition energy, we use the energy from
+HSE level calculations.
+
+*** Band Gap and Band Structure
+:PROPERTIES:
+:CUSTOM_ID: band-gap-and-band-structure
+:CLASS: unnumbered
+:END:
+*** SLME Package
+:PROPERTIES:
+:CUSTOM_ID: slme-package
+:CLASS: unnumbered
+:END:
+* Results and discussion
+:PROPERTIES:
+:CUSTOM_ID: results-and-discussion
+:CLASS: unnumbered
+:END:
+** Visualization of DFT Data
+:PROPERTIES:
+:CUSTOM_ID: visualization-of-dft-data
+:CLASS: unnumbered
+:END:
+shows plots for critical properties of perovskites in the datasets.
+
+*** Lattice constant PBE vs HSE
+:PROPERTIES:
+:CUSTOM_ID: lattice-constant-pbe-vs-hse
+:CLASS: unnumbered
+:END:
+Fig 2(a) presents the lattice parameter comparison of PBE calculation
+and HSE calculations. Most of the samples have close HSE lattice
+parameters and PBE lattice parameters. This indicates that the accuracy
+of PBE on lattice and structure is enough for most of the perovskite
+samples. Some samples are observed significantly different lattice
+parameters. By checking the optimized structures, we found that the
+perovskite structure is largely deformed and no longer keep the
+octahedral structures. Thus, we removed these 3 points for following
+analysis.
+
+*** Decomposition energy vs band gap PBE and HSE
+:PROPERTIES:
+:CUSTOM_ID: decomposition-energy-vs-band-gap-pbe-and-hse
+:CLASS: unnumbered
+:END:
+Fig 2(b) is showing the PBE band gap compared to the PBE decomposition
+energy. It presents the diversity of our perovskite dataset. The data
+sets cover a large range of band gap and decomposition energy. For
+example, we have perovskite with low decomposition energy (good
+stability) and suitable band gap value (between 1 eV to 2.5 eV for PBE
+calculations). And we can also find samples with low stability and large
+band gap. The distribution of band gap and decomposition energy shows a
+great diversity of all perovskite samples and indicates that our data
+set can statistically represent a sufficient perovskite space. Fig 2(c)
+shows the plot of HSE band gaps and HSE decomposition energy. Since we
+applied HSE calculations for part of the samples, it shows some grouping
+on low decomposition energy. Compared to PBE plot, more data should be
+added in high decomposition energy region and suitable band gap region.
+
+*** Spectroscopic Limited Maximum Efficiency (SLME) vs PBE Band gap
+:PROPERTIES:
+:CUSTOM_ID: spectroscopic-limited-maximum-efficiency-slme-vs-pbe-band-gap
+:CLASS: unnumbered
+:END:
+Fig 2(d) presents the Spectroscopic Limited Maximum Efficiency (SLME)
+values related to the PBE band gap. Spectroscopic Limited Maximum
+Efficiency (SLME) is a very important properties for photovoltaic
+performance. SLME measures the absorption efficiency of light for the
+perovskite. As Fig 2(d) showing, a peak around 1.5 eV is obvious. The
+peak indicates that these samples with 1.5 eV PBE band gap will also
+have best absorption efficiency as photovoltaic materials. As the band
+gap increases, the SLME value decreases and eventually goes to zero due
+to the high band gap values.
+
+** Pearson Correlation Results
+:PROPERTIES:
+:CUSTOM_ID: pearson-correlation-results
+:CLASS: unnumbered
+:END:
+It is unlikely that any of the targets is fully explained by a single
+composition or composition derived axis. But there are helpful relations
+that aid in obtaining a physical understanding.
+
+as in a Pearson correlation map is produced to check for strong
+relations. Those that exist, when plotted in detail show some trending,
+but always with extensive variability. Evidently, an accurate model will
+have to be formed on a multidimensional domain.
+
+** PCA
+:PROPERTIES:
+:CUSTOM_ID: pca
+:CLASS: unnumbered
+:END:
+Principal Component Analysis is a method of projecting high dimensional
+data onto a plane defined by the two linear combinations of axes that
+explain as much of the variance as possible.
+
+The method of PCA is the Singular Value Decomposition, a Unitary
+Transform which generalizes the familiar eigendecomposition. PCA will
+"rotate" the N data points in M-D space until their widest 2D cross
+section is displayed.
+
+At this point it is readily apparent that this dataset is highly
+topological. The data exists on a mostly bounded domain in high
+dimensions, so there is some geometry the features constitute.
+
+Our models will prefer to use this this geometric structure in their
+explanation for why perovskite properties vary, this can be useful for
+accuracy, it can also be a bias-inducing hindrance.
+
+** MDS / T-SNE / Isomap Results
+:PROPERTIES:
+:CUSTOM_ID: mds-t-sne-isomap-results
+:CLASS: unnumbered
+:END:
+** DONE Screening process of all samples in database
+:PROPERTIES:
+:CUSTOM_ID: screening-process-of-all-samples-in-database
+:CLASS: unnumbered
+:END:
+:STATUSLOG:
+- State "DONE"       from              [2022-05-24 Tue 13:31]
+:END:
+The synthetic Perovskite data is collected for sampling variety and
+without regard for each compound's viability. In order to extract
+potentially high-performing candidates for synthesis, we screen all
+samples according to certain constraints, thereby obtaining some
+Perovskites worth examining with higher Level of Theory DFT
+calculations and future physical experiments by brute force. This
+dataset can only confidently claim to sample cubic phase
+perovskites. Therefore, a promising candidate should have low
+deformation. Additionally, a lower decomposition energy combined with
+a maximal SLME value would be ideal for physical testing. Our
+screening procedure consists of cutting based on the Deviation from
+Cubicity metric, octahedral factor, Goldschmidt tolerance factor,
+Bartel tolerance factor, decomposition energy, and band gap -- acting
+as less stringent proxy for the SLME spectrum. The following sections
+will discuss the details of each constraint.
+
+*** Deviation from Cubicity
+:PROPERTIES:
+:CUSTOM_ID: deviation-of-cubicity
+:CLASS: unnumbered
+:END:
+For all the compositions we tested in our data set, some of them will
+have large strain and deformation because of the combination of
+elements. For these largely deformed samples, they are no longer remain
+a cubic perovskite structure. In this section, we want to analyst how
+the structure is apart from the cubic perovskite structure and rule out
+these largely deformed samples. Firstly, we need to define deviation of
+cubicity. For each perovskite sample, we measure the difference between
+b, c lattice parameter against a lattice, showing in Equation X. If the
+lattice deviation of cubicity is larger than 10%, we will consider this
+perovskite is no longer remain a cubic perovskite and exclude it.
+Similarly, we also need to consider 3 angles, , and , to make sure the
+angle also remain 90 degrees. We calculated the difference of , and
+versus 90 degrees, showing in Equation X, and take this as angular
+deviation of cubicity. We also consider the samples that have more than
+5% of angular deviation of cubicity are not cubic perovskites and
+exclude them. Fig 7 (d) shows the screening results for angle deviation
+of cubicity. SI Fig X shows the screening results for b, c lattice and ,
+angle. Most of the samples with non-cubic perovskites structures are
+organic-inorganic hybrid perovskites. A large part of the excluded
+samples are A-mixing hybrid perovskites. It indicates that organic
+ligands in A site sometimes increase the lattice along some direction
+and make the perovskite deformed.
+
+*** Octahedral factor, tolerance factor, and Bartel tolerance factor
+:PROPERTIES:
+:CUSTOM_ID: octahedral-factor-tolerance-factor-and-bartel-tolerance-factor
+:CLASS: unnumbered
+:END:
+The stability of perovskite can be predicted by using the atom radius of
+all components. There are 3 types of factors are usually considered,
+Octahedral factor, tolerance factor, and Bartel tolerance factor. The
+formula of these three factors are shown in equation XXX. In our
+screening process, we set the criteria for Octahedral factor as 0.442 --
+0.895. The criteria for tolerance factor is set to be 0.813 -- 1.107.
+The criteria for Bartel tolerance factor is set to be less than 4.18.
+Fig 7 (a) shows the Octahedral factor versus decomposition energy plot.
+Fig 7 (b) shows the tolerance factor versus decomposition energy plot.
+The tolerance factor shows a trend that as the tolerance factor
+increases, the decomposition energy decreases. Fig 7 (c) shows the
+Bartel tolerance factor versus decomposition energy plot. Within the
+criteria of Bartel tolerance factor, the decomposition energy is rapidly
+decreased.
+
+*** Screening Results
+:PROPERTIES:
+:CUSTOM_ID: screening-results
+:CLASS: unnumbered
+:END:
+...\\
+
+* Perspective and Future Work
+:PROPERTIES:
+:CUSTOM_ID: perspective-and-future-work
+:CLASS: unnumbered
+:END:
+The design of this dataset is uniquely suited to the exploration of
+alloying effects on Perovskite properties. The combinatorial space of
+possible alloys has been sparsely but systematically sampled along
+four primary alloy schemes. This sample space affords the opportunity
+for a QM/ML surrogate model to form the basis of an active learning
+strategy which can begin selecting potentially high performing
+multi-site alloy candidates based on the current sample set.
+
+The principal challenge will be in extracting features useful as
+performance features. The basic feature sets examined here are highly
+correlated, but nonetheless show promise as basic screening criterion.
+
+Modeling pipelines capable of predicting Perovskite decomposition
+energy will likely be very achievable using a transductive and
+invertible equivalent of the tSNE algorithm, potentially SONG.
+
+* Conclusions
+:PROPERTIES:
+:CUSTOM_ID: conclusions
+:CLASS: unnumbered
+:END:
+...\\
+
+* Conflicts of interest
+:PROPERTIES:
+:CUSTOM_ID: conflicts-of-interest
+:CLASS: unnumbered
+:END:
+There are no conflicts to declare.
+
+* Acknowledgements
+:PROPERTIES:
+:CUSTOM_ID: acknowledgements
+:CLASS: unnumbered
+:END:
+Extensive discussions with and scientific feedback from UC San Diego
+researchers David Fenning and Rishi Kumar and Argonne National Lab
+scientist Maria Chan are acknowledged. This work was performed at Purdue
+University, under startup account F.10023800.05.002 from the Materials
+Engineering department. This research used resources of the National
+Energy Research Scientific Computing Center, the Laboratory Computing
+Resource Center at Argonne National Laboratory, and the RCAC clusters at
+Purdue.
+
+* Supplemental Material
+:PROPERTIES:
+:CUSTOM_ID: SI
+:CLASS: unnumbered
+:END:
