@@ -11,7 +11,7 @@
 #+creator: Emacs 29.0.50 (Org mode 9.5.3)
 #+cite_export:
 #+latex_class: article
-#+latex_class_options: [twoside, twocolumn, 9pt]
+#+latex_class_options: [twoside, twocolumn, 9pt, draft]
 #+latex_header:
 #+latex_header_extra:
 #+description:
@@ -33,49 +33,20 @@
 :CLASS: unnumbered
 :END:
 
-#+ATTR_LATEX: :float multicolumn
+#+ATTR_LATEX: :float multicolumn :options h
 #+CAPTION: \label{Fig:outline} 
 #+CAPTION: (a) Chemical space of ABX_3 perovskites. (b) Pie charts showing
 #+CAPTION: the amounts of various atomic and molecular species as well as types
 #+CAPTION: of mixing in the DFT dataset. (c) Detailed outline of this work.
 [[file:Figure1.png]]
 
-#+ATTR_LATEX: :float multicolumn
-#+CAPTION: \label{Fig:pairplots} 
-#+CAPTION: Visualization of DFT data: PBE and HSE properties; lattice constants,
-#+CAPTION: decomposition energies, band gaps, photovoltaic figure of merit.
-[[file:Figure2.png]]
+** Coverage of Chemical Space
 
 #+ATTR_LATEX: :float multicolumn
 #+CAPTION: \label{fig:chemspace_uni}
 #+CAPTION: Plots showing number of Perovskites representing a constituent at a
 #+CAPTION: certain atomic fraction of a complete Perovskite.
 [[file:variability_of_composition_vectors.png]]
-
-#+ATTR_LATEX: :float multicolumn
-#+CAPTION: \label{Fig:lot_comp} 
-#+CAPTION: Comparison of PBE and HSE computed properties with collected
-#+CAPTION: experimental measurements: (a) pseudo-cubic lattice constants, and
-#+CAPTION: (b) electronic band gaps.
-[[file:Figure3.pdf]]
-
-#+ATTR_LATEX: :float multicolumn
-#+CAPTION: \label{Fig:pearson} 
-#+CAPTION: Pearson linear correlation coefficients between 50 composition and
-#+CAPTION: elemental descriptors and (a) 6 PBE computed properties, and (b) 4
-#+CAPTION: HSE computed properties.
-[[file:Figure4.png]]
-
-#+ATTR_LATEX: :float multicolumn
-#+CAPTION: \label{Fig:pca}
-#+CAPTION: PCA
-[[file:comp_ratio_projection_annot.png]]
-
-#+ATTR_LATEX: :float multicolumn
-#+CAPTION: \label{Fig:cuts}
-#+CAPTION: placing limits on properties governing viability results in a subset
-#+CAPTION: of the dataset potentially suitable for physical testing.
-[[file:Figure6.png]]
 
 * Methodology
 :PROPERTIES:
@@ -113,8 +84,6 @@ random alloys for given mixing concentrations. Thus, we constructed
 mixing samples. The resulting structures are optimized using a DFT
 variable-cell relaxation.
 
-here the tense must be consistent.
-
 ** Calculation Details
 :PROPERTIES:
 :CUSTOM_ID: calculation-details
@@ -134,6 +103,7 @@ convergence threshold is set to be 0.5 eV/Å.
 :CUSTOM_ID: loptics-calculations-and-absorption-spectrum
 :CLASS: unnumbered
 :END:
+
 ** Analysis of DFT Computed Properties
 :PROPERTIES:
 :CUSTOM_ID: analysis-of-dft-computed-properties
@@ -144,16 +114,16 @@ convergence threshold is set to be 0.5 eV/Å.
 :CUSTOM_ID: decomposition-energy
 :CLASS: unnumbered
 :END:
-The decomposition energy is an important property showing the stability
-of perovskite. To calculate the decomposition energy for ABX3
-perovskite, we assume it will decompose to two phases, AX and BX2. Using
-DFT calculations, we can get the optimized energy of perovskite and its
-decomposed compounds.
+The decomposition energy indicates the stability of a compound. To
+calculate the decomposition energy for ABX3 perovskite, we assume it
+will decompose to two phases, AX and BX2. Using DFT calculations, we
+can get the optimized energy of a perovskite and that of its
+constituent phases.
 
 The equation is presenting the details calculation for decomposition
-energy. For PBE decomposition energy, we use DFT energy results from PBE
-level calculation. For HSE decomposition energy, we use the energy from
-HSE level calculations.
+energy. For PBE decomposition energy, we use DFT energy results from
+PBE level calculation. For HSE decomposition energy, we use the energy
+from HSE level calculations.
 
 *** Band Gap and Band Structure
 :PROPERTIES:
@@ -175,7 +145,11 @@ HSE level calculations.
 :CUSTOM_ID: visualization-of-dft-data
 :CLASS: unnumbered
 :END:
-shows plots for critical properties of perovskites in the datasets.
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{Fig:pairplots} 
+#+CAPTION: DFT Results: PBE and HSE properties; lattice constants,
+#+CAPTION: decomposition energies, band gaps, photovoltaic figure of merit.
+[[file:Figure2.png]]
 
 *** Lattice constant PBE vs HSE
 :PROPERTIES:
@@ -191,6 +165,15 @@ parameters. By checking the optimized structures, we found that the
 perovskite structure is largely deformed and no longer keep the
 octahedral structures. Thus, we removed these 3 points for following
 analysis.
+
+*** Lattice constant vs experimental data
+
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{Fig:lot_comp} 
+#+CAPTION: Comparison of PBE and HSE computed properties with collected
+#+CAPTION: experimental measurements: (a) pseudo-cubic lattice constants, and
+#+CAPTION: (b) electronic band gaps.
+[[file:Figure3.pdf]]
 
 *** Decomposition energy vs band gap PBE and HSE
 :PROPERTIES:
@@ -231,6 +214,14 @@ to the high band gap values.
 :CUSTOM_ID: pearson-correlation-results
 :CLASS: unnumbered
 :END:
+
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{Fig:pearson} 
+#+CAPTION: Pearson linear correlation coefficients between 50 composition and
+#+CAPTION: elemental descriptors and (a) 6 PBE computed properties, and (b) 4
+#+CAPTION: HSE computed properties.
+[[file:Figure4.png]]
+
 It is unlikely that any of the targets is fully explained by a single
 composition or composition derived axis. But there are helpful relations
 that aid in obtaining a physical understanding.
@@ -245,6 +236,11 @@ have to be formed on a multidimensional domain.
 :CUSTOM_ID: pca
 :CLASS: unnumbered
 :END:
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{Fig:pca}
+#+CAPTION: PCA
+[[file:comp_ratio_projection_annot.png]]
+
 Principal Component Analysis is a method of projecting high dimensional
 data onto a plane defined by the two linear combinations of axes that
 explain as much of the variance as possible.
@@ -290,6 +286,12 @@ Cubicity metric, octahedral factor, Goldschmidt tolerance factor,
 Bartel tolerance factor, decomposition energy, and band gap -- acting
 as less stringent proxy for the SLME spectrum. The following sections
 will discuss the details of each constraint.
+
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{Fig:cuts}
+#+CAPTION: placing limits on properties governing viability results in a subset
+#+CAPTION: of the dataset potentially suitable for physical testing.
+[[file:Figure6.png]]
 
 *** Deviation from Cubicity
 :PROPERTIES:

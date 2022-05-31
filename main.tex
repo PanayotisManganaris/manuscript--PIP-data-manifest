@@ -1,6 +1,6 @@
-% Created 2022-05-31 Tue 10:56
+% Created 2022-05-31 Tue 16:29
 % Intended LaTeX compiler: pdflatex
-\documentclass[twoside, twocolumn, 9pt]{article}
+\documentclass[twoside, twocolumn, 9pt, draft]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
@@ -196,18 +196,15 @@ and improved performance across many optoelectronic applications.
 \footnotetext{\textsuperscript{\dag}Electronic Supplementary Information (ESI) available: https://www.github.com/PanayotisManganaris/REPO_TODO. See DOI: 00.0000/00000000.}
 
 \section*{Introduction}
-\label{sec:org15b8991}
+\label{sec:org57d5735}
 \begin{figure*}
 \centering
-\includegraphics[width=.9\linewidth]{Figure1.png}
+\includegraphics[h,width=.9\linewidth]{Figure1.png}
 \caption{\label{Fig:outline} (a) Chemical space of ABX\textsubscript{3} perovskites. (b) Pie charts showing the amounts of various atomic and molecular species as well as types of mixing in the DFT dataset. (c) Detailed outline of this work.}
 \end{figure*}
 
-\begin{figure*}
-\centering
-\includegraphics[width=.9\linewidth]{Figure2.png}
-\caption{\label{Fig:pairplots} Visualization of DFT data: PBE and HSE properties; lattice constants, decomposition energies, band gaps, photovoltaic figure of merit.}
-\end{figure*}
+\subsection*{Coverage of Chemical Space}
+\label{sec:org389cc7c}
 
 \begin{figure*}
 \centering
@@ -215,34 +212,10 @@ and improved performance across many optoelectronic applications.
 \caption{\label{fig:chemspace_uni} Plots showing number of Perovskites representing a constituent at a certain atomic fraction of a complete Perovskite.}
 \end{figure*}
 
-\begin{figure*}
-\centering
-\includegraphics[width=.9\linewidth]{Figure3.pdf}
-\caption{\label{Fig:lot_comp} Comparison of PBE and HSE computed properties with collected experimental measurements: (a) pseudo-cubic lattice constants, and (b) electronic band gaps.}
-\end{figure*}
-
-\begin{figure*}
-\centering
-\includegraphics[width=.9\linewidth]{Figure4.png}
-\caption{\label{Fig:pearson} Pearson linear correlation coefficients between 50 composition and elemental descriptors and (a) 6 PBE computed properties, and (b) 4 HSE computed properties.}
-\end{figure*}
-
-\begin{figure*}
-\centering
-\includegraphics[width=.9\linewidth]{comp_ratio_projection_annot.png}
-\caption{\label{Fig:pca} PCA}
-\end{figure*}
-
-\begin{figure*}
-\centering
-\includegraphics[width=.9\linewidth]{Figure6.png}
-\caption{\label{Fig:cuts} placing limits on properties governing viability results in a subset of the dataset potentially suitable for physical testing.}
-\end{figure*}
-
 \section*{Methodology}
-\label{sec:org820a64c}
+\label{sec:org9c7faa5}
 \subsection*{Building Perovskite Dataset}
-\label{sec:org9138815}
+\label{sec:orgd191b18}
 The dataset we report is based on standard cubic phase ABX\textsubscript{3}
 Perovskite structures obtained from public databases. Fourteen common
 Perovskite constituents are selected to form our Halide Perovskite
@@ -269,10 +242,8 @@ random alloys for given mixing concentrations. Thus, we constructed
 mixing samples. The resulting structures are optimized using a DFT
 variable-cell relaxation.
 
-here the tense must be consistent.
-
 \subsection*{Calculation Details}
-\label{sec:orge1cb780}
+\label{sec:orgc4131c4}
 Calculation DFT calculations are performed with Vienna Ab initio
 Simulation Package (VASP) version 6.1. The projector augmented wave
 (PAW) potentials were used The generalized gradient approximation (GGA)
@@ -283,34 +254,39 @@ k-point mesh, with a reciprocal mesh as 4x4x4. The structural force
 convergence threshold is set to be 0.5 eV/Å.
 
 \subsubsection*{LOPTICS Calculations and Absorption Spectrum}
-\label{sec:orgc8c510e}
+\label{sec:org25fda3f}
+
 \subsection*{Analysis of DFT Computed Properties}
-\label{sec:org596440e}
+\label{sec:org0228c71}
 \subsubsection*{Decomposition Energy}
-\label{sec:org51b0e9e}
-The decomposition energy is an important property showing the stability
-of perovskite. To calculate the decomposition energy for ABX3
-perovskite, we assume it will decompose to two phases, AX and BX2. Using
-DFT calculations, we can get the optimized energy of perovskite and its
-decomposed compounds.
+\label{sec:org64e32fb}
+The decomposition energy indicates the stability of a compound. To
+calculate the decomposition energy for ABX3 perovskite, we assume it
+will decompose to two phases, AX and BX2. Using DFT calculations, we
+can get the optimized energy of a perovskite and that of its
+constituent phases.
 
 The equation is presenting the details calculation for decomposition
-energy. For PBE decomposition energy, we use DFT energy results from PBE
-level calculation. For HSE decomposition energy, we use the energy from
-HSE level calculations.
+energy. For PBE decomposition energy, we use DFT energy results from
+PBE level calculation. For HSE decomposition energy, we use the energy
+from HSE level calculations.
 
 \subsubsection*{Band Gap and Band Structure}
-\label{sec:org37c15e7}
+\label{sec:orga87f3df}
 \subsubsection*{SLME Package}
-\label{sec:org5217761}
+\label{sec:orgc534696}
 \section*{Results and discussion}
-\label{sec:orgf4e0cec}
+\label{sec:orgecc3d86}
 \subsection*{Visualization of DFT Data}
-\label{sec:orgdeffe46}
-shows plots for critical properties of perovskites in the datasets.
+\label{sec:org9f320a6}
+\begin{figure*}
+\centering
+\includegraphics[width=.9\linewidth]{Figure2.png}
+\caption{\label{Fig:pairplots} DFT Results: PBE and HSE properties; lattice constants, decomposition energies, band gaps, photovoltaic figure of merit.}
+\end{figure*}
 
 \subsubsection*{Lattice constant PBE vs HSE}
-\label{sec:orgf1baed9}
+\label{sec:org6cf34d5}
 Fig 2(a) presents the lattice parameter comparison of PBE calculation
 and HSE calculations. Most of the samples have close HSE lattice
 parameters and PBE lattice parameters. This indicates that the accuracy
@@ -321,8 +297,17 @@ perovskite structure is largely deformed and no longer keep the
 octahedral structures. Thus, we removed these 3 points for following
 analysis.
 
+\subsubsection*{Lattice constant vs experimental data}
+\label{sec:orgb553c8e}
+
+\begin{figure*}
+\centering
+\includegraphics[width=.9\linewidth]{Figure3.pdf}
+\caption{\label{Fig:lot_comp} Comparison of PBE and HSE computed properties with collected experimental measurements: (a) pseudo-cubic lattice constants, and (b) electronic band gaps.}
+\end{figure*}
+
 \subsubsection*{Decomposition energy vs band gap PBE and HSE}
-\label{sec:orgb7e8c3f}
+\label{sec:org340eaa3}
 Fig 2(b) is showing the PBE band gap compared to the PBE decomposition
 energy. It presents the diversity of our perovskite dataset. The data
 sets cover a large range of band gap and decomposition energy. For
@@ -338,7 +323,7 @@ on low decomposition energy. Compared to PBE plot, more data should be
 added in high decomposition energy region and suitable band gap region.
 
 \subsubsection*{Spectroscopic Limited Maximum Efficiency (SLME) vs PBE Band gap}
-\label{sec:orga1e1e13}
+\label{sec:org06af9a9}
 Fig 2(d) presents the Spectroscopic Limited Maximum Efficiency (SLME)
 values related to the PBE band gap. Spectroscopic Limited Maximum
 Efficiency (SLME) is a very important properties for photovoltaic
@@ -350,7 +335,13 @@ gap increases, the SLME value decreases and eventually goes to zero due
 to the high band gap values.
 
 \subsection*{Pearson Correlation Results}
-\label{sec:org9be1f9e}
+\label{sec:orgf67ab25}
+\begin{figure*}
+\centering
+\includegraphics[width=.9\linewidth]{Figure4.png}
+\caption{\label{Fig:pearson} Pearson linear correlation coefficients between 50 composition and elemental descriptors and (a) 6 PBE computed properties, and (b) 4 HSE computed properties.}
+\end{figure*}
+
 It is unlikely that any of the targets is fully explained by a single
 composition or composition derived axis. But there are helpful relations
 that aid in obtaining a physical understanding.
@@ -361,7 +352,13 @@ but always with extensive variability. Evidently, an accurate model will
 have to be formed on a multidimensional domain.
 
 \subsection*{PCA}
-\label{sec:org646df04}
+\label{sec:org37e32c8}
+\begin{figure*}
+\centering
+\includegraphics[width=.9\linewidth]{comp_ratio_projection_annot.png}
+\caption{\label{Fig:pca} PCA}
+\end{figure*}
+
 Principal Component Analysis is a method of projecting high dimensional
 data onto a plane defined by the two linear combinations of axes that
 explain as much of the variance as possible.
@@ -380,10 +377,10 @@ explanation for why perovskite properties vary, this can be useful for
 accuracy, it can also be a bias-inducing hindrance.
 
 \subsection*{MDS / T-SNE / Isomap Results}
-\label{sec:orgffd61a8}
+\label{sec:orgf26c1a6}
 
 \section*{Perspective and Future Work}
-\label{sec:org439aa30}
+\label{sec:orga3ca34e}
 The design of this dataset is uniquely suited to the exploration of
 alloying effects on Perovskite properties. The combinatorial space of
 possible alloys has been sparsely but systematically sampled along
@@ -401,15 +398,15 @@ energy will likely be very achievable using a transductive and
 invertible equivalent of the tSNE algorithm, potentially SONG.
 
 \section*{Conclusions}
-\label{sec:orgce19aa4}
+\label{sec:org58e46c9}
 \ldots{}\\
 
 \section*{Conflicts of interest}
-\label{sec:org7f70a6a}
+\label{sec:orga973e6a}
 There are no conflicts to declare.
 
 \section*{Acknowledgements}
-\label{sec:org146fcf9}
+\label{sec:orgf1d8133}
 Extensive discussions with and scientific feedback from UC San Diego
 researchers David Fenning and Rishi Kumar and Argonne National Lab
 scientist Maria Chan are acknowledged. This work was performed at Purdue
@@ -420,5 +417,5 @@ Resource Center at Argonne National Laboratory, and the RCAC clusters at
 Purdue.
 
 \section*{Supplemental Material}
-\label{sec:org6d166bc}
+\label{sec:org9251e48}
 \end{document}
