@@ -249,41 +249,6 @@ The target space is briefly summarized in both uni-variate and bi-variate views
 :results:
 :end:
 
-* Computed Targets vs Experimental Targets
-Here, a selection of experimentally obtained Perovskite bandgaps
-aggregated for twelve different compounds by Almora et.al.
-[[cite:&almora-2020-devic-perfor]] are compared to computed band gaps.
-
-Also, a body of over 40,000 experimentally measured bandgaps and PCE
-values collected by [[cite:&jacobsson-2021-open-acces]] are examined.
-
-
-
-Almora measured the bandgap and computed the Power Conversion
-Efficiency of a variety of solar cell devices from published
-measurements of the short circuit current density, open circuit
-voltage, and "Fill Factor." 
-
-** Mannodi vs Almora
-#+begin_src jupyter-python :session "py" :exports "none" :results "raw drawer"
-  union_df = pd.merge(mc, ac, on=ac.columns, how='outer', indicator=False, suffixes=("_mannodi", "_almora")) #get a joined index
-  both_df = union_df[union_df._merge=="both"]
-#+end_src
-
-parity comparisons indicate PBE underestimates bandgaps and HSE
-overestimates bandgaps systematically
-
-#+begin_src jupyter-python :session "py" :exports "results" :results "raw drawer" :file ./.ob-jupyter/BGcorrob.png
-
-#+end_src
-
-*** table
-#+begin_src jupyter-python :session "py" :exports "both" :results "raw drawer"
-  both_df[["Formula_mannodi", "EMP_bg_eV", "PBE_bg_eV", "HSE_bg_eV"]]
-#+end_src
-
-** Mannodi vs Materials Zone
-** Mannodi vs Briones
 * Pie Charts
 TODO: remove labels for convenience
 

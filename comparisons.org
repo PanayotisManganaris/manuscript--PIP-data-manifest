@@ -1,0 +1,458 @@
+#+TITLE: Comparing Perovskite Datasets
+#+AUTHOR: Panayotis Manganaris
+#+EMAIL: pmangana@purdue.edu
+#+PROPERTY: header-args :session mrg2 :kernel mrg :async yes :pandoc org
+* COMMENT DEV dependencies
+todo: when fit/transform methods are piped to dataframes the columns should be automatically serialized and de-serialized
+#+begin_src jupyter-python :exports results :results raw drawer
+  %load_ext autoreload
+  %autoreload 2
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+  
+#+begin_src jupyter-python :exports results :results raw drawer
+  import sys, os
+  sys.path.append(os.path.expanduser("~/src/cmcl"))
+  sys.path.append(os.path.expanduser("~/src/yogi")) # for frame transformers...
+  sys.path.append(os.path.expanduser("~/src/spyglass"))
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  # featurization
+  import cmcl
+  import yogi
+  #from yogi.data.frame import *
+  from cmcl import Categories
+  # visualization convenience
+  from spyglass.model_imaging import parityplot
+  from spyglass.spyglass import biplot
+#+end_src
+
+#+RESULTS:
+:results:
+: [INFO] 2022-06-02 09:33:08 - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+: [INFO] 2022-06-02 09:33:08 - NumExpr defaulting to 8 threads.
+:end:
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  from sklearnex import patch_sklearn
+  patch_sklearn()
+#+end_src
+
+#+RESULTS:
+:results:
+: Intel(R) Extension for Scikit-learn* enabled (https://github.com/intel/scikit-learn-intelex)
+:end:
+  
+#+begin_src jupyter-python :exports results :results raw drawer
+  # data tools
+  import sqlite3
+  import pandas as pd
+  import numpy as np
+  from functools import partial
+  # feature engineering
+  from sklearn.impute import SimpleImputer
+  from sklearn.preprocessing import OrdinalEncoder, Normalizer, StandardScaler
+  #transformers
+  from sklearn.decomposition import PCA, TruncatedSVD, KernelPCA
+  from sklearn.manifold import TSNE
+  #visualization
+  from sklearn import set_config
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  # ignore all FutureWarnings -- handling coming in a future version of yogi
+  from warnings import simplefilter
+  simplefilter(action='ignore', category=FutureWarning)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+* load data
+** load from database
+#+begin_src jupyter-python :exports results :results raw drawer
+  mannodi_pbe_q = """SELECT *
+                     FROM mannodi_pbe"""
+  almora_q = """SELECT *
+                FROM almora"""
+  mannodi_hse_q = """SELECT *
+                     FROM mannodi_hse"""
+  sqlref = """SELECT *
+              FROM mannodi_ref_elprop"""
+  sqlother = """SELECT *
+                FROM mannodi_ref_emp"""
+  with sqlite3.connect(os.path.expanduser("~/src/cmcl/cmcl/db/perovskites.db")) as conn:
+      mannodi_pbe = pd.read_sql(mannodi_pbe_q, conn, index_col="index")
+      mannodi_hse = pd.read_sql(mannodi_hse_q, conn, index_col="index")
+      almora = pd.read_sql(almora_q, conn, index_col='index')
+      lookup = pd.read_sql(sqlref, conn, index_col='index')
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** load LCs
+#+begin_src jupyter-python :exports results :results raw drawer
+  briones = pd.read_csv('./briones_LC.csv')
+  jiang = pd.read_csv('./jiang_LC.csv')
+  hybrids = pd.read_csv('./hybrids.csv')
+  lattice = pd.concat([briones, jiang, hybrids], axis=0)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+* Clean Data
+going forward we just assume that almora consists primarily of cubic phase crystals
+** subset based on deviation from cubicity
+#+begin_src jupyter-python :exports results :results raw drawer
+  exclude = ["Rb0.375Cs0.625GeBr3", "RbGeBr1.125Cl1.875", "K0.75Cs0.25GeI3", "K8Sn8I9Cl15"]
+  mannodi_pbe = mannodi_pbe[~mannodi_pbe.Formula.isin(exclude)]
+  mannodi_hse = mannodi_hse[~mannodi_hse.Formula.isin(exclude)]
+  almora = almora[~almora.Formula.isin(exclude)]
+  lattice = lattice[~lattice.Formula.isin(exclude)]
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+** adjust formula strings for comparability
+#+begin_src jupyter-python :exports results :results raw drawer
+  lattice.Formula = lattice.Formula.str.replace("NH4","AM")
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** Comp vs Experimental directivity
+- trim and aggregate band gaps in datasets with band gaps
+- trim and aggregate LC in datasets with LCs
+#+begin_src jupyter-python :exports results :results raw drawer
+  #use index to transfer categorical variables through aggregation
+  almora = almora.groupby('Formula').agg({'bg_eV':'median', #make an auto dict...
+                                          'efficiency':'median',
+                                          'citation':'first'}).reset_index()
+  almora = almora.reindex(index=almora['bg_eV'].dropna().index)
+
+  mannodi_pbe = mannodi_pbe.groupby('Formula').agg({'bg_eV':'median',
+                                                    'efficiency':'median',
+                                                    'LC_A':'median',
+                                                    'sim_cell':'first',
+                                                    'bgType':'first'}).reset_index()
+  mannodi_pbe = mannodi_pbe.reindex(index=mannodi_pbe['bg_eV'].dropna().index)
+
+  mannodi_hse = mannodi_hse.groupby('Formula').agg({'bg_eV':'median',
+                                                    'LC_A':'median',
+                                                    'sim_cell':'first',
+                                                    'bgType':'first'}).reset_index()
+  mannodi_hse = mannodi_hse.reindex(index=mannodi_hse['bg_eV'].dropna().index)
+
+  lattice = lattice.groupby('Formula').agg({'LC_A':'median'}).reset_index()
+  lattice = lattice.reindex(index=lattice['LC_A'].dropna().index)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+* Compute Composition Vectors
+#+begin_src jupyter-python :exports results :results raw drawer
+  pc = mannodi_pbe.ft.comp().iloc[:, :14:]
+  hc = mannodi_hse.ft.comp().iloc[:, :14:]
+  ac = almora.ft.comp()
+  lc = lattice.ft.comp()
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** subset index
+lattice records are ready
+*** cut down pbe by comp total
+#+begin_src jupyter-python :exports results :results raw drawer
+  size = mannodi_pbe.sim_cell.isin(["2x2x2"])
+  pc = pc.collect.abx()
+  g = pc.groupby(level=0, axis=1).sum()
+  vB, vX, vA, = g.A.isin([1, 8]), g.B.isin([1, 8]), g.X.isin([3, 24])
+  #subset indexes
+  focus = size*vB*vA*vX
+  pc = pc[focus]
+  mannodi_pbe = mannodi_pbe[focus]
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+*** cut down hse by comp total
+#+begin_src jupyter-python :exports results :results raw drawer
+  size = mannodi_hse.sim_cell.isin(["2x2x2"])
+  hc = hc.collect.abx()
+  g = hc.groupby(level=0, axis=1).sum()
+  vB, vX, vA, = g.A.isin([1, 8]), g.B.isin([1, 8]), g.X.isin([3, 24])
+  #subset indexes
+  focus = size*vB*vA*vX
+  hc = hc[focus]
+  mannodi_hse = mannodi_hse[focus]
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+*** cut down almora by comp total
+#+begin_src jupyter-python :exports results :results raw drawer
+  ac = ac.applymap(pd.to_numeric, errors='coerce')
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  ac = ac.collect.abx()
+  g = ac.groupby(level=0, axis=1).sum()
+  vB, vX, vA, = g.A.isin([1, 8]), g.B.isin([1, 8]), g.X.isin([3, 24])
+  #subset indexes
+  focus = vB*vA*vX
+  ac = ac[focus]
+  almora = almora[focus]
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+** generate mix categories
+*** pbe mix
+#+begin_src jupyter-python :exports results :results raw drawer
+  mixlog = pc.groupby(level=0, axis=1).count()
+  mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
+  mannodi_pbe = mannodi_pbe.assign(mix=mix)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+*** hse mix
+#+begin_src jupyter-python :exports results :results raw drawer
+  mixlog = hc.groupby(level=0, axis=1).count()
+  mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
+  mannodi_hse = mannodi_hse.assign(mix=mix)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+*** almora mix
+#+begin_src jupyter-python :exports results :results raw drawer
+  mixlog = ac.groupby(level=0, axis=1).count()
+  mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
+  almora = almora.assign(mix=mix)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+*** lattice mix
+#+begin_src jupyter-python :exports results :results raw drawer
+  mixlog = lc.groupby(level=0, axis=1).count()
+  mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
+  lattice = lattice.assign(mix=mix)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** TODO generate Organics Categories
+need robust hybrid id logic...
+#+begin_src jupyter-python :exports results :results raw drawer
+  organics = my.ft.comp().collect.org()
+  orglog = organics.groupby(level=0, axis=1).count()
+  org = orglog.pipe(Categories.logif, condition=lambda x: x==1, default="inorganic", catstring="and")
+  mc = mc.assign(org=org).set_index('org', append=True)
+  my = my.assign(org=org).set_index('org', append=True)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+* build comparisons tables
+** scatter composition vectors in preparation for join ops
+#+begin_src jupyter-python :exports results :results raw drawer
+  pc.columns = pc.columns.droplevel('site')
+  hc.columns = hc.columns.droplevel('site')
+  ac.columns = ac.columns.droplevel('site')
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** concatenate tables in preparation for join ops
+#+begin_src jupyter-python :exports results :results raw drawer
+  pbe = pd.concat([mannodi_pbe, pc], axis=1)
+  hse = pd.concat([mannodi_hse, hc], axis=1)
+  ebg = pd.concat([almora, ac], axis=1)
+  elc = pd.concat([lattice, lc], axis=1)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** perform joins
+#+begin_src jupyter-python :exports results :results raw drawer
+  pbe_v_hse = pd.merge(hse, pbe, on=hc.columns.to_list(),
+                       how='inner', suffixes=("_hse", "_pbe"))
+  pbe_v_ebg = pd.merge(ebg, pbe, on=ac.columns.to_list(),
+                       how='inner', suffixes=("_ebg", "_pbe"))
+  hse_v_ebg = pd.merge(ebg, hse, on=ac.columns.to_list(),
+                       how='inner', suffixes=("_ebg", "_hse"))
+  pbe_v_elc = pd.merge(elc, pbe, on=[value for value in lc.columns.to_list() if value in pc.columns.to_list()],
+                       how='inner', suffixes=("_ebg", "_pbe"))
+  hse_v_elc = pd.merge(elc, hse, on=[value for value in lc.columns.to_list() if value in hc.columns.to_list()],
+                       how='inner', suffixes=("_ebg", "_hse"))
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+* Computed Targets vs Experimental Targets
+** PBE v HSE band gaps
+#+begin_src jupyter-python :exports both :results raw drawer
+  plt.style.use('default')
+  %matplotlib qt
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+  
+#+begin_src jupyter-python :exports both :results raw drawer
+  p = sns.relplot(data=pbe_v_hse, x='bg_eV_pbe', y='bg_eV_hse', hue='mix_pbe', height=3, aspect=1)
+  plt.axline((0, 0),
+             (1, 1),
+             c='k')
+  p.savefig('./pbe_v_hse_bg.png', transparent=True)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** PBE v HSE Lattice Constants
+#+begin_src jupyter-python :exports both :results raw drawer
+  p = sns.relplot(data=pbe_v_hse, x='LC_A_pbe', y='LC_A_hse', hue='mix_pbe', height=3, aspect=1)
+  plt.axline((0, 0),
+             (1, 1),
+             c='k')
+  p.savefig('./pbe_v_hse_LC.png', transparent=True)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** PBE v experimental band gaps/efficiencies
+Here, a selection of experimentally obtained Perovskite bandgaps
+aggregated for different compounds by Almora et.al.
+[[cite:&almora-2020-devic-perfor]] are compared to computed band gaps.
+
+Almora measured the band gap and computed the Power Conversion
+Efficiency of a variety of solar cell devices from published
+measurements of the short circuit current density, open circuit
+voltage, and "Fill Factor."
+
+parity comparisons indicate PBE underestimates bandgaps and HSE
+overestimates bandgaps systematically
+
+#+begin_src jupyter-python :exports both :results raw drawer
+  p = sns.relplot(data=pbe_v_ebg, x='bg_eV_ebg', y='bg_eV_pbe', hue='mix_ebg', height=3, aspect=1)
+  plt.axline((0, 0),
+             (1, 1),
+             c='k')
+  p.savefig('./pbe_v_almora_bg.png', transparent=True)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+#+begin_src jupyter-python :exports both :results raw drawer
+  p = sns.relplot(data=pbe_v_ebg, x='efficiency_ebg', y='efficiency_pbe', hue='mix_ebg', height=3, aspect=1)
+  plt.axline((0, 0),
+             (1, 1),
+             c='k')
+  p.savefig('./pbe_v_almora_eff.png', transparent=True)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** hse v experimental band gaps
+#+begin_src jupyter-python :exports both :results raw drawer
+  p = sns.relplot(data=hse_v_ebg, x='bg_eV_ebg', y='bg_eV_hse', hue='mix_ebg', height=3, aspect=1)
+  plt.axline((0, 0),
+             (1, 1),
+             c='k')
+  p.savefig('./hse_v_almora_bg.png', transparent=True)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** PBE v experimental LC
+#+begin_src jupyter-python :exports both :results raw drawer
+  p = sns.relplot(data=pbe_v_elc[~pbe_v_elc.index.isin([1,2,3,4,5,6])], x='LC_A_ebg', y='LC_A_pbe', hue='mix_ebg', height=3, aspect=1)
+  plt.axline((0, 0),
+             (1, 1),
+             c='k')
+  p.figure.axes[0].set_xlim([5,7])
+  p.figure.axes[0].set_ylim([5,7])  
+  p.savefig('./pbe_v_exp_LC.png', transparent=True)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** HSE v experimental LC
+#+begin_src jupyter-python :exports both :results raw drawer
+    with sns.plotting_context('poster'):
+        p = sns.relplot(data=hse_v_elc[~pbe_v_elc.index.isin([1,2,3,4,5,6])],
+                        x='LC_A_ebg', y='LC_A_hse', hue='mix_ebg', height=3, aspect=1)
+        plt.axline((0, 0),
+                   (1, 1),
+                   c='k')
+        p.figure.axes[0].set_xlim([5,7])
+        p.figure.axes[0].set_ylim([5,7])  
+        p.savefig('./hse_v_exp_LC.png', transparent=True)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** Mannodi vs Materials Zone
+Over 40,000 experimentally measured bandgaps and efficiency
+measurements collected by [[cite:&jacobsson-2021-open-acces]].
