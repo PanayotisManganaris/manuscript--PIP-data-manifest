@@ -410,7 +410,6 @@ Energy Research Scientific Computing Center, the Laboratory Computing
 Resource Center at Argonne National Laboratory, and the RCAC clusters at
 Purdue.
 
-* References
 bibliographystyle:rsc
 bibliography:~/org/bibliotex/bibliotex.bib
 * Supplemental Material
