@@ -32,6 +32,14 @@
 :CUSTOM_ID: introduction
 :CLASS: unnumbered
 :END:
+The challenge of optimizing Perovskite performance is one with many
+facets. Almost every detail of a Perovskite crystal's structure and
+chemistry effects its performance as a semiconductor. The size of the
+unit cell effects its substrate affinity and in turn its carrier
+concentrations. The crystal phase effects many aspects of the
+electronic structure, including the band gap and optical response. Of
+course, the structure is ultimately dependent on the proportions and
+arrangement of the constituent elements.
 
 #+ATTR_LATEX: :float multicolumn :options h
 #+CAPTION: \label{Fig:outline} 
@@ -130,11 +138,16 @@ from HSE level calculations.
 :CUSTOM_ID: band-gap-and-band-structure
 :CLASS: unnumbered
 :END:
+
 *** SLME Package
 :PROPERTIES:
 :CUSTOM_ID: slme-package
 :CLASS: unnumbered
 :END:
+The SLME metric developed by [[citet:&yu-2012-ident-poten]] is used as the
+primary criterion screening perovskites for their photovoltaic
+merits. The SLME value is computed for every Perovskite using Logan
+William's SL3ME [[cite:&williams-2022-sl3me]].
 * Results and discussion
 :PROPERTIES:
 :CUSTOM_ID: results-and-discussion
@@ -397,6 +410,9 @@ Energy Research Scientific Computing Center, the Laboratory Computing
 Resource Center at Argonne National Laboratory, and the RCAC clusters at
 Purdue.
 
+* References
+bibliographystyle:rsc
+bibliography:~/org/bibliotex/bibliotex.bib
 * Supplemental Material
 :PROPERTIES:
 :CUSTOM_ID: SI
