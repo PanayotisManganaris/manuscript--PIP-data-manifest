@@ -53,6 +53,8 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
   
 #+begin_src jupyter-python :exports results :results raw drawer
   # data tools
+  import traceback
+  import re
   import sqlite3
   import pandas as pd
   import numpy as np
@@ -279,14 +281,49 @@ lattice records are ready
 :results:
 :end:
 
-** TODO generate Organics Categories
-need robust hybrid id logic...
+** generate Organics Categories
+*** pbe org
 #+begin_src jupyter-python :exports results :results raw drawer
-  organics = my.ft.comp().collect.org()
+  organics = mannodi_pbe.ft.comp().collect.org()
   orglog = organics.groupby(level=0, axis=1).count()
-  org = orglog.pipe(Categories.logif, condition=lambda x: x==1, default="inorganic", catstring="and")
-  mc = mc.assign(org=org).set_index('org', append=True)
-  my = my.assign(org=org).set_index('org', append=True)
+  org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
+  mannodi_pbe = mannodi_pbe.assign(org=org)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+*** hse mix
+#+begin_src jupyter-python :exports results :results raw drawer
+  organics = mannodi_hse.ft.comp().collect.org()
+  orglog = organics.groupby(level=0, axis=1).count()
+  org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
+  mannodi_hse = mannodi_hse.assign(org=org)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+*** almora mix
+#+begin_src jupyter-python :exports results :results raw drawer
+  organics = almora.ft.comp().collect.org()
+  orglog = organics.groupby(level=0, axis=1).count()
+  org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
+  almora = almora.assign(org=org)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+*** lattice mix
+#+begin_src jupyter-python :exports results :results raw drawer
+  organics = lattice.ft.comp().collect.org()
+  orglog = organics.groupby(level=0, axis=1).count()
+  org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
+  lattice = lattice.assign(org=org)
 #+end_src
 
 #+RESULTS:
@@ -305,30 +342,22 @@ need robust hybrid id logic...
 :results:
 :end:
 
-** concatenate tables in preparation for join ops
+** concatenate tables and perform join ops
 #+begin_src jupyter-python :exports results :results raw drawer
-  pbe = pd.concat([mannodi_pbe, pc], axis=1)
-  hse = pd.concat([mannodi_hse, hc], axis=1)
-  ebg = pd.concat([almora, ac], axis=1)
-  elc = pd.concat([lattice, lc], axis=1)
-#+end_src
+  def robust_compare(compare1, on1, compare2, on2, suf1='x', suf2='y'):
+      df1 = pd.concat([compare1, on1], axis=1)
+      df2 = pd.concat([compare2, on2], axis=1)
+      intersection = [v for v in on1.columns.to_list() if v in on2.columns.to_list()]
+      difference = [v for v in on1.columns.to_list() + on2.columns.to_list() if v not in intersection]
+      join = pd.merge(df1, df2, on=intersection,
+                      how='inner', suffixes=("_"+suf1, "_"+suf2))
+      return join[join[difference].isna().agg('prod', axis=1).apply(bool)]
 
-#+RESULTS:
-:results:
-:end:
-
-** perform joins
-#+begin_src jupyter-python :exports results :results raw drawer
-  pbe_v_hse = pd.merge(hse, pbe, on=hc.columns.to_list(),
-                       how='inner', suffixes=("_hse", "_pbe"))
-  pbe_v_ebg = pd.merge(ebg, pbe, on=ac.columns.to_list(),
-                       how='inner', suffixes=("_ebg", "_pbe"))
-  hse_v_ebg = pd.merge(ebg, hse, on=ac.columns.to_list(),
-                       how='inner', suffixes=("_ebg", "_hse"))
-  pbe_v_elc = pd.merge(elc, pbe, on=[value for value in lc.columns.to_list() if value in pc.columns.to_list()],
-                       how='inner', suffixes=("_ebg", "_pbe"))
-  hse_v_elc = pd.merge(elc, hse, on=[value for value in lc.columns.to_list() if value in hc.columns.to_list()],
-                       how='inner', suffixes=("_ebg", "_hse"))
+  hse_v_pbe = robust_compare(mannodi_hse, hc, mannodi_pbe.drop(['mix', 'org'], axis=1), pc, suf1='hse', suf2='pbe')
+  ebg_v_pbe = robust_compare(almora, ac, mannodi_pbe.drop(['mix', 'org'], axis=1), pc, suf1='exp', suf2='pbe')
+  ebg_v_hse = robust_compare(almora, ac, mannodi_hse.drop(['mix', 'org'], axis=1), hc, suf1='exp', suf2='hse')
+  elc_v_pbe = robust_compare(lattice, lc, mannodi_pbe.drop(['mix', 'org'], axis=1), pc, suf1='exp', suf2='pbe')
+  elc_v_hse = robust_compare(lattice, lc, mannodi_hse.drop(['mix', 'org'], axis=1), hc, suf1='exp', suf2='hse')
 #+end_src
 
 #+RESULTS:
@@ -347,11 +376,16 @@ need robust hybrid id logic...
 :end:
   
 #+begin_src jupyter-python :exports both :results raw drawer
-  p = sns.relplot(data=pbe_v_hse, x='bg_eV_pbe', y='bg_eV_hse', hue='mix_pbe', height=3, aspect=1)
-  plt.axline((0, 0),
-             (1, 1),
-             c='k')
-  p.savefig('./pbe_v_hse_bg.png', transparent=True)
+  with sns.plotting_context('poster'):
+    p = sns.relplot(data=hse_v_pbe,
+                    x='bg_eV_pbe', y='bg_eV_hse', hue='org', style='mix',
+                    height=6, aspect=1.2)
+    xlims = p.figure.axes[0].get_xlim()
+    ylims = p.figure.axes[0].get_ylim()
+    plt.axline((min(xlims+ylims), min(xlims+ylims)),
+               (max(xlims+ylims), max(xlims+ylims)),
+               c='k')
+    p.savefig('./pbe_v_hse_bg.png', transparent=True)
 #+end_src
 
 #+RESULTS:
@@ -360,11 +394,16 @@ need robust hybrid id logic...
 
 ** PBE v HSE Lattice Constants
 #+begin_src jupyter-python :exports both :results raw drawer
-  p = sns.relplot(data=pbe_v_hse, x='LC_A_pbe', y='LC_A_hse', hue='mix_pbe', height=3, aspect=1)
-  plt.axline((0, 0),
-             (1, 1),
-             c='k')
-  p.savefig('./pbe_v_hse_LC.png', transparent=True)
+  with sns.plotting_context('poster'):
+    p = sns.relplot(data=hse_v_pbe,
+                    x='LC_A_pbe', y='LC_A_hse', hue='org', style='mix',
+                    height=6, aspect=1.3)
+    xlims = p.figure.axes[0].get_xlim()
+    ylims = p.figure.axes[0].get_ylim()
+    plt.axline((min(xlims+ylims), min(xlims+ylims)),
+               (max(xlims+ylims), max(xlims+ylims)),
+               c='k')
+    p.savefig('./pbe_v_hse_LC.png', transparent=True)
 #+end_src
 
 #+RESULTS:
@@ -385,11 +424,16 @@ parity comparisons indicate PBE underestimates bandgaps and HSE
 overestimates bandgaps systematically
 
 #+begin_src jupyter-python :exports both :results raw drawer
-  p = sns.relplot(data=pbe_v_ebg, x='bg_eV_ebg', y='bg_eV_pbe', hue='mix_ebg', height=3, aspect=1)
-  plt.axline((0, 0),
-             (1, 1),
-             c='k')
-  p.savefig('./pbe_v_almora_bg.png', transparent=True)
+  with sns.plotting_context('poster'):
+    p = sns.relplot(data=ebg_v_pbe,
+                    x='bg_eV_exp', y='bg_eV_pbe', hue='org', style='mix',
+                    height=6, aspect=1.2)
+    xlims = p.figure.axes[0].get_xlim()
+    ylims = p.figure.axes[0].get_ylim()
+    plt.axline((min(xlims+ylims), min(xlims+ylims)),
+               (max(xlims+ylims), max(xlims+ylims)),
+               c='k')
+    p.savefig('./pbe_v_almora_bg.png', transparent=True)
 #+end_src
 
 #+RESULTS:
@@ -397,11 +441,16 @@ overestimates bandgaps systematically
 :end:
 
 #+begin_src jupyter-python :exports both :results raw drawer
-  p = sns.relplot(data=pbe_v_ebg, x='efficiency_ebg', y='efficiency_pbe', hue='mix_ebg', height=3, aspect=1)
-  plt.axline((0, 0),
-             (1, 1),
-             c='k')
-  p.savefig('./pbe_v_almora_eff.png', transparent=True)
+  with sns.plotting_context('poster'):
+    p = sns.relplot(data=ebg_v_pbe,
+                    x='efficiency_exp', y='efficiency_pbe', hue='org', style='mix',
+                    height=6, aspect=1.2)
+    xlims = p.figure.axes[0].get_xlim()
+    ylims = p.figure.axes[0].get_ylim()
+    plt.axline((min(xlims+ylims), min(xlims+ylims)),
+               (max(xlims+ylims), max(xlims+ylims)),
+               c='k')
+    p.savefig('./pbe_v_almora_eff.png', transparent=True)
 #+end_src
 
 #+RESULTS:
@@ -410,11 +459,16 @@ overestimates bandgaps systematically
 
 ** hse v experimental band gaps
 #+begin_src jupyter-python :exports both :results raw drawer
-  p = sns.relplot(data=hse_v_ebg, x='bg_eV_ebg', y='bg_eV_hse', hue='mix_ebg', height=3, aspect=1)
-  plt.axline((0, 0),
-             (1, 1),
-             c='k')
-  p.savefig('./hse_v_almora_bg.png', transparent=True)
+  with sns.plotting_context('poster'):
+    p = sns.relplot(data=ebg_v_hse,
+                    x='bg_eV_exp', y='bg_eV_hse', hue='org', style='mix',
+                    height=6, aspect=1.2)
+    xlims = p.figure.axes[0].get_xlim()
+    ylims = p.figure.axes[0].get_ylim()
+    plt.axline((min(xlims+ylims), min(xlims+ylims)),
+               (max(xlims+ylims), max(xlims+ylims)),
+               c='k')
+    p.savefig('./hse_v_almora_bg.png', transparent=True)
 #+end_src
 
 #+RESULTS:
@@ -423,13 +477,16 @@ overestimates bandgaps systematically
 
 ** PBE v experimental LC
 #+begin_src jupyter-python :exports both :results raw drawer
-  p = sns.relplot(data=pbe_v_elc[~pbe_v_elc.index.isin([1,2,3,4,5,6])], x='LC_A_ebg', y='LC_A_pbe', hue='mix_ebg', height=3, aspect=1)
-  plt.axline((0, 0),
-             (1, 1),
-             c='k')
-  p.figure.axes[0].set_xlim([5,7])
-  p.figure.axes[0].set_ylim([5,7])  
-  p.savefig('./pbe_v_exp_LC.png', transparent=True)
+  with sns.plotting_context('poster'):
+    p = sns.relplot(data=elc_v_pbe,
+                    x='LC_A_exp', y='LC_A_pbe', hue='org', style='mix',
+                    height=6, aspect=1.2)
+    xlims = p.figure.axes[0].get_xlim()
+    ylims = p.figure.axes[0].get_ylim()
+    plt.axline((min(xlims+ylims), min(xlims+ylims)),
+               (max(xlims+ylims), max(xlims+ylims)),
+               c='k')
+    p.savefig('./pbe_v_exp_LC.png', transparent=True)
 #+end_src
 
 #+RESULTS:
@@ -438,21 +495,22 @@ overestimates bandgaps systematically
 
 ** HSE v experimental LC
 #+begin_src jupyter-python :exports both :results raw drawer
-    with sns.plotting_context('poster'):
-        p = sns.relplot(data=hse_v_elc[~pbe_v_elc.index.isin([1,2,3,4,5,6])],
-                        x='LC_A_ebg', y='LC_A_hse', hue='mix_ebg', height=3, aspect=1)
-        plt.axline((0, 0),
-                   (1, 1),
-                   c='k')
-        p.figure.axes[0].set_xlim([5,7])
-        p.figure.axes[0].set_ylim([5,7])  
-        p.savefig('./hse_v_exp_LC.png', transparent=True)
+  with sns.plotting_context('poster'):
+    p = sns.relplot(data=elc_v_hse,
+                    x='LC_A_exp', y='LC_A_hse', hue='org', style='mix',
+                    height=6, aspect=1.2)
+    xlims = p.figure.axes[0].get_xlim()
+    ylims = p.figure.axes[0].get_ylim()
+    plt.axline((min(xlims+ylims), min(xlims+ylims)),
+               (max(xlims+ylims), max(xlims+ylims)),
+               c='k')
+    p.savefig('./hse_v_exp_LC.png', transparent=True)
 #+end_src
 
 #+RESULTS:
 :results:
 :end:
 
-** Mannodi vs Materials Zone
+* Mannodi vs Materials Zone
 Over 40,000 experimentally measured bandgaps and efficiency
 measurements collected by [[cite:&jacobsson-2021-open-acces]].
