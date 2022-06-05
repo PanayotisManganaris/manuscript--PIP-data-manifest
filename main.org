@@ -169,7 +169,7 @@ William's SL3ME [[cite:&williams-2022-sl3me]].
 :CUSTOM_ID: lattice-constant-pbe-vs-hse
 :CLASS: unnumbered
 :END:
-Fig \ref{fig:lc_lot_vs} presents the lattice parameter comparison of PBE
+Fig ref:fig:lc_lot_vs presents the lattice parameter comparison of PBE
 calculation and HSE calculations. Full relaxations at both levels of
 theory mostly agree on the lattice parameters. At least, any deviation
 appears to be very linearly explained. This suggests the accuracy of
@@ -183,15 +183,15 @@ octahedral structures. Thus, we exclude these outliers from any
 analysis concerned with the dominant pseudo cubic structures which are
 the focus of this report.
 
-#+ATTR_LATEX: :float t
-#+CAPTION: \label{fig:lc_lot_vs} 
+#+ATTR_LATEX: :float
+#+CAPTION: \label{fig:lc_lot_vs}
 #+CAPTION: Comparing lattice constants obtain by full PBE and HSE
 #+CAPTION: relax calculations
 [[file:pbe_v_hse_LC.png]]
 
 *** Comparing synthetic to physical data
 
-#+ATTR_LATEX: :float t
+#+ATTR_LATEX: :float 
 #+CAPTION: \label{fig:lc_val_vs} 
 #+CAPTION: Comparison of PBE and HSE computed pseudo-cubic lattice
 #+CAPTION: constants with crystallographic measures for lattice constants
