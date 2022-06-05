@@ -1,4 +1,4 @@
-% Created 2022-06-05 Sun 15:12
+% Created 2022-06-05 Sun 17:50
 % Intended LaTeX compiler: pdflatex
 \documentclass[twoside, twocolumn, 9pt, draft]{article}
 \usepackage[utf8]{inputenc}
@@ -196,24 +196,36 @@ and improved performance across many optoelectronic applications.
 \footnotetext{\textsuperscript{\dag}Electronic Supplementary Information (ESI) available: https://www.github.com/PanayotisManganaris/REPO_TODO. See DOI: 00.0000/00000000.}
 
 \section*{Introduction}
-\label{sec:org765d666}
+\label{sec:orgbf6a0c1}
 The challenge of optimizing Perovskite performance is one with many
 facets. Almost every detail of a Perovskite crystal's structure and
 chemistry effects its performance as a semiconductor. The size of the
 unit cell effects its substrate affinity and in turn its carrier
-concentrations. The crystal phase effects many aspects of the
-electronic structure, including the band gap and optical response. Of
-course, the structure is ultimately dependent on the proportions and
-arrangement of the constituent elements.
+concentrations \cite{jiang-2006-predic-lattic}. The crystal's phase
+effects many aspects of the electronic structure, including the band
+gap and optical response. Of course, these qualities of a structure
+are largely dependent on the specification, proportions and
+arrangements of the constituent elements.
+
+We report a synthetic dataset collected for 495 chemically distinct,
+pseudo cubic Halide Perovskites. This dataset builds on that of 229
+samples which formed the foundation of the prior work by
+\citet{mannodi-kanakkithodi-2021-data-driven-new}. The DFT computed
+properties we collected and the levels of theory used are discussed in
+\ref{methodology}. The relatively large size of this dataset is intended
+to provide an initial sampling suitable for guiding exploration of the
+alloy space. Structural information is considered constant to better
+focus on obtaining physically meaningful interpretations of models
+dealing only with information derived from a sample composition.
 
 \begin{figure*}
 \centering
 \includegraphics[h,width=.9\linewidth]{Figure1.png}
-\caption{\label{fig:outline} (a) Chemical space of ABX\textsubscript{3} perovskites. (b) Pie charts showing the amounts of various atomic and molecular species as well as types of mixing in the DFT dataset. (c) Detailed outline of this work.}
+\caption{\label{fig:outline} (a) Chemical space of ABX\textsubscript{3} perovskites. (b) Number of samples representing each kind of primary alloy. (c) Detailed outline.}
 \end{figure*}
 
 \subsection*{Coverage of Chemical Space}
-\label{sec:org9aadc70}
+\label{sec:org47e7de7}
 
 \begin{figure*}
 \centering
@@ -222,9 +234,9 @@ arrangement of the constituent elements.
 \end{figure*}
 
 \section*{Methodology}
-\label{sec:org81d7538}
+\label{sec:org12a2078}
 \subsection*{Building Perovskite Dataset}
-\label{sec:org5925fbb}
+\label{sec:org93080c2}
 The dataset we report is based on standard cubic phase ABX\textsubscript{3}
 Perovskite structures obtained from public databases. Fourteen common
 Perovskite constituents are selected to form our Halide Perovskite
@@ -252,7 +264,7 @@ mixing samples. The resulting structures are optimized using a DFT
 variable-cell relaxation.
 
 \subsection*{Calculation Details}
-\label{sec:orge4c5f92}
+\label{sec:orga0ed701}
 Calculation DFT calculations are performed with Vienna Ab initio
 Simulation Package (VASP) version 6.1. The projector augmented wave
 (PAW) potentials were used The generalized gradient approximation (GGA)
@@ -263,12 +275,12 @@ k-point mesh, with a reciprocal mesh as 4x4x4. The structural force
 convergence threshold is set to be 0.5 eV/Å.
 
 \subsubsection*{LOPTICS Calculations and Absorption Spectrum}
-\label{sec:orgd4aaec6}
+\label{sec:org443f3ee}
 
 \subsection*{Analysis of DFT Computed Properties}
-\label{sec:org991eca5}
+\label{sec:org9a6a88c}
 \subsubsection*{Decomposition Energy}
-\label{sec:orgb198493}
+\label{sec:orgd53f590}
 The decomposition energy indicates the stability of a compound. To
 calculate the decomposition energy for ABX3 perovskite, we assume it
 will decompose to two phases, AX and BX2. Using DFT calculations, we
@@ -281,18 +293,18 @@ PBE level calculation. For HSE decomposition energy, we use the energy
 from HSE level calculations.
 
 \subsubsection*{Band Gap and Band Structure}
-\label{sec:org96f949d}
+\label{sec:orgc19fafa}
 
 \subsubsection*{SLME Package}
-\label{sec:org98c6074}
+\label{sec:org2825665}
 The SLME metric developed by \citet{yu-2012-ident-poten} is used as the
 primary criterion screening perovskites for their photovoltaic
 merits. The SLME value is computed for every Perovskite using Logan
 William's SL3ME \cite{williams-2022-sl3me}.
 \section*{Results and discussion}
-\label{sec:org1b2919e}
+\label{sec:orgec3a7b7}
 \subsection*{Visualization of DFT Data}
-\label{sec:org1c13c89}
+\label{sec:orgca41615}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{Figure2.png}
@@ -300,7 +312,7 @@ William's SL3ME \cite{williams-2022-sl3me}.
 \end{figure*}
 
 \subsubsection*{Lattice constant PBE vs HSE}
-\label{sec:orged355d8}
+\label{sec:orgb2a4fec}
 Fig \ref{fig:lc_lot_vs} presents the lattice parameter comparison of PBE
 calculation and HSE calculations. Full relaxations at both levels of
 theory mostly agree on the lattice parameters. At least, any deviation
@@ -321,7 +333,7 @@ the focus of this report.
 \end{center}
 
 \subsubsection*{Comparing synthetic to physical data}
-\label{sec:org415c7f5}
+\label{sec:org772e8b1}
 
 \begin{center}
 \includegraphics[width=.9\linewidth]{pbe_v_exp_LC.png}
@@ -333,7 +345,7 @@ the focus of this report.
 \end{center}
 
 \subsubsection*{Decomposition energy vs band gap PBE and HSE}
-\label{sec:org2213b80}
+\label{sec:orgcb907dd}
 Fig 2(b) is showing the PBE band gap compared to the PBE decomposition
 energy. It presents the diversity of our perovskite dataset. The data
 sets cover a large range of band gap and decomposition energy. For
@@ -349,7 +361,7 @@ on low decomposition energy. Compared to PBE plot, more data should be
 added in high decomposition energy region and suitable band gap region.
 
 \subsubsection*{Spectroscopic Limited Maximum Efficiency (SLME) vs PBE Band gap}
-\label{sec:orgeb2297c}
+\label{sec:org33cb602}
 Fig 2(d) presents the Spectroscopic Limited Maximum Efficiency (SLME)
 values related to the PBE band gap. Spectroscopic Limited Maximum
 Efficiency (SLME) is a very important properties for photovoltaic
@@ -361,7 +373,7 @@ gap increases, the SLME value decreases and eventually goes to zero due
 to the high band gap values.
 
 \subsection*{Pearson Correlation Results}
-\label{sec:org982fc41}
+\label{sec:org92dd047}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{Figure4.png}
@@ -378,7 +390,7 @@ but always with extensive variability. Evidently, an accurate model will
 have to be formed on a multidimensional domain.
 
 \subsection*{PCA}
-\label{sec:org71558bf}
+\label{sec:org3d46a80}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{comp_ratio_projection_annot.png}
@@ -403,10 +415,10 @@ explanation for why perovskite properties vary, this can be useful for
 accuracy, it can also be a bias-inducing hindrance.
 
 \subsection*{MDS / T-SNE / Isomap Results}
-\label{sec:org53d190b}
+\label{sec:orge5941cf}
 
 \section*{Perspective and Future Work}
-\label{sec:orge02f458}
+\label{sec:org2630ce0}
 The design of this dataset is uniquely suited to the exploration of
 alloying effects on Perovskite properties. The combinatorial space of
 possible alloys has been sparsely but systematically sampled along
@@ -435,15 +447,15 @@ For this reason, kernel learning methods appear to be particularly
 promising for high speed optimization of the space.
 
 \section*{Conclusions}
-\label{sec:org28faf5d}
+\label{sec:org1ed612c}
 \ldots{}\\
 
 \section*{Conflicts of interest}
-\label{sec:orgb4559db}
+\label{sec:org1821c83}
 There are no conflicts to declare.
 
 \section*{acknowledgements}
-\label{sec:org3cb9e0e}
+\label{sec:orgb8d3537}
 Extensive discussions with and scientific feedback from UC San Diego
 researchers David Fenning and Rishi Kumar and Argonne National Lab
 scientist Maria Chan are acknowledged. This work was performed at Purdue
@@ -456,5 +468,5 @@ Purdue.
 \bibliographystyle{rsc}
 \bibliography{../../../org/bibliotex/bibliotex}
 \section*{Supplemental Material}
-\label{sec:org6758eda}
+\label{sec:org4f075fa}
 \end{document}
