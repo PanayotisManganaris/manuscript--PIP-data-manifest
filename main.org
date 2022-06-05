@@ -42,7 +42,7 @@ course, the structure is ultimately dependent on the proportions and
 arrangement of the constituent elements.
 
 #+ATTR_LATEX: :float multicolumn :options h
-#+CAPTION: \label{Fig:outline} 
+#+CAPTION: \label{fig:outline} 
 #+CAPTION: (a) Chemical space of ABX_3 perovskites. (b) Pie charts showing
 #+CAPTION: the amounts of various atomic and molecular species as well as types
 #+CAPTION: of mixing in the DFT dataset. (c) Detailed outline of this work.
@@ -69,7 +69,7 @@ arrangement of the constituent elements.
 The dataset we report is based on standard cubic phase ABX_3
 Perovskite structures obtained from public databases. Fourteen common
 Perovskite constituents are selected to form our Halide Perovskite
-composition space \ref{Fig:outline}. Five constituents including
+composition space \ref{fig:outline}. Five constituents including
 Methylammonium and Formamidinium cations represent the possible A-site
 occupants. Six heavy metal elements represent the possible B-site
 occupants. Three halides represent the possible X-site occupants.
@@ -159,9 +159,9 @@ William's SL3ME [[cite:&williams-2022-sl3me]].
 :CLASS: unnumbered
 :END:
 #+ATTR_LATEX: :float multicolumn
-#+CAPTION: \label{Fig:pairplots} 
+#+CAPTION: \label{fig:pairplots} 
 #+CAPTION: DFT Results: PBE and HSE properties; lattice constants,
-#+CAPTION: decomposition energies, band gaps, photovoltaic figure of merit.
+#+CAPTION: decomposition energies, band gaps, and converter efficiencies.
 [[file:Figure2.png]]
 
 *** Lattice constant PBE vs HSE
@@ -169,24 +169,34 @@ William's SL3ME [[cite:&williams-2022-sl3me]].
 :CUSTOM_ID: lattice-constant-pbe-vs-hse
 :CLASS: unnumbered
 :END:
-Fig 2(a) presents the lattice parameter comparison of PBE calculation
-and HSE calculations. Most of the samples have close HSE lattice
-parameters and PBE lattice parameters. This indicates that the accuracy
-of PBE on lattice and structure is enough for most of the perovskite
-samples. Some samples are observed significantly different lattice
-parameters. By checking the optimized structures, we found that the
-perovskite structure is largely deformed and no longer keep the
-octahedral structures. Thus, we removed these 3 points for following
-analysis.
+Fig \ref{fig:lc_lot_vs} presents the lattice parameter comparison of PBE
+calculation and HSE calculations. Full relaxations at both levels of
+theory mostly agree on the lattice parameters. At least, any deviation
+appears to be very linearly explained. This suggests the accuracy of
+PBE relaxation is enough to optimize most Perovskite samples.
 
-*** Lattice constant vs experimental data
+Note this also served as a reasonable validation for our results. A
+few samples did have significantly differing lattice parameters. This
+prompted checking the optimized structures. We found those Perovskite
+structures were substantially deformed and no longer had obvious
+octahedral structures. Thus, we exclude these outliers from any
+analysis concerned with the dominant pseudo cubic structures which are
+the focus of this report.
 
-#+ATTR_LATEX: :float multicolumn
-#+CAPTION: \label{Fig:lot_comp} 
-#+CAPTION: Comparison of PBE and HSE computed properties with collected
-#+CAPTION: experimental measurements: (a) pseudo-cubic lattice constants, and
-#+CAPTION: (b) electronic band gaps.
-[[file:Figure3.pdf]]
+#+ATTR_LATEX: :float t
+#+CAPTION: \label{fig:lc_lot_vs} 
+#+CAPTION: Comparing lattice constants obtain by full PBE and HSE
+#+CAPTION: relax calculations
+[[file:pbe_v_hse_LC.png]]
+
+*** Comparing synthetic to physical data
+
+#+ATTR_LATEX: :float t
+#+CAPTION: \label{fig:lc_val_vs} 
+#+CAPTION: Comparison of PBE and HSE computed pseudo-cubic lattice
+#+CAPTION: constants with crystallographic measures for lattice constants
+[[file:pbe_v_exp_LC.png]]
+[[file:hse_v_exp_LC.png]]
 
 *** Decomposition energy vs band gap PBE and HSE
 :PROPERTIES:
@@ -229,7 +239,7 @@ to the high band gap values.
 :END:
 
 #+ATTR_LATEX: :float multicolumn
-#+CAPTION: \label{Fig:pearson} 
+#+CAPTION: \label{fig:pearson} 
 #+CAPTION: Pearson linear correlation coefficients between 50 composition and
 #+CAPTION: elemental descriptors and (a) 6 PBE computed properties, and (b) 4
 #+CAPTION: HSE computed properties.
@@ -250,7 +260,7 @@ have to be formed on a multidimensional domain.
 :CLASS: unnumbered
 :END:
 #+ATTR_LATEX: :float multicolumn
-#+CAPTION: \label{Fig:pca}
+#+CAPTION: \label{fig:pca}
 #+CAPTION: PCA
 [[file:comp_ratio_projection_annot.png]]
 
@@ -301,7 +311,7 @@ as less stringent proxy for the SLME spectrum. The following sections
 will discuss the details of each constraint.
 
 #+ATTR_LATEX: :float multicolumn
-#+CAPTION: \label{Fig:cuts}
+#+CAPTION: \label{fig:cuts}
 #+CAPTION: placing limits on properties governing viability results in a subset
 #+CAPTION: of the dataset potentially suitable for physical testing.
 [[file:Figure6.png]]
@@ -374,13 +384,24 @@ for a QM/ML surrogate model to form the basis of an active learning
 strategy which can begin selecting potentially high performing
 multi-site alloy candidates based on the current sample set.
 
-The principal challenge will be in extracting features useful as
-performance features. The basic feature sets examined here are highly
-correlated, but nonetheless show promise as basic screening criterion.
+For the calculation of future data points obtained by such a scheme,
+we will follow a strategy of performing full structural optimization
+at a PBE level of theory unless circumstances demand otherwise. This
+is justified by ref:fig:lc_lot_vs.
+
+We anticipate our principal challenge will be in extracting useful
+predictor variables from the composition information.
+
+The basic feature sets examined here are highly correlated, but
+nonetheless show promise both as a basic screening criterion, and as
+robust classifier features under t-SNE transformation.
 
 Modeling pipelines capable of predicting Perovskite decomposition
 energy will likely be very achievable using a transductive and
 invertible equivalent of the tSNE algorithm, potentially SONG.
+
+For this reason, kernel learning methods appear to be particularly
+promising for high speed optimization of the space.
 
 * Conclusions
 :PROPERTIES:
@@ -396,7 +417,7 @@ invertible equivalent of the tSNE algorithm, potentially SONG.
 :END:
 There are no conflicts to declare.
 
-* Acknowledgements
+* acknowledgements
 :PROPERTIES:
 :CUSTOM_ID: acknowledgements
 :CLASS: unnumbered
