@@ -1,4 +1,4 @@
-% Created 2022-06-06 Mon 01:20
+% Created 2022-06-06 Mon 12:52
 % Intended LaTeX compiler: pdflatex
 \documentclass[twoside, twocolumn, 9pt, draft]{article}
 \usepackage[utf8]{inputenc}
@@ -12,7 +12,10 @@
 \usepackage{amssymb}
 \usepackage{capt-of}
 \usepackage{hyperref}
-\usepackage[acronym]{glossaries}
+\usepackage[acronym,nogroupskip,nonumberlist]{glossaries}
+\usepackage[%
+stylemods,style=long-name-desc,
+]{glossaries-extra}
 \usepackage{abstract}%% easy abstract environment (from frontmatter pkg "ltxfront")
 \usepackage[export]{adjustbox}%% expanded control over image, minipages, etc
 \usepackage{sectsty}%% control of section heading appearance in default and script doc classes
@@ -202,7 +205,7 @@ and improved performance across many optoelectronic applications.
 \footnotetext{\textsuperscript{\dag}Electronic Supplementary Information (ESI) available: https://www.github.com/PanayotisManganaris/REPO_TODO. See DOI: 00.0000/00000000.}
 
 \section*{{\bfseries\sffamily DONE} Introduction}
-\label{sec:org19fff68}
+\label{sec:org7e3fe03}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-06-05 Sun 18:16]}
 \end{itemize}
@@ -227,6 +230,9 @@ alloy space. Structural information is considered constant to better
 focus on obtaining physically meaningful interpretations of models
 dealing only with information derived from a sample composition.
 
+\printglossary
+\printglossary[style=mcolindex, type=\acronymtype]
+
 \begin{figure*}
 \centering
 \includegraphics[h,width=.9\linewidth]{outline.png}
@@ -234,9 +240,9 @@ dealing only with information derived from a sample composition.
 \end{figure*}
 
 \section*{{\bfseries\sffamily TODO} Methodology}
-\label{sec:orgb2525b9}
+\label{sec:org8240ddc}
 \subsection*{{\bfseries\sffamily NEXT} Building Perovskite Dataset}
-\label{sec:org0902f06}
+\label{sec:org604959b}
 \begin{itemize}
 \item State "NEXT"       from "TODO"       \textit{[2022-06-05 Sun 22:11]}
 \end{itemize}
@@ -279,7 +285,7 @@ validity of the PBE relaxations.
 \end{figure*}
 
 \subsection*{{\bfseries\sffamily TODO} Calculation Details}
-\label{sec:orgd7c2afc}
+\label{sec:org0c60371}
 Calculation DFT calculations are performed with \gls{vasp} version
 6.1. \acrfull{paw} pseudopotentials were used. All calculations for
 all samples are performed using the \acrfull{pbe}
@@ -290,12 +296,12 @@ Monkhorst-Pack k-point mesh. The structural force convergence
 threshold is set to be 0.5 eV/Å.
 
 \subsubsection*{{\bfseries\sffamily TODO} LOPTICS Calculations and Absorption Spectrum}
-\label{sec:org9539b06}
+\label{sec:org37b2be3}
 
 \subsection*{{\bfseries\sffamily TODO} Discussion of DFT Computed Properties}
-\label{sec:orgdbb580a}
+\label{sec:orgfc3d23c}
 \subsubsection*{{\bfseries\sffamily DONE} Decomposition Energy}
-\label{sec:org5121a38}
+\label{sec:orgbe45ef7}
 \begin{itemize}
 \item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 00:43]}
 \end{itemize}
@@ -308,14 +314,14 @@ equation \eqref{eq:decoE}. This calculation is performed separately for
 each level of theory.
 
 \begin{equation}\label{eq:decoE}
-E_{decomp} = E_{opt}(ABX_3) - E_{opt}(AX) - E_{opt}(AX2)
+E_{decomp} = E_{opt}(ABX_3) - E_{opt}(AX) - E_{opt}(BX2)
 \end{equation}
 
 \subsubsection*{{\bfseries\sffamily TODO} Band Gap and Band Structure}
-\label{sec:org2631fe5}
+\label{sec:org4b00cad}
 
 \subsubsection*{{\bfseries\sffamily DONE} SLME Package}
-\label{sec:org0077bb6}
+\label{sec:org08a7947}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-06-05 Sun 20:45]}
 \end{itemize}
@@ -328,9 +334,9 @@ for the PBE band gaps and the HSE band gaps, resulting in two
 synthetic efficiencies for each record.
 
 \section*{{\bfseries\sffamily TODO} Results and discussion}
-\label{sec:org3a4adfb}
+\label{sec:org99d48f0}
 \subsection*{{\bfseries\sffamily TODO} Visualization of DFT Data}
-\label{sec:org2a123b6}
+\label{sec:org5194870}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{Figure2.png}
@@ -338,7 +344,7 @@ synthetic efficiencies for each record.
 \end{figure*}
 
 \subsubsection*{{\bfseries\sffamily DONE} Lattice constant PBE vs HSE}
-\label{sec:org6f01156}
+\label{sec:orgbaa0db2}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-06-06 Mon 01:02]}
 \end{itemize}
@@ -362,7 +368,7 @@ the focus of this report.
 \end{center}
 
 \subsubsection*{{\bfseries\sffamily DONE} Comparing synthetic to physical data}
-\label{sec:org955e68f}
+\label{sec:org84f902b}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-06-06 Mon 01:01]}
 \end{itemize}
@@ -380,7 +386,7 @@ The physical data used in comparison is collected from the works of
 \citet{briones-2021-accel-lattic,jiang-2006-predic-lattic,chen-2015-under-spotl}.
 
 \subsubsection*{{\bfseries\sffamily TODO} Decomposition energy vs band gap PBE and HSE}
-\label{sec:org9551c98}
+\label{sec:orga0d5cda}
 Fig 2(b) is showing the PBE band gap compared to the PBE decomposition
 energy. It presents the diversity of our perovskite dataset. The data
 sets cover a large range of band gap and decomposition energy. For
@@ -396,7 +402,7 @@ on low decomposition energy. Compared to PBE plot, more data should be
 added in high decomposition energy region and suitable band gap region.
 
 \subsubsection*{{\bfseries\sffamily TODO} Spectroscopic Limited Maximum Efficiency (SLME) vs PBE Band gap}
-\label{sec:org3e6fa3d}
+\label{sec:org6e2b3a5}
 Fig 2(d) presents the Spectroscopic Limited Maximum Efficiency (SLME)
 values related to the PBE band gap. Spectroscopic Limited Maximum
 Efficiency (SLME) is a very important properties for photovoltaic
@@ -408,7 +414,7 @@ gap increases, the SLME value decreases and eventually goes to zero due
 to the high band gap values.
 
 \subsection*{{\bfseries\sffamily TODO} Pearson Correlation Results}
-\label{sec:org057246c}
+\label{sec:org0b92079}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{PBE_v_comp_pearson2.png}
@@ -430,7 +436,7 @@ but always with extensive variability. Evidently, an accurate model will
 have to be formed on a multidimensional domain.
 
 \subsection*{{\bfseries\sffamily TODO} PCA}
-\label{sec:orgff272f5}
+\label{sec:org65849cf}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{comp_ratio_projection_annot.png}
@@ -455,7 +461,7 @@ explanation for why perovskite properties vary, this can be useful for
 accuracy, it can also be a bias-inducing hindrance.
 
 \subsection*{{\bfseries\sffamily TODO} t-SNE visualization of stability clustering}
-\label{sec:orge3bf035}
+\label{sec:org74812b0}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{tsne_comp_DecoE_clusters.png}
@@ -463,7 +469,7 @@ accuracy, it can also be a bias-inducing hindrance.
 \end{figure*}
 
 \subsection*{{\bfseries\sffamily DONE} Screening process of all samples in database}
-\label{sec:org6c431e7}
+\label{sec:org7de5140}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-05-24 Tue 13:31]}
 \end{itemize}
@@ -490,7 +496,7 @@ will discuss the details of each constraint.
 \end{figure*}
 
 \subsubsection*{Deviation from Cubicity}
-\label{sec:org204c393}
+\label{sec:org65cdfae}
 For all the compositions we tested in our data set, some of them will
 have large strain and deformation because of the combination of
 elements. For these largely deformed samples, they are no longer remain
@@ -515,7 +521,7 @@ ligands in A site sometimes increase the lattice along some direction
 and make the perovskite deformed.
 
 \subsubsection*{Octahedral factor, tolerance factor, and Bartel tolerance factor}
-\label{sec:org16a6d59}
+\label{sec:org12325c3}
 The stability of perovskite can be predicted by using the atom radius of
 all components. There are 3 types of factors are usually considered,
 Octahedral factor, tolerance factor, and Bartel tolerance factor. The
@@ -532,11 +538,11 @@ criteria of Bartel tolerance factor, the decomposition energy is rapidly
 decreased.
 
 \subsubsection*{Screening Results}
-\label{sec:orgc212bee}
+\label{sec:org633f815}
 \ldots{}\\
 
 \section*{Perspective and Future Work}
-\label{sec:orgd9c9017}
+\label{sec:org086bca8}
 The design of this dataset is uniquely suited to the exploration of
 alloying effects on Perovskite properties. The combinatorial space of
 possible alloys has been sparsely but systematically sampled along
@@ -569,15 +575,15 @@ For this reason, kernel learning methods appear to be particularly
 promising for high speed optimization of the space.
 
 \section*{Conclusions}
-\label{sec:org1f97a79}
+\label{sec:org865278d}
 \ldots{}\\
 
 \section*{Conflicts of interest}
-\label{sec:org052b034}
+\label{sec:orgea0e21a}
 There are no conflicts to declare.
 
 \section*{acknowledgements}
-\label{sec:org26dcfaa}
+\label{sec:org82d0862}
 Extensive discussions with and scientific feedback from UC San Diego
 researchers David Fenning and Rishi Kumar and Argonne National Lab
 scientist Maria Chan are acknowledged. This work was performed at Purdue
@@ -590,7 +596,7 @@ Purdue.
 \bibliographystyle{rsc}
 \bibliography{../../../org/bibliotex/bibliotex}
 \section*{Supplemental Material}
-\label{sec:org8167099}
+\label{sec:org21a7cfd}
 \begin{center}
 \includegraphics[width=.9\linewidth]{HSE_v_comp_pearson2.png}
 \end{center}

@@ -12,7 +12,10 @@
 #+cite_export:
 #+latex_class: article
 #+latex_class_options: [twoside, twocolumn, 9pt, draft]
-#+latex_header: \usepackage[acronym]{glossaries}
+#+latex_header: \usepackage[acronym,nogroupskip,nonumberlist]{glossaries}
+#+latex_header: \usepackage[%
+#+latex_header: stylemods,style=long-name-desc,
+#+latex_header: ]{glossaries-extra}
 #+latex_header_extra: \makeglossaries
 #+latex_header_extra: \newglossaryentry{vasp}{name=VASP, description={Vienna Ab initio Simulation Package}}
 #+latex_header_extra: \newacronym{paw}{PAW}{projector augmented wave}
@@ -60,6 +63,9 @@ to provide an initial sampling suitable for guiding exploration of the
 alloy space. Structural information is considered constant to better
 focus on obtaining physically meaningful interpretations of models
 dealing only with information derived from a sample composition.
+
+\printglossary
+\printglossary[style=mcolindex, type=\acronymtype]
 
 #+ATTR_LATEX: :float multicolumn :options h
 #+CAPTION: \label{fig:outline} 
@@ -164,7 +170,7 @@ equation eqref:eq:decoE. This calculation is performed separately for
 each level of theory.
 
 \begin{equation}\label{eq:decoE}
-E_{decomp} = E_{opt}(ABX_3) - E_{opt}(AX) - E_{opt}(AX2)
+E_{decomp} = E_{opt}(ABX_3) - E_{opt}(AX) - E_{opt}(BX2)
 \end{equation}
 
 *** TODO Band Gap and Band Structure
@@ -339,7 +345,7 @@ accuracy, it can also be a bias-inducing hindrance.
 :END:
 #+ATTR_LATEX: :float multicolumn
 #+CAPTION: \label{fig:pca}
-#+CAPTION: t-SNE
+#+CAPTION: t-SNE 
 [[file:tsne_comp_DecoE_clusters.png]]
 
 ** DONE Screening process of all samples in database
