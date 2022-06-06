@@ -18,6 +18,7 @@
 #+latex_header: ]{glossaries-extra}
 #+latex_header_extra: \makeglossaries
 #+latex_header_extra: \newglossaryentry{vasp}{name=VASP, description={Vienna Ab initio Simulation Package}}
+#+latex_header_extra: \newglossaryentry{slme}{name=SLME, description={Spectroscopically Limited Maximum Efficiency}, user1=\citeauthor{yu-2012-ident-poten}}
 #+latex_header_extra: \newacronym{paw}{PAW}{projector augmented wave}
 #+latex_header_extra: \newacronym{gga}{GGA}{generalized gradient approximation}
 #+latex_header_extra: \newacronym{pbe}{PBE}{Perdew-Burke-Ernzerhof}
@@ -35,7 +36,7 @@
 \footnotetext{\textsuperscript{\dag}Electronic Supplementary Information (ESI) available: https://www.github.com/PanayotisManganaris/REPO_TODO. See DOI: 00.0000/00000000.}
 #+end_export
 
-* DONE Introduction
+* TODO Introduction
 :PROPERTIES:
 :CUSTOM_ID: introduction
 :CLASS: unnumbered
@@ -63,9 +64,6 @@ to provide an initial sampling suitable for guiding exploration of the
 alloy space. Structural information is considered constant to better
 focus on obtaining physically meaningful interpretations of models
 dealing only with information derived from a sample composition.
-
-\printglossary
-\printglossary[style=mcolindex, type=\acronymtype]
 
 #+ATTR_LATEX: :float multicolumn :options h
 #+CAPTION: \label{fig:outline} 
@@ -97,26 +95,31 @@ component vectors form a constrained 14 dimensional space (Figure
 ref:fig:chemspace_uni) within which all Perovskite compounds
 consisting of the elements in Figure ref:fig:outline (a) must exist.
 
-Each computational run is performed using a 2x2x2 supercell, this
-allows A and B site doping to be modeled in discrete 1/8^th fractions
-of the total site occupancy, and it allows X site doping to be modeled
-in 1/24^th fractions. At these mixing levels, it is appropriate to
-call all these Perovskites alloys.
-
 The pure (non-alloyed) possibilities are exhaustively sampled using
 \(5*6*3 = 90\) Perovskites. Based on these pure Perovskite structures,
 we mix candidates for A, B, and X sites systematically. The alloy
 space sees combinatorial scaling and must be sparsely sampled
 ref:fig:sample_map.
 
-To create alloys, for example in B sites, we first select possible B
-sites mixing elements.  Then SQS methods are applied to generate
-random alloys for given mixing concentrations. Thus, we constructed
-126 A-site mixing samples, 151 B-site mixing samples and 127 X-site
-mixing samples. All resulting structures are optimized using a DFT
-variable-cell relaxation under PBE-GGA. 299 of these same initial
-structures also undergo a full HSE06 relaxation to help ensure the
-validity of the PBE relaxations.
+To generate site-mixing structures with high representativeness,
+special quasi-random structures (SQS) are applied. The SQS method is
+to build a special periodic structure and make the first
+nearest-neighbor shells as similar to the target random alloy as
+possible. The SQS can be considered as the best possible periodic unit
+cell representing a given random alloy.
+
+Each computational run is performed using a 2x2x2 supercell, this
+allows A and B site doping to be modeled in discrete 1/8^th fractions
+of the total site occupancy, and it allows X site doping to be modeled
+in 1/24^th fractions. At these mixing levels, it is appropriate to
+call all these Perovskites alloys.
+
+following the process above, 126 A-site mixing samples, 151 B-site
+mixing samples and 127 X-site mixing samples are generated. All
+resulting structures are optimized using a DFT variable-cell
+relaxation under \acr(pbe). These same initial structures also
+underwent a full \acr(hse) relaxation to help ensure the validity of
+the PBE relaxations, however only 299 were computationally tractable.
 
 #+ATTR_LATEX: :float multicolumn
 #+CAPTION: \label{fig:chemspace_uni}
@@ -128,30 +131,32 @@ validity of the PBE relaxations.
 #+CAPTION: \label{fig:sample_map}
 #+CAPTION: Heatmaps show samples chosen to represent B-alloy space
 
-** TODO Calculation Details
+** DONE Calculation Details
 :PROPERTIES:
 :CUSTOM_ID: calculation-details
 :CLASS: unnumbered
 :END:
-Calculation DFT calculations are performed with \gls{vasp} version
-6.1. \acrfull{paw} pseudopotentials were used. All calculations for
-all samples are performed using the \acrfull{pbe}
-functional. Additionally, \acrfull{hse} is used as
-exchange-correlation energy. The energy cutoff for the plane-wave
-basis is set to 500 eV. The Brillouin zone was sampled by 4x4x4
-Monkhorst-Pack k-point mesh. The structural force convergence
-threshold is set to be 0.5 eV/Å.
-
-*** TODO LOPTICS Calculations and Absorption Spectrum
-:PROPERTIES:
-:CUSTOM_ID: loptics-calculations-and-absorption-spectrum
-:CLASS: unnumbered
+:STATUSLOG:
+- State "DONE"       from "TODO"       [2022-06-06 Mon 17:17]
 :END:
+DFT calculations are performed with \gls{vasp} version 6.2. The
+\acr{paw} potentials were used as pseudopotentials. The generalized
+gradient approximation \acr{gga} of \acr{pbe} and the hybrid \acr{hse}
+(\alpha=0.25 and \omega=0.2) functionals are used as
+exchange-correlation energy. The energy cutoff for the plane-wave
+basis is set to 500 eV. For \acr{pbe} the Brillouin zone was sampled
+by 6x6x6 reciprocal mesh using the Monkhorst-Pack k-point mesh. For
+\acr{hse} the Brillouin zone was sampled by 2x2x2 reciprocal mesh
+using the Monkhorst-Pack k-point mesh. The structural force
+convergence threshold is set to be 0.005 eV/\AA.
 
 ** TODO Discussion of DFT Computed Properties
 :PROPERTIES:
 :CUSTOM_ID: analysis-of-dft-computed-properties
 :CLASS: unnumbered
+:END:
+:STATUSLOG:
+- State "DONE"       from "TODO"       [2022-06-06 Mon 17:19]
 :END:
 *** DONE Decomposition Energy
 :PROPERTIES:
@@ -173,27 +178,28 @@ each level of theory.
 E_{decomp} = E_{opt}(ABX_3) - E_{opt}(AX) - E_{opt}(BX2)
 \end{equation}
 
-*** TODO Band Gap and Band Structure
-:PROPERTIES:
-:CUSTOM_ID: band-gap-and-band-structure
-:CLASS: unnumbered
-:END:
-
-*** DONE SLME Package
+*** TODO \gls{slme} calculations
 :PROPERTIES:
 :CUSTOM_ID: slme-package
 :CLASS: unnumbered
 :END:
 :STATUSLOG:
-- State "DONE"       from              [2022-06-05 Sun 20:45]
+- State "DONE"       from "TODO"       [2022-06-06 Mon 17:30]
 :END:
-The SLME metric developed by [[citet:&yu-2012-ident-poten]] is used as the
-primary criterion screening perovskites for their photovoltaic
-merits. The SLME value is computed considering a 5\mu{}m absorption layer
-for every Perovskite using Logan William's SL3ME
-[[cite:&williams-2022-sl3me]]. This calculation is performed separately
-for the PBE band gaps and the HSE band gaps, resulting in two
-synthetic efficiencies for each record.
+The \gls{slme} metric developed by [[citet:&yu-2012-ident-poten]] is used
+as the primary criterion screening perovskites for their photovoltaic
+merits. The SLME value is computed considering a 5\mu{}m absorption
+layer for every Perovskite according to eqref:eq:slme.
+
+\begin{equation}\label{eq:slme}
+
+\end{equation}
+
+This calculation is performed using Logan William's SL3ME
+[[cite:&williams-2022-sl3me]]. Based on absorption spectra obtained from
+from VASP. This calculation is performed separately for the \acr{pbe}
+band gaps and the \acr{hse} band gaps, resulting in two synthetic
+efficiencies for each record.
 
 * TODO Results and discussion
 :PROPERTIES:
@@ -504,6 +510,9 @@ bibliography:~/org/bibliotex/bibliotex.bib
 :CUSTOM_ID: SI
 :CLASS: unnumbered
 :END:
+\printglossary
+\printglossary[style=mcolindex, type=\acronymtype]
+
 [[file:HSE_v_comp_pearson2.png]]
 [[file:HSE_v_site_prop_pearson.png]]
 

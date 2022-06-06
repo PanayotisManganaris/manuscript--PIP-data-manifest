@@ -1,4 +1,4 @@
-% Created 2022-06-06 Mon 12:52
+% Created 2022-06-06 Mon 17:43
 % Intended LaTeX compiler: pdflatex
 \documentclass[twoside, twocolumn, 9pt, draft]{article}
 \usepackage[utf8]{inputenc}
@@ -71,6 +71,7 @@ bottom=2.0cm
 %\linenumbers\relax%% Commence numbering lines
 \makeglossaries
 \newglossaryentry{vasp}{name=VASP, description={Vienna Ab initio Simulation Package}}
+\newglossaryentry{slme}{name=SLME, description={Spectroscopically Limited Maximum Efficiency}, user1=\citeauthor{yu-2012-ident-poten}}
 \newacronym{paw}{PAW}{projector augmented wave}
 \newacronym{gga}{GGA}{generalized gradient approximation}
 \newacronym{pbe}{PBE}{Perdew-Burke-Ernzerhof}
@@ -205,9 +206,9 @@ and improved performance across many optoelectronic applications.
 \footnotetext{\textsuperscript{\dag}Electronic Supplementary Information (ESI) available: https://www.github.com/PanayotisManganaris/REPO_TODO. See DOI: 00.0000/00000000.}
 
 \section*{{\bfseries\sffamily TODO} Introduction}
-\label{sec:org7e3fe03}
+\label{sec:orgbc77c8f}
 \begin{itemize}
-\item State "TODO"       from     JY         \textit{[2022-06-06 Mon ]}
+\item State "DONE"       from              \textit{[2022-06-05 Sun 18:16]}
 \end{itemize}
 The challenge of optimizing Perovskite performance is one with many
 facets. Almost every detail of a Perovskite crystal's structure and
@@ -230,9 +231,6 @@ alloy space. Structural information is considered constant to better
 focus on obtaining physically meaningful interpretations of models
 dealing only with information derived from a sample composition.
 
-\printglossary
-\printglossary[style=mcolindex, type=\acronymtype]
-
 \begin{figure*}
 \centering
 \includegraphics[h,width=.9\linewidth]{outline.png}
@@ -240,13 +238,12 @@ dealing only with information derived from a sample composition.
 \end{figure*}
 
 \section*{{\bfseries\sffamily TODO} Methodology}
-\label{sec:org8240ddc}
-\subsection*{{\bfseries\sffamily DONE} Building Perovskite Dataset}
-\label{sec:org604959b}
+\label{sec:org7503b63}
+\subsection*{{\bfseries\sffamily NEXT} Building Perovskite Dataset}
+\label{sec:org2313c00}
 \begin{itemize}
-\item State "TODO"       from "DONE-JY"       \textit{[2022-06-05 Mon]}
+\item State "NEXT"       from "TODO"       \textit{[2022-06-05 Sun 22:11]}
 \end{itemize}
-
 The dataset we report is based on standard cubic phase ABX\textsubscript{3}
 Perovskite structures obtained from public databases. Fourteen common
 Perovskite constituents are selected to form our Halide Perovskite
@@ -264,21 +261,25 @@ we mix candidates for A, B, and X sites systematically. The alloy
 space sees combinatorial scaling and must be sparsely sampled
 \ref{fig:sample_map}.
 
-To generate site-mixing structures with high representativeness, special quasi-random structures (SQS) are applied. The SQS method is to build a special periodic structure and make the first nearest-neighbor shells as similar to the target random alloy as possible. The SQS can be considered as the best possible periodic unit cell representing a given random alloy.
+To generate site-mixing structures with high representativeness,
+special quasi-random structures (SQS) are applied. The SQS method is
+to build a special periodic structure and make the first
+nearest-neighbor shells as similar to the target random alloy as
+possible. The SQS can be considered as the best possible periodic unit
+cell representing a given random alloy.
 
-Each computational structure is  using a 2x2x2 supercell, this
+Each computational run is performed using a 2x2x2 supercell, this
 allows A and B site doping to be modeled in discrete 1/8\textsuperscript{th} fractions
 of the total site occupancy, and it allows X site doping to be modeled
 in 1/24\textsuperscript{th} fractions. At these mixing levels, it is appropriate to
 call all these Perovskites alloys.
 
-
-
-Following the processs above, 126 A-site mixing samples, 151 B-site mixing samples and 127 X-site
-mixing samples are generated. All resulting structures are optimized using a DFT
-variable-cell relaxation under PBE-GGA. 299 of these same initial
-structures also undergo a full HSE06 relaxation to help ensure the
-validity of the PBE relaxations.
+following the process above, 126 A-site mixing samples, 151 B-site
+mixing samples and 127 X-site mixing samples are generated. All
+resulting structures are optimized using a DFT variable-cell
+relaxation under \acr(pbe). These same initial structures also
+underwent a full \acr(hse) relaxation to help ensure the validity of
+the PBE relaxations, however only 299 were computationally tractable.
 
 \begin{figure*}
 \centering
@@ -286,17 +287,29 @@ validity of the PBE relaxations.
 \caption{\label{fig:chemspace_uni} Plots showing number of Perovskites representing a constituent at a certain atomic fraction of a complete Perovskite.}
 \end{figure*}
 
-\subsection*{{\bfseries\sffamily DONE -JY} Calculation Details}
-\label{sec:org0c60371}
-DFT calculations are performed with Vienna Ab initio Simulation Package (VASP) version 6.2. The projector augmented wave (PAW) potentials were used as pseudopotentials. The generalized gradient approximation (GGA) of Perdew, Burke and Ernzerhof (PBE) and the hybrid HSE06 functional are used as exchange-correlation energy. The energy cutoff for the plane-wave basis is set to 500 eV. The Brillouin zone was sampled by Monkhorst-Pack k-point mesh, with a reciprocal mesh as 6x6x6 for PBE calculations and 2x2x2 for HSE calculations respectively. The structural force convergence threshold is set to be 0.005 eV/Å.
-
-
-
+\subsection*{{\bfseries\sffamily DONE} Calculation Details}
+\label{sec:org871db90}
+\begin{itemize}
+\item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 17:17]}
+\end{itemize}
+DFT calculations are performed with \gls{vasp} version 6.2. The
+\acr{paw} potentials were used as pseudopotentials. The generalized
+gradient approximation \acr{gga} of \acr{pbe} and the hybrid \acr{hse}
+(\(\alpha\)=0.25 and \(\omega\)=0.2) functionals are used as
+exchange-correlation energy. The energy cutoff for the plane-wave
+basis is set to 500 eV. For \acr{pbe} the Brillouin zone was sampled
+by 6x6x6 reciprocal mesh using the Monkhorst-Pack k-point mesh. For
+\acr{hse} the Brillouin zone was sampled by 2x2x2 reciprocal mesh
+using the Monkhorst-Pack k-point mesh. The structural force
+convergence threshold is set to be 0.005 eV/\AA{}.
 
 \subsection*{{\bfseries\sffamily TODO} Discussion of DFT Computed Properties}
-\label{sec:orgfc3d23c}
+\label{sec:org13d66b2}
+\begin{itemize}
+\item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 17:19]}
+\end{itemize}
 \subsubsection*{{\bfseries\sffamily DONE} Decomposition Energy}
-\label{sec:orgbe45ef7}
+\label{sec:orgaa02bb1}
 \begin{itemize}
 \item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 00:43]}
 \end{itemize}
@@ -312,28 +325,30 @@ each level of theory.
 E_{decomp} = E_{opt}(ABX_3) - E_{opt}(AX) - E_{opt}(BX2)
 \end{equation}
 
-
-\subsubsection*{{\bfseries\sffamily TODO-JY} The Spectroscopically Limited Maximum Efficiency Calculations}
-\label{sec:org08a7947}
+\subsubsection*{{\bfseries\sffamily TODO} \gls{slme} calculations}
+\label{sec:org8628bf8}
 \begin{itemize}
-\item State "TODO-JY"       from     "DONE"         \textit{[2022-06-06 Mon]}
+\item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 17:30]}
 \end{itemize}
+The \gls{slme} metric developed by \citet{yu-2012-ident-poten} is used
+as the primary criterion screening perovskites for their photovoltaic
+merits. The SLME value is computed considering a 5\(\mu\)m absorption
+layer for every Perovskite according to \eqref{eq:slme}.
 
-JY-Will ADD: SLME formula and general concept
+\begin{equation}\label{eq:slme}
 
-The Spectroscopically Limited Maximum Efficiency (SLME) metric developed by \citet{yu-2012-ident-poten} is used as the
-primary criterion screening perovskites for their photovoltaic
-merits. The SLME value is computed considering a 5\(\mu\)m absorption layer
-for every Perovskite .
-n(we need to put some math formula here to show how SLME is integrated from absorption coefficient)
+\end{equation}
 
-This calculation is performed based on absorption spectrum calculation from VASP and then apply SLME python package (Logan William's SL3ME
-\cite{williams-2022-sl3me}) to similate the efficiency value.
+This calculation is performed using Logan William's SL3ME
+\cite{williams-2022-sl3me}. Based on absorption spectra obtained from
+from VASP. This calculation is performed separately for the \acr{pbe}
+band gaps and the \acr{hse} band gaps, resulting in two synthetic
+efficiencies for each record.
 
 \section*{{\bfseries\sffamily TODO} Results and discussion}
-\label{sec:org99d48f0}
+\label{sec:org2a78554}
 \subsection*{{\bfseries\sffamily TODO} Visualization of DFT Data}
-\label{sec:org5194870}
+\label{sec:orgaeaf0e0}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{Figure2.png}
@@ -341,7 +356,7 @@ This calculation is performed based on absorption spectrum calculation from VASP
 \end{figure*}
 
 \subsubsection*{{\bfseries\sffamily DONE} Lattice constant PBE vs HSE}
-\label{sec:orgbaa0db2}
+\label{sec:org8ab31c3}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-06-06 Mon 01:02]}
 \end{itemize}
@@ -365,7 +380,7 @@ the focus of this report.
 \end{center}
 
 \subsubsection*{{\bfseries\sffamily DONE} Comparing synthetic to physical data}
-\label{sec:org84f902b}
+\label{sec:org09c688b}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-06-06 Mon 01:01]}
 \end{itemize}
@@ -383,7 +398,7 @@ The physical data used in comparison is collected from the works of
 \citet{briones-2021-accel-lattic,jiang-2006-predic-lattic,chen-2015-under-spotl}.
 
 \subsubsection*{{\bfseries\sffamily TODO} Decomposition energy vs band gap PBE and HSE}
-\label{sec:orga0d5cda}
+\label{sec:org04b74a6}
 Fig 2(b) is showing the PBE band gap compared to the PBE decomposition
 energy. It presents the diversity of our perovskite dataset. The data
 sets cover a large range of band gap and decomposition energy. For
@@ -399,7 +414,7 @@ on low decomposition energy. Compared to PBE plot, more data should be
 added in high decomposition energy region and suitable band gap region.
 
 \subsubsection*{{\bfseries\sffamily TODO} Spectroscopic Limited Maximum Efficiency (SLME) vs PBE Band gap}
-\label{sec:org6e2b3a5}
+\label{sec:orgda36845}
 Fig 2(d) presents the Spectroscopic Limited Maximum Efficiency (SLME)
 values related to the PBE band gap. Spectroscopic Limited Maximum
 Efficiency (SLME) is a very important properties for photovoltaic
@@ -411,7 +426,7 @@ gap increases, the SLME value decreases and eventually goes to zero due
 to the high band gap values.
 
 \subsection*{{\bfseries\sffamily TODO} Pearson Correlation Results}
-\label{sec:org0b92079}
+\label{sec:orge954c84}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{PBE_v_comp_pearson2.png}
@@ -433,7 +448,7 @@ but always with extensive variability. Evidently, an accurate model will
 have to be formed on a multidimensional domain.
 
 \subsection*{{\bfseries\sffamily TODO} PCA}
-\label{sec:org65849cf}
+\label{sec:orgbcf0319}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{comp_ratio_projection_annot.png}
@@ -458,7 +473,7 @@ explanation for why perovskite properties vary, this can be useful for
 accuracy, it can also be a bias-inducing hindrance.
 
 \subsection*{{\bfseries\sffamily TODO} t-SNE visualization of stability clustering}
-\label{sec:org74812b0}
+\label{sec:orgda39157}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{tsne_comp_DecoE_clusters.png}
@@ -466,7 +481,7 @@ accuracy, it can also be a bias-inducing hindrance.
 \end{figure*}
 
 \subsection*{{\bfseries\sffamily DONE} Screening process of all samples in database}
-\label{sec:org7de5140}
+\label{sec:orgf8df63d}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-05-24 Tue 13:31]}
 \end{itemize}
@@ -493,7 +508,7 @@ will discuss the details of each constraint.
 \end{figure*}
 
 \subsubsection*{Deviation from Cubicity}
-\label{sec:org65cdfae}
+\label{sec:org59c5bfb}
 For all the compositions we tested in our data set, some of them will
 have large strain and deformation because of the combination of
 elements. For these largely deformed samples, they are no longer remain
@@ -518,7 +533,7 @@ ligands in A site sometimes increase the lattice along some direction
 and make the perovskite deformed.
 
 \subsubsection*{Octahedral factor, tolerance factor, and Bartel tolerance factor}
-\label{sec:org12325c3}
+\label{sec:org75e2d43}
 The stability of perovskite can be predicted by using the atom radius of
 all components. There are 3 types of factors are usually considered,
 Octahedral factor, tolerance factor, and Bartel tolerance factor. The
@@ -535,11 +550,11 @@ criteria of Bartel tolerance factor, the decomposition energy is rapidly
 decreased.
 
 \subsubsection*{Screening Results}
-\label{sec:org633f815}
+\label{sec:org14f7d2d}
 \ldots{}\\
 
 \section*{Perspective and Future Work}
-\label{sec:org086bca8}
+\label{sec:org9239cd6}
 The design of this dataset is uniquely suited to the exploration of
 alloying effects on Perovskite properties. The combinatorial space of
 possible alloys has been sparsely but systematically sampled along
@@ -572,15 +587,15 @@ For this reason, kernel learning methods appear to be particularly
 promising for high speed optimization of the space.
 
 \section*{Conclusions}
-\label{sec:org865278d}
+\label{sec:org1f6906b}
 \ldots{}\\
 
 \section*{Conflicts of interest}
-\label{sec:orgea0e21a}
+\label{sec:org0514288}
 There are no conflicts to declare.
 
 \section*{acknowledgements}
-\label{sec:org82d0862}
+\label{sec:org7d123a9}
 Extensive discussions with and scientific feedback from UC San Diego
 researchers David Fenning and Rishi Kumar and Argonne National Lab
 scientist Maria Chan are acknowledged. This work was performed at Purdue
@@ -593,7 +608,10 @@ Purdue.
 \bibliographystyle{rsc}
 \bibliography{../../../org/bibliotex/bibliotex}
 \section*{Supplemental Material}
-\label{sec:org21a7cfd}
+\label{sec:orgf894ef2}
+\printglossary
+\printglossary[style=mcolindex, type=\acronymtype]
+
 \begin{center}
 \includegraphics[width=.9\linewidth]{HSE_v_comp_pearson2.png}
 \end{center}

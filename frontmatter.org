@@ -89,11 +89,11 @@
 \begin{abstract}
 Novel halide Perovskites with improved stability and optoelectronic properties can be designed via composition engineering at cation and/or
 anion sites. Data-driven methods, especially high-throughput first principles computations and subsequent analysis based on unique materials
-descriptors, are key to achieving this goal. In this work, we report a Density Functional Theory (DFT) based dataset of 550 ABX\textsubscript{3} halide
+descriptors, are key to achieving this goal. In this work, we report a Density Functional Theory (DFT) based dataset of 495 ABX\textsubscript{3} halide
 Perovskite compounds, with various atomic and molecular species considered at A, B and X sites, and different amounts of mixing considered
 at each site generated using the Special Quasirandom Structures (SQS) algorithm for alloys. We perform GGA-PBE calculations on pseudo-cubic
 Perovskite structures to determine their lattice constants, stability in terms of formation and decomposition energies, electronic band gaps,
-and properties extracted from optical absorption spectra. To elucidate the importance of the level of theory used, we further perform 300 calculations
+and properties extracted from optical absorption spectra. To elucidate the importance of the level of theory used, we further perform 299 calculations
 using the more expensive HSE06 functional and determine lattice constant, stability and band gap, and compare PBE and HSE06 properties with
 some experimentally measured results. Trends in the datasets are unraveled in terms of the effects of mixing at different sites, the
 composition in terms of specific atomic or molecular species, and averaged elemental properties of species at different sites. This work
