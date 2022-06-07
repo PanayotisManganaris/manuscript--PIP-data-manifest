@@ -407,9 +407,21 @@ constraint.
 
 #+ATTR_LATEX: :float multicolumn
 #+CAPTION: \label{fig:cuts}
-#+CAPTION: placing limits on properties governing viability results in a subset
-#+CAPTION: of the dataset potentially suitable for physical testing.
-[[file:Figure6.png]]
+#+CAPTION: Screening results of Decomposition Energy for (a) octahedral factor
+#+CAPTION: (b) Tolerance Factor (c) Bartel Tolerance Factor (d) Deviation of
+#+CAPTION: Cubicity.
+[[file:screening_factor.png]]
+
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{fig:leftover}
+#+CAPTION: 49 Screened perovskites analysis, (a) pie chart of element
+#+CAPTION: distribution, (b) pie chart of site mixing
+[[file:screening_pie.png]]
+
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{fig:leftover_comp}
+#+CAPTION: Plots of element fraction for A, B, X sites of all screened perovskites.
+[[file:Element_Frac.jpg]]
 
 *** TODO Deviation from Cubicity
 :PROPERTIES:
@@ -465,13 +477,69 @@ factor, the decomposition energy is rapidly decreased.
 :CUSTOM_ID: screening-results
 :CLASS: unnumbered
 :END:
-...\\
+The table XXX shows all 41 promising candidates we screened from our
+dataset by using the cutoff criteria mentioned above. FigXXX shows the
+element distribution of all decent samples. It indicates that MA and
+FA are the most common A site choices for a Perovskite with great
+stability and suitable band gap and photovoltaic properties. For
+inorganic A sites, Cs also contributes a large portion. In B site
+element selection, Pb and Sn are the most selected than other B site
+elements. For X site halide elements, Br is appears the most, and I is
+the second. It tells us that Br and I are preferred in a stable
+Perovskite structure. In figure XXX, the mixing distribution indicates
+that X-site mixing is more favorable to generate a stable Perovskite
+with required properties. Tuning in A sites and B sites can also lead
+to a promising results but more risky.  The FigXXX and SI FIGXXX shows
+the element fraction for each of the screened samples. It indicates if
+certain element prefer to be mixing or non-mixing. For example, Cl is
+preferred to be pure in X site than mixing with other elements. Also
+there is some elements that only appears in pure case, for instance Sr
+at B site. We can also learn from the result that elements, like K,
+Cs, Cl and Ba, are more preferred to have small fraction if they are
+mixing with other elements. Popular choice, like Pb and Sn, are very
+flexible in element fraction. These elements can have a variety of
+possible fraction in promising Perovskite samples.  The screening
+results is showing the trends of how the combinations of elements are
+selected and what mixing features are preferred in decent Perovskite
+structures. It will also provide great help on design new Perovskite
+compounds and tell us what kinds of compounds we should put in to test
+next.
+ 
 
 * TODO Perspective and Future Work
 :PROPERTIES:
 :CUSTOM_ID: perspective-and-future-work
 :CLASS: unnumbered
 :END:
+The high-throughput DFT Perovskite dataset is containing huge amount of
+information of perovskites compounds, structure and properties. It
+leads us to perform screening, clustering and other process so that
+lots of trends are revealed. However, there are still many
+improvements we are eager to accomplish in the future.
+
+Firstly, the dataset are generally constructed based on cubic
+perovskites structures. But not all perovskites are remaining cubic as
+their most stable phases. In the future, we are going to expand our
+dataset that will include high-throughput DFT calculations for multiple
+phases of perovskites, for example tetragonal, orthorhombic, and
+hexagonal phases. This will tells us which phase we should choose for
+each compound and provide more information for analysis.
+
+Also the level of DFT functional should also be included in the future
+work. Important corrections, like Van der Waals forces, spin orbital
+coupling, should also be considered for different compound. We are
+going to expand the dataset with information of multiple level of DFT
+functional and corrections, which will eventually lead us to decide the
+best suitable functional for each compounds and get more accurate
+prediction.
+
+Structural information is another critical part for tuning the
+properties of Perovskite. Octahedral distortion and rotation is the
+main part that causes the change in Perovskite structures. We have
+ongoing work to reveal the relationship between octahedral information
+and properties. These part of information will also be include in the
+future dataset.
+
 The design of this dataset is uniquely suited to the exploration of
 alloying effects on Perovskite properties. The combinatorial space of
 possible alloys has been sparsely but systematically sampled along
@@ -535,7 +603,7 @@ Computing Resource Center at Argonne National Laboratory, and the RCAC
 clusters at Purdue.
 
 bibliographystyle:rsc
-bibliography:main.bib
+bibliography:./main.bib
 * Supplemental Material
 :PROPERTIES:
 :CUSTOM_ID: SI
@@ -555,6 +623,22 @@ bibliography:main.bib
 #+CAPTION: Pearson linear correlation coefficients between 36 composition variables,
 #+CAPTION: and 4 HSE computed properties
 [[file:HSE_v_site_prop_pearson.png]]
+
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{fig:sreened_frac_A}
+#+CAPTION: Element Fraction for A site elements among all screened perovskites
+file:Element_AFrac.jpg
+
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{fig:sreened_frac_B}
+#+CAPTION: Element Fraction for B site elements among all screened perovskites
+[[file:Element_BFrac.jpg]]
+
+#+ATTR_LATEX: :float multicolumn
+#+CAPTION: \label{fig:sreened_frac_X}
+#+CAPTION: Element Fraction for X site elements among all screened perovskites
+[[file:Element_XFrac.jpg]]
+
 
 #+name: glossary
 | label | term  | definition                                    |
