@@ -485,7 +485,12 @@ overestimates bandgaps systematically
     plt.axline((min(xlims+ylims), min(xlims+ylims)),
                (max(xlims+ylims), max(xlims+ylims)),
                c='k')
-    p.savefig('./pbe_v_exp_LC.png', transparent=True)
+    mplcursors.cursor(multiple=True).connect(
+        "add", lambda sel: sel.annotation.set_text(
+          elc_v_pbe["Formula_exp"].iloc[sel.index]
+          )
+      )
+    #p.savefig('./pbe_v_exp_LC.png', transparent=True)
 #+end_src
 
 #+RESULTS:
