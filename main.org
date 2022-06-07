@@ -14,7 +14,7 @@
 #+latex_class_options: [twoside, twocolumn, 9pt, draft]
 #+latex_header: \usepackage[acronym,nogroupskip,nonumberlist]{glossaries}
 #+latex_header: \usepackage[%
-#+latex_header: stylemods,style=long-name-desc,
+#+latex_header: stylemods,style=long-short,
 #+latex_header: ]{glossaries-extra}
 #+latex_header: \makeglossaries
 #+latex_header_extra:
@@ -61,6 +61,8 @@ information is considered constant to better focus on obtaining
 physically meaningful interpretations of models dealing only with
 information derived from a sample composition.
 
+literature review about grouping/unsupervised learning
+
 #+ATTR_LATEX: :float multicolumn :options h
 #+CAPTION: \label{fig:outline} 
 #+CAPTION: (a) Chemical space of ABX_3 perovskites. (b) Number of samples
@@ -83,28 +85,27 @@ information derived from a sample composition.
 The dataset we report is based on standard cubic phase ABX_3
 Perovskite structures obtained from public databases. Fourteen common
 Perovskite constituents are selected to form our Halide Perovskite
-composition space ref:fig:outline. Five constituents including
-[[acrfull:ma][Methylammonium (MA)]] and [[acrfull:fa][Formamidinium (FA)]]
-cations represent the possible A-site occupants. Six metals
-represent the possible B-site occupants. Three halides represent the
-possible X-site occupants. In total, these component vectors form a
-constrained 14 dimensional space (Figure ref:fig:chemspace_uni) within
-which all Perovskite compounds consisting of the elements in Figure
+composition space (Figure ref:fig:outline). Five constituents
+including [[acrfull:ma][Methylammonium (MA)]] and [[acrfull:fa][Formamidinium (FA)]] cations represent
+the possible A-site occupants. Six metals represent the possible
+B-site occupants. Three halides represent the possible X-site
+occupants. In total, these component vectors form a constrained 14
+dimensional space (Figure ref:fig:chemspace_uni) within which all
+Perovskite compounds consisting of the elements in Figure
 ref:fig:outline (a) must exist.
 
 The pure (non-alloyed) possibilities are exhaustively sampled using
 \(5*6*3 = 90\) Perovskites. Based on these pure Perovskite structures,
 we mix candidates for A, B, and X sites systematically. The alloy
-space sees combinatorial scaling and must be sparsely sampled
-ref:fig:sample_map.
+space sees combinatorial scaling and must be sparsely sampled (Figure
+ref:fig:sample_map).
 
 To generate site-mixing structures with high representativeness,
-[[acrfull:sqs][special quasi-random structures (SQS)]] are
-applied. The [[acrshort:sqs][SQS]] method is to build a special
-periodic structure and make the first nearest-neighbor shells as
-similar to the target random alloy as possible. The
-[[acrshort:sqs][SQS]] can be considered as the best possible periodic
-unit cell representing a given random alloy.
+[[acrfull:sqs][special quasi-random structures (SQS)]] are applied. The [[acrshort:sqs][SQS]] method is
+to build a special periodic structure and make the first
+nearest-neighbor shells as similar to the target random alloy as
+possible. The [[acrshort:sqs][SQS]] can be considered the best possible periodic unit
+cell representing a given random alloy.
 
 Each computational run is performed using a 2x2x2 supercell, this
 allows A and B site doping to be modeled in discrete 1/8^th fractions
@@ -114,10 +115,9 @@ call all these Perovskites alloys.
 
 following the process above, 126 A-site mixing samples, 151 B-site
 mixing samples and 127 X-site mixing samples are generated. All
-resulting structures are optimized using a [[acrshort:dft][DFT]]
-variable-cell relaxation under [[acrfull:pbe][PBE]]. These same
-initial structures also underwent a full [[acrfull:hse][HSE]]
-relaxation to help ensure the validity of the [[acrshort:pbe][PBE]]
+resulting structures are optimized using a [[acrshort:dft][DFT]] variable-cell
+relaxation under [[acrfull:pbe][PBE]]. These same initial structures also underwent a
+full [[acrfull:hse][HSE]] relaxation to help ensure the validity of the [[acrshort:pbe][PBE]]
 relaxations, however this was only computationally tractable for 299
 samples.
 
@@ -139,18 +139,16 @@ samples.
 :STATUSLOG:
 - State "DONE"       from "TODO"       [2022-06-06 Mon 17:17]
 :END:
-DFT calculations are performed with [[gls:vasp][VASP]] version
-6.2. The [[acrlong:paw][projector augmented wave]] potentials were
-used as pseudopotentials. The [[acrlong:gga][generalized gradient
-approximation]] of [[acrshort:pbe][PBE]] and the hybrid
-[[acrshort:hse][HSE]]06 (\alpha=0.25 and \omega=0.2) functionals are
-used as exchange-correlation energy. The energy cutoff for the
-plane-wave basis is set to 500 eV. For [[acrshort:pbe][PBE]] the
-Brillouin zone was sampled by 6x6x6 reciprocal mesh using the
-Monkhorst-Pack k-point mesh. For [[acrshort:hse][HSE]] the Brillouin
-zone was sampled by 2x2x2 reciprocal mesh using the Monkhorst-Pack
-k-point mesh. The structural force convergence threshold is set to be
-0.005 eV/\AA.
+DFT calculations are performed with [[gls:vasp][VASP]] version 6.2. The [[acrlong:paw][projector
+augmented wave]] potentials were used as pseudopotentials. The
+[[acrlong:gga][generalized gradient approximation]] of [[acrshort:pbe][PBE]] and the hybrid [[acrshort:hse][HSE]]06
+(\alpha=0.25 and \omega=0.2) functionals are used as
+exchange-correlation energy. The energy cutoff for the plane-wave
+basis is set to 500 eV. For [[acrshort:pbe][PBE]] the Brillouin zone was sampled by
+6x6x6 reciprocal mesh using the Monkhorst-Pack k-point mesh. For [[acrshort:hse][HSE]]
+the Brillouin zone was sampled by 2x2x2 reciprocal mesh using the
+Monkhorst-Pack k-point mesh. The structural force convergence
+threshold is set to be 0.005 eV/\AA.
 
 ** TODO Discussion of DFT Computed Properties
 :PROPERTIES:
@@ -170,11 +168,11 @@ k-point mesh. The structural force convergence threshold is set to be
 :END:
 The decomposition energy indicates the stability of a compound. To
 calculate the decomposition energy for an ABX3 Perovskite, we assume
-it will decompose to two phases, AX and BX2. Using
-[[acrshort:dft][DFT]] calculations, we can get the optimized energy of
-a Perovskite and that of its constituent phases. The decomposition
-energy is calculated using equation eqref:eq:decoE. This calculation
-is performed separately for each level of theory.
+it will decompose to two phases, AX and BX2. Using [[acrshort:dft][DFT]] calculations,
+we can get the optimized energy of a Perovskite and that of its
+constituent phases. The decomposition energy is calculated using
+equation eqref:eq:decoE. This calculation is performed separately for
+each level of theory.
 
 \begin{equation}\label{eq:decoE}
 E_{decomp} = E_{opt}(ABX_3) - E_{opt}(AX) - E_{opt}(BX2)
@@ -188,22 +186,20 @@ E_{decomp} = E_{opt}(ABX_3) - E_{opt}(AX) - E_{opt}(BX2)
 :STATUSLOG:
 - State "DONE"       from "TODO"       [2022-06-06 Mon 17:30]
 :END:
-The [[gls:slme][SLME]] metric developed by
-[[citet:&yu-2012-ident-poten]] is used as the primary criterion
-screening perovskites for their photovoltaic merits. The
-[[gls:slme][SLME]] value is computed considering a 5\mu{}m absorption
-layer for every Perovskite according to eqref:eq:slme.
+The [[gls:slme][SLME]] metric developed by [[citet:&yu-2012-ident-poten]] is used as the
+primary criterion screening perovskites for their photovoltaic
+merits. The [[gls:slme][SLME]] value is computed considering a 5\mu{}m absorption
+layer for every Perovskite according to equation eqref:eq:slme.
 
 \begin{equation}\label{eq:slme}
 
 \end{equation}
 
 This calculation is performed using Logan William's SL3ME
-[[cite:&williams-2022-sl3me]]. Based on absorption spectra obtained
-from from [[gls:vasp][VASP]] . This calculation is performed
-separately for the [[acrshort:pbe][PBE]] band gaps and the
-[[acrshort:hse][HSE]] band gaps, resulting in two synthetic
-efficiencies for each record.
+[[cite:&williams-2022-sl3me]]. Based on absorption spectra obtained from
+from [[gls:vasp][VASP]]. This calculation is performed separately for the [[acrshort:pbe][PBE]] band
+gaps and the [[acrshort:hse][HSE]] band gaps, resulting in two synthetic efficiencies
+for each record.
 
 * TODO Results and discussion
 :PROPERTIES:
@@ -251,19 +247,36 @@ the focus of this report.
 #+CAPTION: relax calculations
 [[file:pbe_v_hse_LC.png]]
 
-*** DONE Comparing synthetic to physical data
+*** TODO Comparing synthetic to physical data
 :STATUSLOG:
 - State "DONE"       from              [2022-06-06 Mon 01:01]
 :END:
-
 #+ATTR_LATEX: :float 
 #+CAPTION: \label{fig:lc_val_vs} 
 #+CAPTION: Comparison of PBE and HSE computed pseudo-cubic lattice
 #+CAPTION: constants with crystallographic measures for lattice constants
-[[file:pbe_v_exp_LC.png]] [[file:hse_v_exp_LC.png]]
+[[file:pbe_v_exp_LC.png]]
+[[file:hse_v_exp_LC.png]]
 
 The physical data used in comparison is collected from the works of
 [[citet:&briones-2021-accel-lattic;&jiang-2006-predic-lattic;&chen-2015-under-spotl]].
+
+The synthetic lattice constants do mostly agree with experiment. The
+[[acrshort:pbe][PBE]] lattice constants are better than the [[acrshort:hse][HSE]] measures ref:tbl:verror.
+
+It should be noted that the physical [[acrshort:fa][FA]]SnI_3 measure reported by
+[[citet:&chen-2015-under-spotl]] is clearly an orthorhombic phase. The
+validating lattice constant here is obtained by averaging lattice
+parameters. However, per the [[Deviation from Cubicity]] metric, this
+phase is still approximately cubic, with angles near enough to 90
+degrees that we consider the data point valid. However, this does
+explain the disagreement in the parity plots.
+
+#+CAPTION:\label{tbl:verror}
+#+CAPTION:Root Mean Squared Error
+| HSE v EXP | PBE v EXP |
+|-----------+-----------|
+|           |           |
 
 *** TODO Decomposition energy vs band gap PBE and HSE
 :PROPERTIES:
@@ -470,15 +483,14 @@ set.
 
 For the calculation of future data points obtained by a surrogate
 optimizer, we will follow a strategy of performing full structural
-optimization at a [[acrshort:pbe][PBE]] level of theory unless
-circumstances demand otherwise. This is justified by
-ref:fig:lc_lot_vs.
+optimization at a [[acrshort:pbe][PBE]] level of theory unless circumstances demand
+otherwise. This is justified by Figure ref:fig:lc_lot_vs and the
+section [[Comparing synthetic to physical data]]
 
-Also, we will explore methods for combining the insights of the
-[[acrshort:pbe][PBE]] and [[acrshort:hse][HSE]] datasets in training
-surrogates, e.g. in section [[SLME calculations]] the two
-[[gls:slme][SLME]] spectra could be used together to converge on a
-physically accurate [[acrshort:pce][PCE]] value.
+Also, we will explore methods for combining the insights of the [[acrshort:pbe][PBE]]
+and [[acrshort:hse][HSE]] datasets in training surrogates, e.g. in section [[SLME
+calculations]] the two [[gls:slme][SLME]] spectra could be used together to converge
+on a physically accurate [[acrshort:pce][PCE]] value.
 
 We anticipate our principal challenge will be in extracting useful
 predictor variables from the composition information. The basic
