@@ -33,12 +33,11 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
   # visualization convenience
   from spyglass.model_imaging import parityplot
   from spyglass.spyglass import biplot
+  import mplcursors
 #+end_src
 
 #+RESULTS:
 :results:
-: [INFO] 2022-06-02 09:33:08 - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
-: [INFO] 2022-06-02 09:33:08 - NumExpr defaulting to 8 threads.
 :end:
 
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -504,13 +503,19 @@ overestimates bandgaps systematically
     plt.axline((min(xlims+ylims), min(xlims+ylims)),
                (max(xlims+ylims), max(xlims+ylims)),
                c='k')
-    p.savefig('./hse_v_exp_LC.png', transparent=True)
+    mplcursors.cursor(multiple=True).connect(
+        "add", lambda sel: sel.annotation.set_text(
+          elc_v_hse["Formula_exp"].iloc[sel.index]
+          )
+      )
+    #p.savefig('./hse_v_exp_LC.png', transparent=True)
 #+end_src
 
 #+RESULTS:
 :results:
 :end:
 
+* again, but improving figure layouts
 * Mannodi vs Materials Zone
 Over 40,000 experimentally measured bandgaps and efficiency
 measurements collected by [[cite:&jacobsson-2021-open-acces]].
