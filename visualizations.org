@@ -30,26 +30,18 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
   import yogi
   #from yogi.data.frame import *
   from cmcl import Categories
-  # visualization convenience
   from spyglass.model_imaging import parityplot
   from spyglass.spyglass import biplot
 #+end_src
 
 #+RESULTS:
 :results:
-: [INFO] 2022-05-23 13:39:59 - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
-: [INFO] 2022-05-23 13:39:59 - NumExpr defaulting to 8 threads.
 :end:
 
 #+begin_src jupyter-python :exports results :results raw drawer
   from sklearnex import patch_sklearn
   patch_sklearn()
 #+end_src
-
-#+RESULTS:
-:results:
-: Intel(R) Extension for Scikit-learn* enabled (https://github.com/intel/scikit-learn-intelex)
-:end:
   
 #+begin_src jupyter-python :exports results :results raw drawer
   # data tools
@@ -101,21 +93,11 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
 :end:
 
 * Prepare Data and Compute Feature Domains
-** Clean Data and Compute Composition Vectors
-#+begin_src jupyter-python :exports results :results raw drawer
-  lookup = lookup.set_index("Formula")
-  mannodi = mannodi.set_index(["Formula", "sim_cell"], append=True)
-#+end_src
-
-#+RESULTS:
-:results:
-:end:
-
-*** compute composition vectors and subset keys
+** subset base on deviation from cubicity
 - drop formula with large lattice parameter difference between HSE and PBE (calculation to be rerun)
 - large structural deformation identified by observing cubicity metric -- well outside of 5-10% spec?
 #+begin_src jupyter-python :exports results :results raw drawer
-  mannodi = mannodi.drop(index=["Rb0.375Cs0.625GeBr3", "RbGeBr1.125Cl1.875", "K0.75Cs0.25GeI3", "K8Sn8I9Cl15"], level=1)
+  mannodi = mannodi[~mannodi.Formula.isin(["Rb0.375Cs0.625GeBr3", "RbGeBr1.125Cl1.875", "K0.75Cs0.25GeI3", "K8Sn8I9Cl15"])]
   maincomp = mannodi.ft.comp().iloc[:, :14:] #compute and subset
 #+end_src
 
@@ -123,7 +105,7 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
 :results:
 :end:
 
-*** auto subset index
+** auto subset index
 The abx function of the collect accessor is a convenience function for
 grouping the resulting composition constituents by site membership
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -139,7 +121,7 @@ grouping the resulting composition constituents by site membership
 :results:
 :end:
 
-*** apply subsets to domains and targets
+** apply subsets
 #+begin_src jupyter-python :exports results :results raw drawer
   mc = maincomp[mfocus]
   my = mannodi[mfocus]
@@ -149,19 +131,17 @@ grouping the resulting composition constituents by site membership
 :results:
 :end:
 
-*** generate mix categories
+** generate mix categories
 #+begin_src jupyter-python :exports results :results raw drawer
   mixlog = mc.groupby(level=0, axis=1).count()
   mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
-  mc = mc.assign(mix=mix).set_index("mix", append=True)
-  my = my.assign(mix=mix).set_index("mix", append=True)
 #+end_src
 
 #+RESULTS:
 :results:
 :end:
 
-*** filter out BandX
+** filter out BandX
 #+begin_src jupyter-python :exports results :results raw drawer
   mixfilter = mix.isin(['A', 'B', 'X', 'pure'])
   mc = mc[mixfilter]
@@ -170,17 +150,17 @@ grouping the resulting composition constituents by site membership
 
 #+RESULTS:
 :results:
-: /opt/miniconda3/envs/mrg/lib/python3.7/site-packages/ipykernel_launcher.py:2: UserWarning: Boolean Series key will be reindexed to match DataFrame index.
-:   
-: /opt/miniconda3/envs/mrg/lib/python3.7/site-packages/ipykernel_launcher.py:3: UserWarning: Boolean Series key will be reindexed to match DataFrame index.
-:   This is separate from the ipykernel package so we can avoid doing imports until
+: /tmp/ipykernel_670020/2576522697.py:2: UserWarning: Boolean Series key will be reindexed to match DataFrame index.
+:   mc = mc[mixfilter]
+: /tmp/ipykernel_670020/2576522697.py:3: UserWarning: Boolean Series key will be reindexed to match DataFrame index.
+:   my = my[mixfilter]
 :end:
 
-*** generate Organics Categories
+** generate Organics Categories
 #+begin_src jupyter-python :exports results :results raw drawer
   organics = my.ft.comp().collect.org()
   orglog = organics.groupby(level=0, axis=1).count()
-  org = orglog.pipe(Categories.logif, condition=lambda x: x==1, default="inorganic", catstring="and")
+  org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
   mc = mc.assign(org=org).set_index('org', append=True)
   my = my.assign(org=org).set_index('org', append=True)
 #+end_src
@@ -188,7 +168,6 @@ grouping the resulting composition constituents by site membership
 #+RESULTS:
 :results:
 :end:
-
 ** Compute Properties Vectors
 the derive_from function performs a three-way N-to-N table join,
 performs a weighted averaging of any resulting redundant entries, and
@@ -759,12 +738,8 @@ instances in the feature array.
 - pca init
 - perplexity 50
 
-* MDS
-
-* ISOMAP
-
 * UMAP
-
+SEE VISUALIZATIONS EDGE
 * reference
 bibliographystyle:plain
 bibliography:~/org/bibliotex/bibliotex.bib
