@@ -8,10 +8,6 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
   %load_ext autoreload
   %autoreload 2
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
   
 #+begin_src jupyter-python :exports results :results raw drawer
   import sys, os
@@ -21,10 +17,6 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
   sys.path.append(os.path.expanduser("~/src/spyglass"))
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 #+begin_src jupyter-python :exports results :results raw drawer
   # featurization
   import cmcl
@@ -32,10 +24,6 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
   #from yogi.data.frame import *
   from cmcl import Categories
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 (edge missing sparse_lsqr)
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -64,10 +52,6 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
   simplefilter(action='ignore', category=FutureWarning)
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 * load data
 #+begin_src jupyter-python :exports results :results raw drawer
   sqlbase = """SELECT *
@@ -88,10 +72,6 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
       other = pd.read_sql(sqlother, conn, index_col='index')
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 * Prepare Data and Compute Feature Domains
 ** compute composition vectors and subset keys
 - drop formula with large lattice parameter difference between HSE and PBE (calculation to be rerun)
@@ -100,10 +80,6 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
   mannodi = mannodi[~mannodi.Formula.isin(["Rb0.375Cs0.625GeBr3", "RbGeBr1.125Cl1.875", "K0.75Cs0.25GeI3", "K8Sn8I9Cl15"])]
   maincomp = mannodi.ft.comp().iloc[:, :14:] #compute and subset
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 ** auto subset index
 The abx function of the collect accessor is a convenience function for
@@ -117,29 +93,17 @@ grouping the resulting composition constituents by site membership
   mfocus = size*mvB*mvA*mvX
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 ** apply subsets to domains and targets
 #+begin_src jupyter-python :exports results :results raw drawer
   mc = maincomp[mfocus]
   my = mannodi[mfocus]
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 ** generate mix categories
 #+begin_src jupyter-python :exports results :results raw drawer
   mixlog = mc.groupby(level=0, axis=1).count()
   mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 ** filter out BandX
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -148,20 +112,12 @@ grouping the resulting composition constituents by site membership
   my = my[mixfilter]
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 ** generate Organics Categories
 #+begin_src jupyter-python :exports results :results raw drawer
   organics = my.ft.comp().collect.org()
   orglog = organics.groupby(level=0, axis=1).count()
   org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 ** TODO Compute Properties Vectors
 fix that function
@@ -176,10 +132,6 @@ first, as above.
 #+begin_src jupyter-python :exports results :results raw drawer
   mp = mc.ft.derive_from(lookup, "element", "Formula")
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 * Target space
 properties collected from DFT computations using the PBE and HSE
@@ -202,12 +154,9 @@ The target space is briefly summarized in both uni-variate and bi-variate views
 #+end_src
 
 #+begin_src jupyter-python :exports results :results raw drawer
-  p.figure.savefig('./PBE_pairplot.png', transparent=True)
+  p.write_image('./pairplot.html')
+  p.write_html('./pairplot.html')
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 * Pie Charts
 * Feature space
@@ -240,10 +189,6 @@ ratios are explored with respect to the alloy class.
   # eliminate the "zeros" (missing values) to focus on the meaningful data
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 #+begin_src jupyter-python :exports results :results raw drawer
   with sns.plotting_context("poster"):
       p = sns.catplot(x="value", col="element", data=nmc, col_wrap=5, kind="count", hue="mix",
@@ -265,18 +210,10 @@ ratios are explored with respect to the alloy class.
   smp = pd.melt(pmp, id_vars=['mix', 'org']).replace(0, np.NaN).dropna() # eliminate "zeros" (missing values) to focus on the meaningful data
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 #+begin_src jupyter-python :exports results :results raw drawer
   with sns.plotting_context("notebook"):
       p = sns.displot(x="value", col=smp.iloc[:,3], row="site", data=smp, kind="hist", hue="mix", multiple='stack')
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 * Bi-variate relations
 it is unlikely that any of the targets is full explained by a single
 composition or composition derived axis. But there are probably
@@ -305,17 +242,9 @@ Then, if any exist, they will be plotted in detail.
   p.figure.show()
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 #+begin_src jupyter-python :exports results :results raw drawer
   p.figure.savefig("./HSE_v_comp_pearson2.png", transparent=True)
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 ** targets vs site-averaged properties
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -331,27 +260,14 @@ Then, if any exist, they will be plotted in detail.
   p.figure.show()
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 #+begin_src jupyter-python :exports results :results raw drawer
   p.figure.savefig("./HSE_v_site_prop_pearson.png", transparent=True)
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 ** correlated axes
 #+begin_src jupyter-python :exports results :results raw drawer
   sns.relplot(x=("X","I"), y="HSE_LC", data=mcvt, hue="mix")
 #+end_src
-
-#+RESULTS:
-:results:
-: <seaborn.axisgrid.FacetGrid at 0x7f591880fc50>
-:end:
 
 * Multivariate relations
 To get a better idea of what structures statistical models might be
@@ -390,10 +306,6 @@ multivariate assemblies:
   #df = pd.concat([pmc.select_dtypes(np.number), mp.select_dtypes(np.number)], axis=1) #combined rational comp and site properties
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 if using a combined assembly, it's likely that further standardization is necessary.
 #+begin_src jupyter-python :exports results :results none
   df = pd.DataFrame(
@@ -413,22 +325,12 @@ pca can be truncated for speed, but with these dimensions it is not necessary.
   sns.move_legend(p, "upper left", bbox_to_anchor=(1, 1))
 #+end_src
 
-#+RESULTS:
-:results:
-: [INFO] 2022-05-22 19:04:21 - sklearn.decomposition.PCA.fit: running accelerated version on CPU
-: [INFO] 2022-05-22 19:04:21 - sklearn.decomposition.PCA.transform: running accelerated version on CPU
-:end:
-
 #+begin_src jupyter-python :exports results :results raw drawer
   #p.figure.savefig("./comp_ratio_projection.png", transparent=True)
   p.figure.savefig('./site_avg_properties_projection', transparent=True)
   #p.figure.savefig("./PBE_cascade.png", transparent=True)
   #p.figure.savefig("./HSE_cascade.png", transparent=True)
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 At this point it is readily apparent that this dataset is highly
 topological. The data exists on a mostly bounded domain in high
@@ -442,12 +344,6 @@ it can also be a bias-inducing hindrance.
   kpcaxis = KernelPCA(n_components=min(df.shape), kernel="rbf", gamma=20, fit_inverse_transform=True, alpha=0.1)
   kpcaxis.fit(df)
 #+end_src
-
-  #+RESULTS:
-  :results:
-  : KernelPCA(alpha=0.1, fit_inverse_transform=True, gamma=20, kernel='rbf',
-  :           n_components=14)
-  :end:
   
 #+begin_src jupyter-python :exports results :results raw drawer
   kdf = pd.DataFrame(
@@ -457,18 +353,10 @@ it can also be a bias-inducing hindrance.
   )
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 #+begin_src jupyter-python :exports results :results raw drawer
   p = sns.scatterplot(data=kdf, x='pc_0', y='pc_1', style='mix', hue='org')
   sns.move_legend(p, "upper left", bbox_to_anchor=(1, 1))
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 * Truncated SVD
 A basic method for factor analysis
@@ -485,18 +373,10 @@ A basic method for factor analysis
   )
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 #+begin_src jupyter-python :exports results :results raw drawer
   p = sns.scatterplot(data=svdf, x='pc_0', y='pc_1', style='mix', hue='org')
   p.figure.show()
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 * TSNE
 tSNE method initializes itself using the PCA transformation of the fit
@@ -524,28 +404,6 @@ instances in the feature array.
   tsnedf = pd.concat(tsnedf_list, axis=0)
 #+end_src
 
-#+RESULTS:
-:results:
-#+begin_example
-  [INFO] 2022-05-22 18:48:42 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:42 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:43 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:43 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:44 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:44 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:45 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:45 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:46 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:46 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:47 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:47 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:48 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:48 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:50 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:50 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-#+end_example
-:end:
-
 #+begin_src jupyter-python :exports both :results raw drawer
   p = px.scatter(tsnedf,
                  facet_col='perplexity', facet_col_wrap=4,
@@ -566,17 +424,9 @@ instances in the feature array.
   p.show()
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 #+begin_src jupyter-python :exports both :results raw drawer
   p.figure.savefig('./tsne_comp_DecoE_clusters', transparent=True)
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 ** DecoE clustering
 - hamming distance
@@ -585,7 +435,7 @@ instances in the feature array.
 
 * UMAP
 #+begin_src jupyter-python :exports both :results raw drawer
-  perplexities = [5, 10, 15]
+  perplexities = [15]
 
   umapdf_list = []
   for perp in perplexities:
@@ -603,10 +453,6 @@ instances in the feature array.
   umapdf = pd.concat(umapdf_list, axis=0)
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 #+begin_src jupyter-python :exports both :results raw drawer 
   p = px.scatter(umapdf,
                  facet_col='perplexity', facet_col_wrap=4,
@@ -615,12 +461,12 @@ instances in the feature array.
   p.update_yaxes(matches=None,
                  scaleanchor="x", )
   p.update_xaxes(matches=None)
-  p.write_html("./umap_projection.html")
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
+  
+#+begin_src jupyter-python :exports both :results raw drawer 
+  p.write_image("./umap_projection.png")
+  #p.write_html("./umap_projection.html")
+#+end_src
 
 * reference
 bibliographystyle:plain
