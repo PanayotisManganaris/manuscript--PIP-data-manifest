@@ -258,7 +258,8 @@ the focus of this report.
 [[file:pbe_v_exp_LC.png]]
 [[file:hse_v_exp_LC.png]]
 
-The physical data used in comparison is collected from the works of
+The physical data used in the Lattice Constant Comparisons is
+collected from the works of
 [[citet:&briones-2021-accel-lattic;&jiang-2006-predic-lattic;&chen-2015-under-spotl]].
 
 The synthetic lattice constants do mostly agree with experiment. The
@@ -505,7 +506,6 @@ structures. It will also provide great help on design new Perovskite
 compounds and tell us what kinds of compounds we should put in to test
 next.
  
-
 * TODO Perspective and Future Work
 :PROPERTIES:
 :CUSTOM_ID: perspective-and-future-work
@@ -603,6 +603,7 @@ Computing Resource Center at Argonne National Laboratory, and the RCAC
 clusters at Purdue.
 
 bibliographystyle:rsc
+bibliography:~/org/bibliotex/bibliotex.bib
 bibliography:./main.bib
 * Supplemental Material
 :PROPERTIES:
