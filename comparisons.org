@@ -38,6 +38,8 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
 
 #+RESULTS:
 :results:
+: [INFO] 2022-06-27 13:47:21 - Note: NumExpr detected 12 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+: [INFO] 2022-06-27 13:47:21 - NumExpr defaulting to 8 threads.
 :end:
 
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -90,10 +92,13 @@ todo: when fit/transform methods are piped to dataframes the columns should be a
               FROM mannodi_ref_elprop"""
   sqlother = """SELECT *
                 FROM mannodi_ref_emp"""
+  zone_q = """SELECT *
+              FROM zone_prop"""
   with sqlite3.connect(os.path.expanduser("~/src/cmcl/cmcl/db/perovskites.db")) as conn:
       mannodi_pbe = pd.read_sql(mannodi_pbe_q, conn, index_col="index")
       mannodi_hse = pd.read_sql(mannodi_hse_q, conn, index_col="index")
       almora = pd.read_sql(almora_q, conn, index_col='index')
+      zone = pd.read_sql(zone_q, conn, index_col='index')
       lookup = pd.read_sql(sqlref, conn, index_col='index')
 #+end_src
 
@@ -343,14 +348,20 @@ lattice records are ready
 
 ** concatenate tables and perform join ops
 #+begin_src jupyter-python :exports results :results raw drawer
-  def robust_compare(compare1, on1, compare2, on2, suf1='x', suf2='y'):
+  def robust_compare(compare1, on1, compare2, on2, how='inner', suf1='x', suf2='y'):
+      """from comparisons, should add to yogi
+      be careful, make sure that the difference between on1 and on2 is not too excessive
+      """
       df1 = pd.concat([compare1, on1], axis=1)
       df2 = pd.concat([compare2, on2], axis=1)
       intersection = [v for v in on1.columns.to_list() if v in on2.columns.to_list()]
       difference = [v for v in on1.columns.to_list() + on2.columns.to_list() if v not in intersection]
       join = pd.merge(df1, df2, on=intersection,
-                      how='inner', suffixes=("_"+suf1, "_"+suf2))
-      return join[join[difference].isna().agg('prod', axis=1).apply(bool)]
+                      how=how, suffixes=("_"+suf1, "_"+suf2))
+      if difference:
+          return join[join[difference].isna().agg('prod', axis=1).apply(bool)]
+      else:
+          return join
 
   hse_v_pbe = robust_compare(mannodi_hse, hc, mannodi_pbe.drop(['mix', 'org'], axis=1), pc, suf1='hse', suf2='pbe')
   ebg_v_pbe = robust_compare(almora, ac, mannodi_pbe.drop(['mix', 'org'], axis=1), pc, suf1='exp', suf2='pbe')
@@ -386,10 +397,6 @@ lattice records are ready
                c='k')
     p.savefig('./pbe_v_hse_bg.png', transparent=True)
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 ** PBE v HSE Lattice Constants
 #+begin_src jupyter-python :exports both :results raw drawer
@@ -524,3 +531,94 @@ overestimates bandgaps systematically
 * Mannodi vs Materials Zone
 Over 40,000 experimentally measured bandgaps and efficiency
 measurements collected by [[cite:&jacobsson-2021-open-acces]].
+#+begin_src jupyter-python :export none :results raw drawer
+  zc = zone.rename(columns={'Compound':'Formula'}).ft.comp()
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+* MultiPhase Comparisons
+#+begin_src jupyter-python :export none :results raw drawer
+  sample_set = ["MAGeI3",
+                "MAGeBr3",
+                "FASnBr3",
+                "CsPbI3",
+                "CsSnI3",
+                "FASnI3",
+                "MAPbBr3",
+                "MAPbI3",
+                "FASnCl3",
+                "CsSnCl3",
+                "CsGeCl3",
+                "MAPbCl3",
+                "MASnBr3",
+                "CsPbCl3",
+                "MASnI3",
+                "FAPbI3",
+                "MASnCl3",
+                "MAPb0.75Sn0.25I3",
+                "CsGeBr3",
+                "CsPbBr3",
+                "CsSnBr3",
+                "CsGeI3",
+                "FAGeBr3",
+                "FAGeCl3",
+                "FAPbBr3",
+                "FAPbCl3",
+                "MAGeCl3",
+                "FAGeI3",]
+  sample = pd.DataFrame(sample_set, columns=["Formula"])
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+#+begin_src jupyter-python :export none :results raw drawer
+  agg = robust_compare(sample, sample.ft.comp(),
+                       lattice, lc,
+                       how='left',
+                       suf1="samp", suf2="pbe")[['Formula_samp', 'Formula_pbe', 'bg_eV']]
+  agg.set_index('Formula_samp').reindex(index=sample.Formula).reset_index()
+#+end_src
+
+#+begin_src jupyter-python :export none :results raw drawer
+  zone_agg = robust_compare(sample, sample.ft.comp(),
+                            zone, zc,
+                            how='left',
+                            suf1="samp", suf2="zone")[['Formula_samp', 'bg_eV']].fillna(0).groupby('Formula_samp', as_index=False).agg('median')
+  zone_agg.bg_eV = zone_agg.bg_eV.apply(pd.to_numeric, errors='coerce')
+
+  zone_rep = robust_compare(sample, sample.ft.comp(),
+                            zone, zc,
+                            how='left',
+                            suf1="samp", suf2="zone")[['Formula_samp', 'bg_eV']].groupby('Formula_samp', as_index=False).count()
+#+end_src
+
+#+RESULTS:
+:results:
+# [goto error]
+: [0;31m---------------------------------------------------------------------------[0m
+: [0;31mNameError[0m                                 Traceback (most recent call last)
+: [0;32m/tmp/ipykernel_13620/3082699280.py[0m in [0;36m<module>[0;34m[0m
+: [1;32m      1[0m zone_agg = robust_compare(sample, sample.ft.comp(),
+: [0;32m----> 2[0;31m                           [0mzone[0m[0;34m,[0m [0mzc[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
+: [0m[1;32m      3[0m                           [0mhow[0m[0;34m=[0m[0;34m'left'[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
+: [1;32m      4[0m                           suf1="samp", suf2="zone")[['Formula_samp', 'bg_eV']].fillna(0).groupby('Formula_samp', as_index=False).agg('median')
+: [1;32m      5[0m [0mzone_agg[0m[0;34m.[0m[0mbg_eV[0m [0;34m=[0m [0mzone_agg[0m[0;34m.[0m[0mbg_eV[0m[0;34m.[0m[0mapply[0m[0;34m([0m[0mpd[0m[0;34m.[0m[0mto_numeric[0m[0;34m,[0m [0merrors[0m[0;34m=[0m[0;34m'coerce'[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+: 
+: [0;31mNameError[0m: name 'zc' is not defined
+:end:
+
+#+begin_src jupyter-python :export none :results raw drawer
+  zone_rep.set_index('Formula_samp').loc[sample.Formula, :].reset_index().bg_eV
+  zone_rep.set_index('Formula_samp').reindex(sample.Formula).reset_index().bg_eV
+#+end_src
+
+[[cite:&jiang-2006-predic-lattic]]
+
+[[cite:&briones-2021-accel-lattic]]
+
+[[cite:&chen-2015-under-spotl]]
