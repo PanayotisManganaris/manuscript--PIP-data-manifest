@@ -39,15 +39,45 @@
 :STATUSLOG:
 - State "DONE"       from              [2022-06-05 Sun 18:16]
 :END:
-The challenge of optimizing Perovskite performance is one with many
-facets. Almost every detail of a Perovskite crystal's structure and
-chemistry effects its performance as a semiconductor. The size of the
-unit cell effects its substrate affinity and in turn its carrier
-concentrations [[cite:&jiang-2006-predic-lattic]]. The crystal's phase
-effects many aspects of the electronic structure, including the band
-gap and optical response. Of course, these qualities of a structure
-are largely dependent on the specification, proportions and
-arrangements of the constituent elements.
+The perovskite structure has been widely investigated by material
+scientists in recent decades for its promising industry
+applications. A perovskite unit cell contains a generalized
+three-component ABX3 formula unit wherein A and B are cations with
+different oxidation states while X is an anion. The symbolic 3D
+perovskite structure is a network of BX6 octahedra which are held in
+place by large A-site cations. This unique structure makes the
+crystal's electronic properties incredibly tunable. Numerous research
+efforts are devoted to [[acrfull:hap][halide perovskites (HaP)]], specifically, as a
+promising solar cell absorption material[XXX]. ABX3 [[acrlong:hap][halide perovskite]]
+X-sites anions consist of halogens such as I and Br, B-site cations
+may be divalent elements such as Pb and Sn, and the A-site is occupied
+by large monovalent cations. The A-site cation can be so large that
+either inorganic (e.g Cs, K, Rb) elements or organic ligands (e.g
+[[acrfull:ma][Methylammonium (MA)]] and [[acrfull:fa][Formamidinium (FA)]]). The most commonly studied
+hybrid organic-inorganic [[acrlong:hap][halide perovskites]], MAPbI3 and FAPbI3, have
+relatively recently demonstrated extraordinary [[acrfull:pce][power conversion
+efficiency (PCE)]] between 20\% and 25\% when used as absorbers in
+single or multi junction solar cells[XXX]. This is a five fold
+improvement over prior art and shows off the most attractive feature
+of halide perovskites, their unique tunability. Experimentally, it has
+been shown that a perovskite structure is considered stable if A-site,
+B-site, and X-site ionic radii satisfy the well-known tolerance (t)
+and octahedral (\mu) relations[XXX]. Even under these restrictions,
+the configuration space of [[acrshort:hap][HaP]] structures, alloy ratios, alloy
+ordering, and defects still poses a highly multidimensional
+optimization problem.  Generally speaking, [[acrlong:hap][halide perovskite]] design
+can be divided into several aspects. (1) Compounds: (2) Structure and
+phases: (3) Defects (4) Polymorphism.
+
+# The challenge of optimizing Perovskite performance is one with many
+# facets. Almost every detail of a Perovskite crystal's structure and
+# chemistry effects its performance as a semiconductor. The size of the
+# unit cell effects its substrate affinity and in turn its carrier
+# concentrations [[cite:&jiang-2006-predic-lattic]]. The crystal's phase
+# effects many aspects of the electronic structure, including the band
+# gap and optical response. Of course, these qualities of a structure
+# are largely dependent on the specification, proportions and
+# arrangements of the constituent elements.
 
 We report a synthetic dataset collected for 495 chemically distinct,
 pseudo cubic Halide Perovskites. This dataset builds on that of 229
@@ -86,13 +116,12 @@ The dataset we report is based on standard cubic phase ABX_3
 Perovskite structures obtained from public databases. Fourteen common
 Perovskite constituents are selected to form our Halide Perovskite
 composition space (Figure ref:fig:outline). Five constituents
-including [[acrfull:ma][Methylammonium (MA)]] and [[acrfull:fa][Formamidinium (FA)]] cations represent
-the possible A-site occupants. Six metals represent the possible
-B-site occupants. Three halides represent the possible X-site
-occupants. In total, these component vectors form a constrained 14
-dimensional space (Figure ref:fig:chemspace_uni) within which all
-Perovskite compounds consisting of the elements in Figure
-ref:fig:outline (a) must exist.
+including [[acrshort:ma][MA]] and [[acrshort:fa][FA]] cations represent the possible A-site
+occupants. Six metals represent the possible B-site occupants. Three
+halides represent the possible X-site occupants. In total, these
+component vectors form a constrained 14 dimensional space (Figure
+ref:fig:chemspace_uni) within which all Perovskite compounds
+consisting of the elements in Figure ref:fig:outline (a) must exist.
 
 The pure (non-alloyed) possibilities are exhaustively sampled using
 \(5*6*3 = 90\) Perovskites. Based on these pure Perovskite structures,
@@ -645,16 +674,16 @@ file:Element_AFrac.jpg
 | label | term  | definition                                    |
 |-------+-------+-----------------------------------------------|
 | vasp  | VASP  | Vienna Ab initio Simulation Package           |
-| slme  | SLME  | Spectroscopic Limited Maximum Efficiency      |
-| qmml  | QM/ML | Quantum Mechanics Machine Learning            |
-| pca   | PCA   | Principal Component Analysis                  |
-| tsne  | t-SNE | t-distributed Stochastic Neighbor Embedding   |
-| umap  | UMAP  | Uniform Manifold Approximation and Projection |
+| slme  | SLME  | spectroscopic limited maximum efficiency      |
+| qmml  | QM/ML | quantum mechanics machine learning            |
+| pca   | PCA   | principal component analysis                  |
+| tsne  | t-SNE | t-distributed stochastic neighbor embedding   |
+| umap  | UMAP  | uniform manifold approximation and projection |
 
 #+name: acronyms
 | label | abbreviation | full form                          |
 |-------+--------------+------------------------------------|
-| dft   | DFT          | Density Functional Theory          |
+| dft   | DFT          | density functional theory          |
 | sqs   | SQS          | special quasi-random structures    |
 | paw   | PAW          | projector augmented wave           |
 | gga   | GGA          | generalized gradient approximation |
@@ -662,4 +691,5 @@ file:Element_AFrac.jpg
 | hse   | HSE          | Heyd-Scuseria-Ernzerhof            |
 | ma    | MA           | Methylammonium                     |
 | fa    | FA           | Formamidinium                      |
-| pce   | PCE          | Power Conversion Efficiency        |
+| pce   | PCE          | power conversion efficiency        |
+| hap   | HaP          | halide perovskite                  |
