@@ -1,7 +1,7 @@
 \providecommand*{\mcitethebibliography}{\thebibliography}
 \csname @ifundefined\endcsname{endmcitethebibliography}
 {\let\endmcitethebibliography\endthebibliography}{}
-\begin{mcitethebibliography}{6}
+\begin{mcitethebibliography}{5}
 \providecommand*{\natexlab}[1]{#1}
 \providecommand*{\mciteSetBstSublistMode}[1]{}
 \providecommand*{\mciteSetBstMaxWidthForm}[2]{}
@@ -18,22 +18,6 @@
 \mciteSetBstSublistLabelBeginEnd{\mcitemaxwidthsubitemform\space}
 {\relax}{\relax}
 
-\bibitem[Jiang \emph{et~al.}(2006)Jiang, Guo, Liu, Zhu, Zhou, Wu, and
-  Li]{jiang-2006-predic-lattic}
-L.~Jiang, J.~Guo, H.~Liu, M.~Zhu, X.~Zhou, P.~Wu and C.~Li, \emph{Journal of
-  Physics and Chemistry of Solids}, 2006, \textbf{67}, 1531--1536\relax
-\mciteBstWouldAddEndPuncttrue
-\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
-{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
-\EndOfBibitem
-\bibitem[Mannodi-Kanakkithodi and
-  Chan(2021)]{mannodi-kanakkithodi-2021-data-driven-new}
-A.~Mannodi-Kanakkithodi and M.~K.~Y. Chan, \emph{Energy and Environmental
-  Science}, 2021\relax
-\mciteBstWouldAddEndPuncttrue
-\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
-{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
-\EndOfBibitem
 \bibitem[Yu and Zunger(2012)]{yu-2012-ident-poten}
 L.~Yu and A.~Zunger, \emph{Physical Review Letters}, 2012, \textbf{108},
   year\relax
@@ -53,6 +37,14 @@ L.~Williams, \emph{Sl3me -- a Python3 Implementation of the Spectroscopic
   Pelicano]{briones-2021-accel-lattic}
 J.~Briones, M.~C. Guinto and C.~M. Pelicano, \emph{Materials Letters}, 2021,
   \textbf{298}, 130040\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Jiang \emph{et~al.}(2006)Jiang, Guo, Liu, Zhu, Zhou, Wu, and
+  Li]{jiang-2006-predic-lattic}
+L.~Jiang, J.~Guo, H.~Liu, M.~Zhu, X.~Zhou, P.~Wu and C.~Li, \emph{Journal of
+  Physics and Chemistry of Solids}, 2006, \textbf{67}, 1531--1536\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax

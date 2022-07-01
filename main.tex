@@ -1,6 +1,6 @@
-% Created 2022-06-07 Tue 18:38
+% Created 2022-07-01 Fri 09:19
 % Intended LaTeX compiler: pdflatex
-\documentclass[twoside, twocolumn, 9pt]{article}
+\documentclass[twoside, twocolumn, 9pt, draft]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
@@ -70,13 +70,7 @@ bottom=2.0cm
 
 %\usepackage[mathlines]{lineno}%% Enable numbering of text and display math
 %\linenumbers\relax%% Commence numbering lines
-\newglossaryentry{vasp}{name=VASP,description={{Vienna Ab initio Simulation Package}}}
-\newglossaryentry{slme}{name=SLME,description={{Spectroscopic Limited Maximum Efficiency}}}
-\newglossaryentry{qmml}{name=QM/ML,description={{Quantum Mechanics Machine Learning}}}
-\newglossaryentry{pca}{name=PCA,description={{Principal Component Analysis}}}
-\newglossaryentry{tsne}{name=t-SNE,description={{t-distributed Stochastic Neighbor Embedding}}}
-\newglossaryentry{umap}{name=UMAP,description={{Uniform Manifold Approximation and Projection}}}
-\newacronym{dft}{DFT}{Density Functional Theory}
+\newacronym{dft}{DFT}{density functional theory}
 \newacronym{sqs}{SQS}{special quasi-random structures}
 \newacronym{paw}{PAW}{projector augmented wave}
 \newacronym{gga}{GGA}{generalized gradient approximation}
@@ -84,7 +78,14 @@ bottom=2.0cm
 \newacronym{hse}{HSE}{Heyd-Scuseria-Ernzerhof}
 \newacronym{ma}{MA}{Methylammonium}
 \newacronym{fa}{FA}{Formamidinium}
-\newacronym{pce}{PCE}{Power Conversion Efficiency}
+\newacronym{pce}{PCE}{power conversion efficiency}
+\newacronym{hap}{HaP}{halide perovskite}
+\newglossaryentry{vasp}{name=VASP,description={{Vienna Ab initio Simulation Package}}}
+\newglossaryentry{slme}{name=SLME,description={{spectroscopic limited maximum efficiency}}}
+\newglossaryentry{qmml}{name=QM/ML,description={{quantum mechanics machine learning}}}
+\newglossaryentry{pca}{name=PCA,description={{principal component analysis}}}
+\newglossaryentry{tsne}{name=t-SNE,description={{t-distributed stochastic neighbor embedding}}}
+\newglossaryentry{umap}{name=UMAP,description={{uniform manifold approximation and projection}}}
 \date{\today}
 \title{A High-Throughput Computational Dataset of Halide Perovskite Alloys\textsuperscript{\dag}}
 \hypersetup{
@@ -215,36 +216,45 @@ and improved performance across many optoelectronic applications.
 \footnotetext{\textsuperscript{\dag}Electronic Supplementary Information (ESI) available: https://www.github.com/PanayotisManganaris/REPO_TODO. See DOI: 00.0000/00000000.}
 
 \section*{{\bfseries\sffamily TODO} Introduction}
-\label{sec:orgb26b3ec}
+\label{sec:orgd2ef6b7}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-06-05 Sun 18:16]}
 \end{itemize}
-The perovskite structure has been widely investigated by material scientist and applied to industry products. A perovskite unit cell can be represented by a three-component ABX3 formula unit wherein A and B are cations with different oxidation states while X is an anion. BX6 octahedral network is the symbolic 3D perovskite structure, which are held in place by large A-site cations. This unique structure makes it incredibly tunable on electronic properties via engineering. In the past decades, numerous efforts and researches are devoted to halide perovskite as promising materials with excellent solar cell absorption[XXX]. ABX3 halide perovskites (HaPs) are consist of halogens such as I and Br as X-site anions, divalent elements such as Pb and Sn as B-site cations, and large mono-valent cations in A-site. Specially, the A-site cation can either be inorganic (e.g Cs, K, Rb) or organic ligands (e.g Methylammonium aka MA, Formamidinium aka FA). As the most common hybrid halide perovskite, MAPbI3 and FAPbI3 are proved to have extraordinary power conversion efficiencies between 20\% and 25\% when used as absorbers in single or multi junction solar cells.[XXX]
-The most attractive features of halide perovskites are the unique tunability. Fundamentally, a perovskite structure is considered stable if A-site, B-site, and X-site ionic radii fulfill the well-known tolerance (t) and octahedral (µ) factors.[XXX] Under these restrictions, the halide perovskites still leave infinity possibility of element combination. Generally speaking, the design of halide perovskite can be divided into several aspects.
-(1)	Compounds: 
-(2)	Structure and phases:
-(3)	Defects
-(4)	Polymorphism
+The perovskite structure has been widely investigated by material
+scientists in recent decades for its promising industry
+applications. A perovskite unit cell contains a generalized
+three-component ABX3 formula unit wherein A and B are cations with
+different oxidation states while X is an anion. The symbolic 3D
+perovskite structure is a network of BX6 octahedra which are held in
+place by large A-site cations. This unique structure makes the
+crystal's electronic properties incredibly tunable. Numerous research
+efforts are devoted to \acrfull{hap}, specifically, as a
+promising solar cell absorption material[XXX]. ABX3 \acrlong{hap}
+X-sites anions consist of halogens such as I and Br, B-site cations
+may be divalent elements such as Pb and Sn, and the A-site is occupied
+by large monovalent cations. The A-site cation can be so large that
+either inorganic (e.g Cs, K, Rb) elements or organic ligands (e.g
+\acrfull{ma} and \acrfull{fa}). The most commonly studied
+hybrid organic-inorganic \acrlong{hap}, MAPbI3 and FAPbI3, have
+relatively recently demonstrated extraordinary \acrfull{pce} between 20$\backslash$% and 25$\backslash$% when used as absorbers in
+single or multi junction solar cells[XXX]. This is a five fold
+improvement over prior art and shows off the most attractive feature
+of halide perovskites, their unique tunability. Experimentally, it has
+been shown that a perovskite structure is considered stable if A-site,
+B-site, and X-site ionic radii satisfy the well-known tolerance (t)
+and octahedral (\(\mu\)) relations[XXX]. Even under these restrictions,
+the configuration space of \acrshort{hap} structures, alloy ratios, alloy
+ordering, and defects still poses a highly multidimensional
+optimization problem.  Generally speaking, \acrlong{hap} design
+can be divided into several aspects. (1) Compounds: (2) Structure and
+phases: (3) Defects (4) Polymorphism.
 
-As the huge number of halide perovskites compounds, it rises challenges for experimentalists to screen over all possibilities. However, first principles simulation, such as density functional theory (DFT), have been systematically performed to model each of the factors mentioned above. More importantly, the expense of DFT modeling is much more acceptable when searching for new promising candidates in such boundaryless space. Recently, DFT simulations are known to be reliably applied for modeling structural information, heat of formation or decomposition, band gaps, optical absorption spectra, and defect formation energies of a variety of HaPs, with mixed accuracy compared to experiments.[XXX] 
-
-%%%
-% The challenge of optimizing Perovskite performance is one with many
-% facets. Almost every detail of a Perovskite crystal's structure and
-% chemistry effects its performance as a semiconductor. The size of the
-% unit cell effects its substrate affinity and in turn its carrier
-% concentrations \cite{jiang-2006-predic-lattic}. The crystal's phase
-% effects many aspects of the electronic structure, including the band
-% gap and optical response. Of course, these qualities of a structure
-% are largely dependent on the specification, proportions and
-% arrangements of the constituent elements.
-%%%%%
 We report a synthetic dataset collected for 495 chemically distinct,
 pseudo cubic Halide Perovskites. This dataset builds on that of 229
 samples which formed the foundation of the prior work by
 \citet{mannodi-kanakkithodi-2021-data-driven-new}. The
 \acrfull{dft} computed properties we collected and the levels
-of theory used are discussed in \hyperref[sec:orgefce05d]{Methodology}. The relatively large
+of theory used are discussed in \hyperref[sec:org836fa98]{Methodology}. The relatively large
 size of this dataset is intended to provide an initial sampling
 suitable for guiding exploration of the alloy space. Structural
 information is considered constant to better focus on obtaining
@@ -260,9 +270,9 @@ literature review about grouping/unsupervised learning
 \end{figure*}
 
 \section*{{\bfseries\sffamily TODO} Methodology}
-\label{sec:orgefce05d}
+\label{sec:org836fa98}
 \subsection*{{\bfseries\sffamily NEXT} Building Perovskite Dataset}
-\label{sec:org41fc490}
+\label{sec:orgaf1f146}
 \begin{itemize}
 \item State "NEXT"       from "TODO"       \textit{[2022-06-05 Sun 22:11]}
 \end{itemize}
@@ -270,13 +280,12 @@ The dataset we report is based on standard cubic phase ABX\textsubscript{3}
 Perovskite structures obtained from public databases. Fourteen common
 Perovskite constituents are selected to form our Halide Perovskite
 composition space (Figure \ref{fig:outline}). Five constituents
-including \acrfull{ma} and \acrfull{fa} cations represent
-the possible A-site occupants. Six metals represent the possible
-B-site occupants. Three halides represent the possible X-site
-occupants. In total, these component vectors form a constrained 14
-dimensional space (Figure \ref{fig:chemspace_uni}) within which all
-Perovskite compounds consisting of the elements in Figure
-\ref{fig:outline} (a) must exist.
+including \acrshort{ma} and \acrshort{fa} cations represent the possible A-site
+occupants. Six metals represent the possible B-site occupants. Three
+halides represent the possible X-site occupants. In total, these
+component vectors form a constrained 14 dimensional space (Figure
+\ref{fig:chemspace_uni}) within which all Perovskite compounds
+consisting of the elements in Figure \ref{fig:outline} (a) must exist.
 
 The pure (non-alloyed) possibilities are exhaustively sampled using
 \(5*6*3 = 90\) Perovskites. Based on these pure Perovskite structures,
@@ -312,7 +321,7 @@ samples.
 \end{figure*}
 
 \subsection*{{\bfseries\sffamily DONE} Calculation Details}
-\label{sec:org7ac2ce4}
+\label{sec:orga010dd2}
 \begin{itemize}
 \item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 17:17]}
 \end{itemize}
@@ -327,12 +336,12 @@ Monkhorst-Pack k-point mesh. The structural force convergence
 threshold is set to be 0.005 eV/\AA{}.
 
 \subsection*{{\bfseries\sffamily TODO} Discussion of DFT Computed Properties}
-\label{sec:org3736488}
+\label{sec:org6216802}
 \begin{itemize}
 \item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 17:19]}
 \end{itemize}
 \subsubsection*{{\bfseries\sffamily DONE} Decomposition Energy}
-\label{sec:org792810a}
+\label{sec:org754b41e}
 \begin{itemize}
 \item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 00:43]}
 \end{itemize}
@@ -349,7 +358,7 @@ E_{decomp} = E_{opt}(ABX_3) - E_{opt}(AX) - E_{opt}(BX2)
 \end{equation}
 
 \subsubsection*{{\bfseries\sffamily TODO} SLME calculations}
-\label{sec:org16d388b}
+\label{sec:org5c5f2b2}
 \begin{itemize}
 \item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 17:30]}
 \end{itemize}
@@ -369,9 +378,9 @@ gaps and the \acrshort{hse} band gaps, resulting in two synthetic efficiencies
 for each record.
 
 \section*{{\bfseries\sffamily TODO} Results and discussion}
-\label{sec:org1ddd246}
+\label{sec:org43a9a3e}
 \subsection*{{\bfseries\sffamily TODO} Visualization of DFT Data}
-\label{sec:org5b69b03}
+\label{sec:orgf5281bb}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{Figure2.png}
@@ -379,7 +388,7 @@ for each record.
 \end{figure*}
 
 \subsubsection*{{\bfseries\sffamily DONE} Lattice constant PBE vs HSE}
-\label{sec:org01f52c4}
+\label{sec:orgf888f3f}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-06-06 Mon 01:02]}
 \end{itemize}
@@ -405,7 +414,7 @@ the focus of this report.
 \end{center}
 
 \subsubsection*{{\bfseries\sffamily TODO} Comparing synthetic to physical data}
-\label{sec:org384c7c0}
+\label{sec:orge6bbcdd}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-06-06 Mon 01:01]}
 \end{itemize}
@@ -418,7 +427,8 @@ the focus of this report.
 \captionof{figure}{\label{fig:lc_val_vs} Comparison of PBE and HSE computed pseudo-cubic lattice constants with crystallographic measures for lattice constants}
 \end{center}
 
-The physical data used in comparison is collected from the works of
+The physical data used in the Lattice Constant Comparisons is
+collected from the works of
 \citet{briones-2021-accel-lattic,jiang-2006-predic-lattic,chen-2015-under-spotl}.
 
 The synthetic lattice constants do mostly agree with experiment. The
@@ -427,7 +437,7 @@ The synthetic lattice constants do mostly agree with experiment. The
 It should be noted that the physical \acrshort{fa}SnI\textsubscript{3} measure reported by
 \citet{chen-2015-under-spotl} is clearly an orthorhombic phase. The
 validating lattice constant here is obtained by averaging lattice
-parameters. However, per the \hyperref[sec:org70ec3ea]{Deviation from Cubicity} metric, this
+parameters. However, per the \hyperref[sec:orgf80ac57]{Deviation from Cubicity} metric, this
 phase is still approximately cubic, with angles near enough to 90
 degrees that we consider the data point valid. However, this does
 explain the disagreement in the parity plots.
@@ -443,7 +453,7 @@ HSE v EXP & PBE v EXP\\
 \end{table}
 
 \subsubsection*{{\bfseries\sffamily TODO} Decomposition energy vs band gap PBE and HSE}
-\label{sec:orgec1495c}
+\label{sec:org6411465}
 Fig 2(b) is showing the \acrshort{pbe} band gap compared to the
 \acrshort{pbe} decomposition energy. It presents the diversity
 of our Perovskite dataset. The data sets cover a large range of band
@@ -462,7 +472,7 @@ some grouping on low decomposition energy. Compared to
 decomposition energy region and suitable band gap region.
 
 \subsubsection*{{\bfseries\sffamily TODO} Spectroscopic Limited Maximum Efficiency (SLME) vs PBE Band gap}
-\label{sec:org4842677}
+\label{sec:orgc9da452}
 Fig 2(d) presents the \gls{slme} values related to the
 \acrshort{pbe} band gap. \gls{slme} is a proven proxy
 for photovoltaic performance
@@ -475,7 +485,7 @@ gap increases, the \gls{slme} value decreases and eventually
 goes to zero due to the high band gap values.
 
 \subsection*{{\bfseries\sffamily TODO} Pearson Correlation Results}
-\label{sec:org3babf08}
+\label{sec:org2a64bab}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{PBE_v_comp_pearson2.png}
@@ -498,7 +508,7 @@ trending, but always with extensive variability. Evidently, an
 accurate model will have to be formed on a multidimensional domain.
 
 \subsection*{{\bfseries\sffamily TODO} PCA}
-\label{sec:org060b7fd}
+\label{sec:org8acad30}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{comp_ratio_projection_annot.png}
@@ -523,7 +533,7 @@ explanation for why Perovskite properties vary, this can be useful for
 accuracy, it can also be a bias-inducing hindrance.
 
 \subsection*{{\bfseries\sffamily TODO} t-SNE visualization of stability clustering}
-\label{sec:org1c2e23d}
+\label{sec:orgb1c9d15}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{tsne_comp_DecoE_clusters.png}
@@ -531,7 +541,7 @@ accuracy, it can also be a bias-inducing hindrance.
 \end{figure*}
 
 \subsection*{{\bfseries\sffamily DONE} Screening process of all samples in database}
-\label{sec:orga576afc}
+\label{sec:org502f3f2}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-05-24 Tue 13:31]}
 \end{itemize}
@@ -571,7 +581,7 @@ constraint.
 \end{figure*}
 
 \subsubsection*{{\bfseries\sffamily TODO} Deviation from Cubicity}
-\label{sec:org70ec3ea}
+\label{sec:orgf80ac57}
 For all the compositions we tested in our data set, some of them will
 have large strain and deformation because of the combination of
 elements. For these largely deformed samples, they are no longer
@@ -597,7 +607,7 @@ sometimes increase the lattice along some direction and make the
 perovskite deformed.
 
 \subsubsection*{{\bfseries\sffamily TODO} Octahedral factor, tolerance factor, and Bartel tolerance factor}
-\label{sec:org1ae4cd4}
+\label{sec:orgcf1fcc1}
 The stability of Perovskite can be predicted by using the atom radius
 of all components. There are 3 types of factors are usually
 considered, Octahedral factor, tolerance factor, and Bartel tolerance
@@ -614,7 +624,7 @@ decomposition energy plot. Within the criteria of Bartel tolerance
 factor, the decomposition energy is rapidly decreased.
 
 \subsubsection*{{\bfseries\sffamily TODO} Screening Results}
-\label{sec:org8ad8670}
+\label{sec:orgb72822a}
 The table XXX shows all 41 promising candidates we screened from our
 dataset by using the cutoff criteria mentioned above. FigXXX shows the
 element distribution of all decent samples. It indicates that MA and
@@ -643,9 +653,8 @@ structures. It will also provide great help on design new Perovskite
 compounds and tell us what kinds of compounds we should put in to test
 next.
 
-
 \section*{{\bfseries\sffamily TODO} Perspective and Future Work}
-\label{sec:orge11dcd9}
+\label{sec:orgc37bac2}
 The high-throughput DFT Perovskite dataset is containing huge amount of
 information of perovskites compounds, structure and properties. It
 leads us to perform screening, clustering and other process so that
@@ -688,10 +697,10 @@ For the calculation of future data points obtained by a surrogate
 optimizer, we will follow a strategy of performing full structural
 optimization at a \acrshort{pbe} level of theory unless circumstances demand
 otherwise. This is justified by Figure \ref{fig:lc_lot_vs} and the
-section \hyperref[sec:org384c7c0]{Comparing synthetic to physical data}
+section \hyperref[sec:orge6bbcdd]{Comparing synthetic to physical data}
 
 Also, we will explore methods for combining the insights of the \acrshort{pbe}
-and \acrshort{hse} datasets in training surrogates, e.g. in section \hyperref[sec:org16d388b]{SLME calculations} the two \gls{slme} spectra could be used together to converge
+and \acrshort{hse} datasets in training surrogates, e.g. in section \hyperref[sec:org5c5f2b2]{SLME calculations} the two \gls{slme} spectra could be used together to converge
 on a physically accurate \acrshort{pce} value.
 
 We anticipate our principal challenge will be in extracting useful
@@ -709,15 +718,15 @@ For this reason, kernel learning methods appear to be particularly
 promising for high speed optimization of the space.
 
 \section*{{\bfseries\sffamily TODO} Conclusions}
-\label{sec:org7929a70}
+\label{sec:orge1b2c07}
 \ldots{}\\
 
 \section*{Conflicts of Interest}
-\label{sec:orgdb18134}
+\label{sec:org3e108e8}
 There are no conflicts to declare.
 
 \section*{Acknowledgements}
-\label{sec:orgcc98055}
+\label{sec:org3eb148b}
 Extensive discussions with and scientific feedback from UC San Diego
 researchers David Fenning and Rishi Kumar and Argonne National Lab
 scientist Maria Chan are acknowledged. This work was performed at
@@ -728,9 +737,10 @@ Computing Resource Center at Argonne National Laboratory, and the RCAC
 clusters at Purdue.
 
 \bibliographystyle{rsc}
+\bibliography{../../../org/bibliotex/bibliotex}
 \bibliography{main}
 \section*{Supplemental Material}
-\label{sec:orga6f7b0d}
+\label{sec:orgf3f27ae}
 \printglossaries
 
 \begin{figure*}
