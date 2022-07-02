@@ -1,4 +1,4 @@
-% Created 2022-07-01 Fri 09:19
+% Created 2022-07-02 Sat 14:19
 % Intended LaTeX compiler: pdflatex
 \documentclass[twoside, twocolumn, 9pt, draft]{article}
 \usepackage[utf8]{inputenc}
@@ -80,12 +80,12 @@ bottom=2.0cm
 \newacronym{fa}{FA}{Formamidinium}
 \newacronym{pce}{PCE}{power conversion efficiency}
 \newacronym{hap}{HaP}{halide perovskite}
+\newacronym{pca}{PCA}{principal component analysis}
+\newacronym{tsne}{t-SNE}{t-distributed stochastic neighbor embedding}
+\newacronym{umap}{UMAP}{uniform manifold approximation and projection}
 \newglossaryentry{vasp}{name=VASP,description={{Vienna Ab initio Simulation Package}}}
 \newglossaryentry{slme}{name=SLME,description={{spectroscopic limited maximum efficiency}}}
 \newglossaryentry{qmml}{name=QM/ML,description={{quantum mechanics machine learning}}}
-\newglossaryentry{pca}{name=PCA,description={{principal component analysis}}}
-\newglossaryentry{tsne}{name=t-SNE,description={{t-distributed stochastic neighbor embedding}}}
-\newglossaryentry{umap}{name=UMAP,description={{uniform manifold approximation and projection}}}
 \date{\today}
 \title{A High-Throughput Computational Dataset of Halide Perovskite Alloys\textsuperscript{\dag}}
 \hypersetup{
@@ -216,7 +216,7 @@ and improved performance across many optoelectronic applications.
 \footnotetext{\textsuperscript{\dag}Electronic Supplementary Information (ESI) available: https://www.github.com/PanayotisManganaris/REPO_TODO. See DOI: 00.0000/00000000.}
 
 \section*{{\bfseries\sffamily TODO} Introduction}
-\label{sec:orgd2ef6b7}
+\label{sec:orgb53a90a}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-06-05 Sun 18:16]}
 \end{itemize}
@@ -252,16 +252,78 @@ phases: (3) Defects (4) Polymorphism.
 We report a synthetic dataset collected for 495 chemically distinct,
 pseudo cubic Halide Perovskites. This dataset builds on that of 229
 samples which formed the foundation of the prior work by
-\citet{mannodi-kanakkithodi-2021-data-driven-new}. The
-\acrfull{dft} computed properties we collected and the levels
-of theory used are discussed in \hyperref[sec:org836fa98]{Methodology}. The relatively large
-size of this dataset is intended to provide an initial sampling
-suitable for guiding exploration of the alloy space. Structural
-information is considered constant to better focus on obtaining
-physically meaningful interpretations of models dealing only with
-information derived from a sample composition.
+\citet{mannodi-kanakkithodi-2022-data-driven}. The \acrfull{dft} computed properties we collected and the levels of theory
+used are discussed in \hyperref[sec:org8caf7fd]{Methodology}. The relatively large size of this
+dataset is intended to provide an initial sampling suitable for
+guiding exploration of the alloy space. In this dataset, structures
+are constantly pseudo-cubic, instead we focus on studying the effects
+of sample composition and combinatorial alloying possibilities on the
+computed properties.
 
-literature review about grouping/unsupervised learning
+This exploration is focused on analyzing data features derived from
+the perovskite compositions. Composition vectors are inherently
+bounded -- they have a maximum magnitude -- and they are strongly
+correlate with each other in that they sweep through their bounded
+domain according to the design of the experiment. There is much
+difficulty in "unfolding" this hyper-geometric volume in such a way as
+to reveal patterns in composition that relate to properties targeted
+for prediction. 
+
+In any data analysis, the objective is to extract patterns which
+directly aid the training of a predictive model. In this interest, a
+relatively small number of unique, uncorrelated, and
+"influential"\cite{mahoney-2009-cur-matrix} features are desirable. To
+this end, we report a variety of feature engineering pipelines with an
+emphasis on dimensionality reduction.
+
+The ubiquitous \acrfull{pca} has been employed
+for materials discovery with success. In one prominent instance, under
+a very different dataset, it aided with identifying patterns relating
+superconductor transition temperature with valency in ceramic
+oxides\cite{rajan-2009-princ-compon}. here, pca simply identifies 3 out
+of 5 variables which dominate the variance in the data, thereby aiding
+the formulation of a physically meaningful description of the
+phenomenon.
+
+The method of \acrshort{pca} is the Singular Value Decomposition, a unitary
+transform which generalizes the familiar eigen decomposition.
+Conceptually, \acrshort{pca} will "rotate" the \(N\) data points in
+\(M\)-dimensional space until their widest \(k\)-dimensional cross
+section is found. Naturally, the first \(k\) principal components may
+be chosen by the user, but they are determined in an entirely
+unsupervised, mathematical manner. So long as \(k<M\) they represent a
+lossy, lower-dimensional projection of the data. Even better, they
+inherently gather the major variance into a minimal number of
+orthogonal axes. This makes \acrshort{pca} a robust and powerful feature
+engineering technique for (1) constructing uncorrelated
+features\cite{mahoney-2009-cur-matrix} and (2) de-noising data.
+
+For this, the study by \citet{rajan-2009-princ-compon} is noteworthy
+because it uses the second and third principal components in a 5
+dimensional space to formulate its model. This clearly demonstrates
+that meaningful patterns can emerge even in \acrshort{pca} cross sections that
+capture less overall variance. This is something we are attentive to
+in our "round" \acrshort{pca} space with many similarly potent principal
+components (see figure \label{fig:scree}).
+
+Considerably more complex data projections are also examined. Two
+relatively novel dimensionality reduction techniques, namely
+\acrfull{tsne}
+\cite{maaten-2008-visual-high} and \Acrfull{umap} \cite{mcinnes-2018-umap} are employed mainly for the
+purpose of algorithmically clustering feature spaces. This is because
+these methods are non-parametric, as such they transform a data space
+rather than a data point. This makes it more difficult to use them as
+a feature engineering method, but it is not impossible. An attempt at
+enabling \acrshort{umap} to be used in this way exists as an implementation of
+"parametric UMAP" by \citet{mcinnes-2018-python-umap} which trains a
+neural network to learn a mapping between the data space and manifold
+projection.
+
+We do see the older \acrshort{tsne} method clusters \acrshort{hap} decomposition energies
+effectively on the embedding space of composition vectors. This
+quality is examined in multiple ways, but we try to recreate it with
+parametric UMAP so as to create a viable feature engineering pipeline
+utilizing the transformation.
 
 \begin{figure*}
 \centering
@@ -270,14 +332,15 @@ literature review about grouping/unsupervised learning
 \end{figure*}
 
 \section*{{\bfseries\sffamily TODO} Methodology}
-\label{sec:org836fa98}
+\label{sec:org8caf7fd}
 \subsection*{{\bfseries\sffamily NEXT} Building Perovskite Dataset}
-\label{sec:orgaf1f146}
+\label{sec:org0a48644}
 \begin{itemize}
 \item State "NEXT"       from "TODO"       \textit{[2022-06-05 Sun 22:11]}
 \end{itemize}
 The dataset we report is based on standard cubic phase ABX\textsubscript{3}
-Perovskite structures obtained from public databases. Fourteen common
+Perovskite structures originally obtained from Computational Materials
+Repository (CMR)\cite{pilania-2016-machin-learn}. Fourteen common
 Perovskite constituents are selected to form our Halide Perovskite
 composition space (Figure \ref{fig:outline}). Five constituents
 including \acrshort{ma} and \acrshort{fa} cations represent the possible A-site
@@ -321,7 +384,7 @@ samples.
 \end{figure*}
 
 \subsection*{{\bfseries\sffamily DONE} Calculation Details}
-\label{sec:orga010dd2}
+\label{sec:org9d448d0}
 \begin{itemize}
 \item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 17:17]}
 \end{itemize}
@@ -336,12 +399,12 @@ Monkhorst-Pack k-point mesh. The structural force convergence
 threshold is set to be 0.005 eV/\AA{}.
 
 \subsection*{{\bfseries\sffamily TODO} Discussion of DFT Computed Properties}
-\label{sec:org6216802}
+\label{sec:org5b94c5f}
 \begin{itemize}
 \item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 17:19]}
 \end{itemize}
 \subsubsection*{{\bfseries\sffamily DONE} Decomposition Energy}
-\label{sec:org754b41e}
+\label{sec:org65af7d0}
 \begin{itemize}
 \item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 00:43]}
 \end{itemize}
@@ -358,7 +421,7 @@ E_{decomp} = E_{opt}(ABX_3) - E_{opt}(AX) - E_{opt}(BX2)
 \end{equation}
 
 \subsubsection*{{\bfseries\sffamily TODO} SLME calculations}
-\label{sec:org5c5f2b2}
+\label{sec:orgacaffaa}
 \begin{itemize}
 \item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 17:30]}
 \end{itemize}
@@ -378,9 +441,9 @@ gaps and the \acrshort{hse} band gaps, resulting in two synthetic efficiencies
 for each record.
 
 \section*{{\bfseries\sffamily TODO} Results and discussion}
-\label{sec:org43a9a3e}
+\label{sec:org3eb2799}
 \subsection*{{\bfseries\sffamily TODO} Visualization of DFT Data}
-\label{sec:orgf5281bb}
+\label{sec:org0a3437c}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{Figure2.png}
@@ -388,7 +451,7 @@ for each record.
 \end{figure*}
 
 \subsubsection*{{\bfseries\sffamily DONE} Lattice constant PBE vs HSE}
-\label{sec:orgf888f3f}
+\label{sec:org9e4c9ab}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-06-06 Mon 01:02]}
 \end{itemize}
@@ -414,7 +477,7 @@ the focus of this report.
 \end{center}
 
 \subsubsection*{{\bfseries\sffamily TODO} Comparing synthetic to physical data}
-\label{sec:orge6bbcdd}
+\label{sec:org58ce9eb}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-06-06 Mon 01:01]}
 \end{itemize}
@@ -437,7 +500,7 @@ The synthetic lattice constants do mostly agree with experiment. The
 It should be noted that the physical \acrshort{fa}SnI\textsubscript{3} measure reported by
 \citet{chen-2015-under-spotl} is clearly an orthorhombic phase. The
 validating lattice constant here is obtained by averaging lattice
-parameters. However, per the \hyperref[sec:orgf80ac57]{Deviation from Cubicity} metric, this
+parameters. However, per the \hyperref[sec:org9618f97]{Deviation from Cubicity} metric, this
 phase is still approximately cubic, with angles near enough to 90
 degrees that we consider the data point valid. However, this does
 explain the disagreement in the parity plots.
@@ -453,7 +516,7 @@ HSE v EXP & PBE v EXP\\
 \end{table}
 
 \subsubsection*{{\bfseries\sffamily TODO} Decomposition energy vs band gap PBE and HSE}
-\label{sec:org6411465}
+\label{sec:orga57fdd8}
 Fig 2(b) is showing the \acrshort{pbe} band gap compared to the
 \acrshort{pbe} decomposition energy. It presents the diversity
 of our Perovskite dataset. The data sets cover a large range of band
@@ -472,7 +535,7 @@ some grouping on low decomposition energy. Compared to
 decomposition energy region and suitable band gap region.
 
 \subsubsection*{{\bfseries\sffamily TODO} Spectroscopic Limited Maximum Efficiency (SLME) vs PBE Band gap}
-\label{sec:orgc9da452}
+\label{sec:org53b1622}
 Fig 2(d) presents the \gls{slme} values related to the
 \acrshort{pbe} band gap. \gls{slme} is a proven proxy
 for photovoltaic performance
@@ -485,7 +548,7 @@ gap increases, the \gls{slme} value decreases and eventually
 goes to zero due to the high band gap values.
 
 \subsection*{{\bfseries\sffamily TODO} Pearson Correlation Results}
-\label{sec:org2a64bab}
+\label{sec:org4f22c68}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{PBE_v_comp_pearson2.png}
@@ -508,21 +571,29 @@ trending, but always with extensive variability. Evidently, an
 accurate model will have to be formed on a multidimensional domain.
 
 \subsection*{{\bfseries\sffamily TODO} PCA}
-\label{sec:org8acad30}
+\label{sec:org3f6fb33}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{comp_ratio_projection_annot.png}
 \caption{\label{fig:pca} PCA}
 \end{figure*}
 
-\gls{pca} is a method of projecting high dimensional data onto
+
+However, in a homogeneous domain of the sort outlined by the ABX3
+perovskite, pca is most effective only for identifying the major
+topology of the data distribution. While this tends to involve
+uninformative biases in a regression, it is still useful for revealing
+global trends in the explored space.
+
+ however, these variables are unsurprising
+and may not as strongly explain the properties targeted for
+statistical modeling
+
+
+\acrshort{pca} is a method of projecting high dimensional data onto
 a plane defined by the two linear combinations of axes that explain as
 much of the variance as possible.
 
-The method of \gls{pca} is the Singular Value Decomposition, a
-Unitary Transform which generalizes the familiar
-eigendecomposition. \gls{pca} will "rotate" the N data points
-in M-D space until their widest 2D cross section is displayed.
 
 At this point it is readily apparent that this dataset is highly
 topological. The data exists on a mostly bounded domain in high
@@ -533,7 +604,7 @@ explanation for why Perovskite properties vary, this can be useful for
 accuracy, it can also be a bias-inducing hindrance.
 
 \subsection*{{\bfseries\sffamily TODO} t-SNE visualization of stability clustering}
-\label{sec:orgb1c9d15}
+\label{sec:org80211cf}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{tsne_comp_DecoE_clusters.png}
@@ -541,7 +612,7 @@ accuracy, it can also be a bias-inducing hindrance.
 \end{figure*}
 
 \subsection*{{\bfseries\sffamily DONE} Screening process of all samples in database}
-\label{sec:org502f3f2}
+\label{sec:orge2a0600}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-05-24 Tue 13:31]}
 \end{itemize}
@@ -581,7 +652,7 @@ constraint.
 \end{figure*}
 
 \subsubsection*{{\bfseries\sffamily TODO} Deviation from Cubicity}
-\label{sec:orgf80ac57}
+\label{sec:org9618f97}
 For all the compositions we tested in our data set, some of them will
 have large strain and deformation because of the combination of
 elements. For these largely deformed samples, they are no longer
@@ -607,7 +678,7 @@ sometimes increase the lattice along some direction and make the
 perovskite deformed.
 
 \subsubsection*{{\bfseries\sffamily TODO} Octahedral factor, tolerance factor, and Bartel tolerance factor}
-\label{sec:orgcf1fcc1}
+\label{sec:org98772eb}
 The stability of Perovskite can be predicted by using the atom radius
 of all components. There are 3 types of factors are usually
 considered, Octahedral factor, tolerance factor, and Bartel tolerance
@@ -624,7 +695,7 @@ decomposition energy plot. Within the criteria of Bartel tolerance
 factor, the decomposition energy is rapidly decreased.
 
 \subsubsection*{{\bfseries\sffamily TODO} Screening Results}
-\label{sec:orgb72822a}
+\label{sec:org81f2ee0}
 The table XXX shows all 41 promising candidates we screened from our
 dataset by using the cutoff criteria mentioned above. FigXXX shows the
 element distribution of all decent samples. It indicates that MA and
@@ -654,7 +725,7 @@ compounds and tell us what kinds of compounds we should put in to test
 next.
 
 \section*{{\bfseries\sffamily TODO} Perspective and Future Work}
-\label{sec:orgc37bac2}
+\label{sec:orgb888ae4}
 The high-throughput DFT Perovskite dataset is containing huge amount of
 information of perovskites compounds, structure and properties. It
 leads us to perform screening, clustering and other process so that
@@ -697,10 +768,10 @@ For the calculation of future data points obtained by a surrogate
 optimizer, we will follow a strategy of performing full structural
 optimization at a \acrshort{pbe} level of theory unless circumstances demand
 otherwise. This is justified by Figure \ref{fig:lc_lot_vs} and the
-section \hyperref[sec:orge6bbcdd]{Comparing synthetic to physical data}
+section \hyperref[sec:org58ce9eb]{Comparing synthetic to physical data}
 
 Also, we will explore methods for combining the insights of the \acrshort{pbe}
-and \acrshort{hse} datasets in training surrogates, e.g. in section \hyperref[sec:org5c5f2b2]{SLME calculations} the two \gls{slme} spectra could be used together to converge
+and \acrshort{hse} datasets in training surrogates, e.g. in section \hyperref[sec:orgacaffaa]{SLME calculations} the two \gls{slme} spectra could be used together to converge
 on a physically accurate \acrshort{pce} value.
 
 We anticipate our principal challenge will be in extracting useful
@@ -718,15 +789,15 @@ For this reason, kernel learning methods appear to be particularly
 promising for high speed optimization of the space.
 
 \section*{{\bfseries\sffamily TODO} Conclusions}
-\label{sec:orge1b2c07}
+\label{sec:orgb74b977}
 \ldots{}\\
 
 \section*{Conflicts of Interest}
-\label{sec:org3e108e8}
+\label{sec:orge53251a}
 There are no conflicts to declare.
 
 \section*{Acknowledgements}
-\label{sec:org3eb148b}
+\label{sec:org58a51d9}
 Extensive discussions with and scientific feedback from UC San Diego
 researchers David Fenning and Rishi Kumar and Argonne National Lab
 scientist Maria Chan are acknowledged. This work was performed at
@@ -740,7 +811,7 @@ clusters at Purdue.
 \bibliography{../../../org/bibliotex/bibliotex}
 \bibliography{main}
 \section*{Supplemental Material}
-\label{sec:orgf3f27ae}
+\label{sec:org67b5341}
 \printglossaries
 
 \begin{figure*}

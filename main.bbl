@@ -1,7 +1,7 @@
 \providecommand*{\mcitethebibliography}{\thebibliography}
 \csname @ifundefined\endcsname{endmcitethebibliography}
 {\let\endmcitethebibliography\endthebibliography}{}
-\begin{mcitethebibliography}{5}
+\begin{mcitethebibliography}{12}
 \providecommand*{\natexlab}[1]{#1}
 \providecommand*{\mciteSetBstSublistMode}[1]{}
 \providecommand*{\mciteSetBstMaxWidthForm}[2]{}
@@ -18,6 +18,60 @@
 \mciteSetBstSublistLabelBeginEnd{\mcitemaxwidthsubitemform\space}
 {\relax}{\relax}
 
+\bibitem[Mannodi-Kanakkithodi and
+  Chan(2022)]{mannodi-kanakkithodi-2022-data-driven}
+A.~Mannodi-Kanakkithodi and M.~K.~Y. Chan, \emph{Energy Environ. Sci.}, 2022,
+  \textbf{15}, 1930--1949\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Mahoney and Drineas(2009)]{mahoney-2009-cur-matrix}
+M.~W. Mahoney and P.~Drineas, \emph{Proceedings of the National Academy of
+  Sciences}, 2009, \textbf{106}, 697--702\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Rajan \emph{et~al.}(2009)Rajan, Suh, and
+  Mendez]{rajan-2009-princ-compon}
+K.~Rajan, C.~Suh and P.~F. Mendez, \emph{Statistical Analysis and Data Mining:
+  The ASA Data Science Journal}, 2009, \textbf{1}, 361--371\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[van~der Maaten and Hinton(2008)]{maaten-2008-visual-high}
+L.~van~der Maaten and G.~E. Hinton, \emph{Journal of Machine Learning
+  Research}, 2008, \textbf{9}, 2579--2605\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[{McInnes} \emph{et~al.}(2018){McInnes}, {Healy}, and
+  {Melville}]{mcinnes-2018-umap}
+L.~{McInnes}, J.~{Healy} and J.~{Melville}, \emph{ArXiv e-prints}, 2018\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[McInnes \emph{et~al.}(2018)McInnes, Healy, Saul, and
+  Grossberger]{mcinnes-2018-python-umap}
+L.~McInnes, J.~Healy, N.~Saul and L.~Grossberger, \emph{Python UMAP: Uniform
+  Manifold Approximation and Projection}, 2018\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Pilania \emph{et~al.}(2016)Pilania, Mannodi-Kanakkithodi, Uberuaga,
+  Ramprasad, Gubernatis, and Lookman]{pilania-2016-machin-learn}
+G.~Pilania, A.~Mannodi-Kanakkithodi, B.~P. Uberuaga, R.~Ramprasad, J.~E.
+  Gubernatis and T.~Lookman, \emph{Scientific Reports}, 2016, \textbf{6},
+  year\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
 \bibitem[Yu and Zunger(2012)]{yu-2012-ident-poten}
 L.~Yu and A.~Zunger, \emph{Physical Review Letters}, 2012, \textbf{108},
   year\relax
