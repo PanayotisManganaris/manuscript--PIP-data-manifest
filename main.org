@@ -82,16 +82,80 @@ phases: (3) Defects (4) Polymorphism.
 We report a synthetic dataset collected for 495 chemically distinct,
 pseudo cubic Halide Perovskites. This dataset builds on that of 229
 samples which formed the foundation of the prior work by
-[[citet:&mannodi-kanakkithodi-2021-data-driven-new]]. The
-[[acrfull:dft][DFT]] computed properties we collected and the levels
-of theory used are discussed in [[Methodology]]. The relatively large
-size of this dataset is intended to provide an initial sampling
-suitable for guiding exploration of the alloy space. Structural
-information is considered constant to better focus on obtaining
-physically meaningful interpretations of models dealing only with
-information derived from a sample composition.
+[[citet:&mannodi-kanakkithodi-2022-data-driven]]. The [[acrfull:dft][density functional
+theory (DFT)]] computed properties we collected and the levels of theory
+used are discussed in [[Methodology]]. The relatively large size of this
+dataset is intended to provide an initial sampling suitable for
+guiding exploration of the alloy space. In this dataset, structures
+are constantly pseudo-cubic, instead we focus on studying the effects
+of sample composition and combinatorial alloying possibilities on the
+computed properties.
 
-literature review about grouping/unsupervised learning
+This exploration is focused on analyzing data features derived from
+the perovskite compositions. Composition vectors are inherently
+bounded -- they have a maximum magnitude -- and they are strongly
+correlate with each other in that they sweep through their bounded
+domain according to the design of the experiment. There is much
+difficulty in "unfolding" this hyper-geometric volume in such a way as
+to reveal patterns in composition that relate to properties targeted
+for prediction. 
+
+In any data analysis, the objective is to extract patterns which
+directly aid the training of a predictive model. In this interest, a
+relatively small number of unique, uncorrelated, and
+"influential"[[cite:&mahoney-2009-cur-matrix]] features are desirable. To
+this end, we report a variety of feature engineering pipelines with an
+emphasis on dimensionality reduction.
+
+The ubiquitous [[acrfull:pca][principal component analysis (PCA)]] has been employed
+for materials discovery with success. In one prominent instance, under
+a very different dataset, it aided with identifying patterns relating
+superconductor transition temperature with valency in ceramic
+oxides[[cite:&rajan-2009-princ-compon]]. here, pca simply identifies 3 out
+of 5 variables which dominate the variance in the data, thereby aiding
+the formulation of a physically meaningful description of the
+phenomenon.
+
+The method of [[acrshort:pca][PCA]] is the Singular Value Decomposition, a unitary
+transform which generalizes the familiar eigen decomposition.
+Conceptually, [[acrshort:pca][PCA]] will "rotate" the \(N\) data points in
+\(M\)-dimensional space until their widest \(k\)-dimensional cross
+section is found. Naturally, the first \(k\) principal components may
+be chosen by the user, but they are determined in an entirely
+unsupervised, mathematical manner. So long as \(k<M\) they represent a
+lossy, lower-dimensional projection of the data. Even better, they
+inherently gather the major variance into a minimal number of
+orthogonal axes. This makes [[acrshort:pca][PCA]] a robust and powerful feature
+engineering technique for (1) constructing uncorrelated
+features[[cite:&mahoney-2009-cur-matrix]] and (2) de-noising data.
+
+For this, the study by [[citet:&rajan-2009-princ-compon]] is noteworthy
+because it uses the second and third principal components in a 5
+dimensional space to formulate its model. This clearly demonstrates
+that meaningful patterns can emerge even in [[acrshort:pca][PCA]] cross sections that
+capture less overall variance. This is something we are attentive to
+in our "round" [[acrshort:pca][PCA]] space with many similarly potent principal
+components (see figure label:fig:scree).
+
+Considerably more complex data projections are also examined. Two
+relatively novel dimensionality reduction techniques, namely
+[[acrfull:tsne][t-distributed stochastic neighbor embedding (t-SNE)]]
+[[cite:&maaten-2008-visual-high]] and [[Acrfull:umap][Uniform manifold approximation and
+projection (UMAP)]] [[cite:&mcinnes-2018-umap]] are employed mainly for the
+purpose of algorithmically clustering feature spaces. This is because
+these methods are non-parametric, as such they transform a data space
+rather than a data point. This makes it more difficult to use them as
+a feature engineering method, but it is not impossible. An attempt at
+enabling [[acrshort:umap][UMAP]] to be used in this way exists as an implementation of
+"parametric UMAP" by [[citet:&mcinnes-2018-python-umap]] which trains a
+neural network to learn a mapping between the data space and manifold
+projection.
+
+We do see the older [[acrshort:tsne][t-SNE]] method clusters [[acrshort:hap][HaP]] decomposition energies
+effectively on the embedding space of composition vectors. This
+quality is examined in multiple ways, but we try to recreate it with
+parametric UMAP so as to create a viable feature engineering pipeline
+utilizing the transformation.
 
 #+ATTR_LATEX: :float multicolumn :options h
 #+CAPTION: \label{fig:outline} 
@@ -113,7 +177,8 @@ literature review about grouping/unsupervised learning
 - State "NEXT"       from "TODO"       [2022-06-05 Sun 22:11]
 :END:
 The dataset we report is based on standard cubic phase ABX_3
-Perovskite structures obtained from public databases. Fourteen common
+Perovskite structures originally obtained from Computational Materials
+Repository (CMR)[[cite:&pilania-2016-machin-learn]]. Fourteen common
 Perovskite constituents are selected to form our Halide Perovskite
 composition space (Figure ref:fig:outline). Five constituents
 including [[acrshort:ma][MA]] and [[acrshort:fa][FA]] cations represent the possible A-site
@@ -378,19 +443,34 @@ accurate model will have to be formed on a multidimensional domain.
 :CUSTOM_ID: pca
 :CLASS: unnumbered
 :END:
+
+#+ATTR_LATEX: :float multicolumn :options h
+#+CAPTION: \label{fig:scree} 
+#+CAPTION: The ratios of variance explained by each principal component 
+#+CAPTION: obtained by a full SVD decomposition.
+
+
 #+ATTR_LATEX: :float multicolumn
 #+CAPTION: \label{fig:pca}
 #+CAPTION: PCA
 [[file:comp_ratio_projection_annot.png]]
 
-[[gls:pca][PCA]] is a method of projecting high dimensional data onto
+
+However, in a homogeneous domain of the sort outlined by the ABX3
+perovskite, pca is most effective only for identifying the major
+topology of the data distribution. While this tends to involve
+uninformative biases in a regression, it is still useful for revealing
+global trends in the explored space.
+
+ however, these variables are unsurprising
+and may not as strongly explain the properties targeted for
+statistical modeling
+
+
+[[acrshort:pca][PCA]] is a method of projecting high dimensional data onto
 a plane defined by the two linear combinations of axes that explain as
 much of the variance as possible.
 
-The method of [[gls:pca][PCA]] is the Singular Value Decomposition, a
-Unitary Transform which generalizes the familiar
-eigendecomposition. [[gls:pca][PCA]] will "rotate" the N data points
-in M-D space until their widest 2D cross section is displayed.
 
 At this point it is readily apparent that this dataset is highly
 topological. The data exists on a mostly bounded domain in high
@@ -676,20 +756,20 @@ file:Element_AFrac.jpg
 | vasp  | VASP  | Vienna Ab initio Simulation Package           |
 | slme  | SLME  | spectroscopic limited maximum efficiency      |
 | qmml  | QM/ML | quantum mechanics machine learning            |
-| pca   | PCA   | principal component analysis                  |
-| tsne  | t-SNE | t-distributed stochastic neighbor embedding   |
-| umap  | UMAP  | uniform manifold approximation and projection |
 
 #+name: acronyms
-| label | abbreviation | full form                          |
-|-------+--------------+------------------------------------|
-| dft   | DFT          | density functional theory          |
-| sqs   | SQS          | special quasi-random structures    |
-| paw   | PAW          | projector augmented wave           |
-| gga   | GGA          | generalized gradient approximation |
-| pbe   | PBE          | Perdew-Burke-Ernzerhof             |
-| hse   | HSE          | Heyd-Scuseria-Ernzerhof            |
-| ma    | MA           | Methylammonium                     |
-| fa    | FA           | Formamidinium                      |
-| pce   | PCE          | power conversion efficiency        |
-| hap   | HaP          | halide perovskite                  |
+| label | abbreviation | full form                                     |
+|-------+--------------+-----------------------------------------------|
+| dft   | DFT          | density functional theory                     |
+| sqs   | SQS          | special quasi-random structures               |
+| paw   | PAW          | projector augmented wave                      |
+| gga   | GGA          | generalized gradient approximation            |
+| pbe   | PBE          | Perdew-Burke-Ernzerhof                        |
+| hse   | HSE          | Heyd-Scuseria-Ernzerhof                       |
+| ma    | MA           | Methylammonium                                |
+| fa    | FA           | Formamidinium                                 |
+| pce   | PCE          | power conversion efficiency                   |
+| hap   | HaP          | halide perovskite                             |
+| pca   | PCA          | principal component analysis                  |
+| tsne  | t-SNE        | t-distributed stochastic neighbor embedding   |
+| umap  | UMAP         | uniform manifold approximation and projection |
