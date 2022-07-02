@@ -4,6 +4,15 @@
 #+PROPERTY: header-args :session mrg :kernel mrg :async yes :pandoc org
 * COMMENT DEV dependencies
 #+INCLUDE: /home/panos/MannodiGroup/publications/Commun-Mat_DFT+ML+GA/dev_dependencies.org
+#+begin_src jupyter-python :exports results :results raw drawer
+  sys.path.append(os.path.expanduser("~/src/umap"))
+  import umap
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
 * load data
 #+INCLUDE: /home/panos/MannodiGroup/publications/Commun-Mat_DFT+ML+GA/load_full_domain.org
 * Target space
