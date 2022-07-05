@@ -7,11 +7,15 @@
 #+begin_src jupyter-python :exports results :results raw drawer
   sys.path.append(os.path.expanduser("~/src/umap"))
   import umap
+  ## feature engineering exploration
+  from sklearn.impute import SimpleImputer
+  from sklearn.preprocessing import OrdinalEncoder, Normalizer, StandardScaler
+  #transformers
+  from sklearn.decomposition import PCA, TruncatedSVD, KernelPCA
+  from sklearn.manifold import TSNE
+  #visualization
+  from spyglass.spyglass import biplot
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 * load data
 #+INCLUDE: /home/panos/MannodiGroup/publications/Commun-Mat_DFT+ML+GA/load_full_domain.org
@@ -29,31 +33,58 @@ The target space is briefly summarized in both uni-variate and bi-variate views
 
 #+begin_src jupyter-python :exports results :results raw drawer
   df = my.select_dtypes(np.number).filter(regex=r'^(?!efficiency|.*dbg)', axis=1).dropna(axis=1, how='all')
+#+end_src
+  
+ploty.js is being extended to enable improved sploms
+#+begin_src jupyter-python :exports results :results raw drawer
   p = px.scatter_matrix(df,
                         dimensions=df.select_dtypes(np.number).columns,
-                        color=mix[my.LoT=='PBE'])
+                        color=mix[my.LoT=='PBE'],
+                        template='seaborn',
+                        width=800, height=800)
+  #p.update_layout(
+  #    paper_bgcolor='rgba(255,255,255,0)',
+  #    plot_bgcolor='rgba(255,255,255,0)',
+  #)
+  p.update_traces(marker=dict(size=2), diagonal=dict())
+  def select_trace(trace):
+      print(trace)
+      return True
+  p.update_xaxes(selector=select_trace, showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False)
+  p.update_xaxes(selector=select_trace)
+  p.update_yaxes(showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False)
+  # for in p.layout
+  #     if prop.startswith('xaxis') or prop.startswith('yaxis'):
+  #         p.update_xaxes(showline=True, linewidth=2, linecolor='black', ticks='outside')
+  # p.update_yaxes(showline=True, linewidth=2, linecolor='black', )
   p.show(renderer='png')
 #+end_src
 
-#+RESULTS:
-:results:
-#+attr_org: :width 700
-[[file:./.ob-jupyter/381295c277c887cfae2923549e2191f15bb93af1.png]]
-:end:
+#+begin_src jupyter-python :exports results :results raw drawer
+  import plotly.figure_factory as ff
+  df1 = df.assign(mix=mix[my.LoT=='PBE'])
+  p = ff.create_scatterplotmatrix(df1, diag='histogram',
+                                  index='mix', size=2,
+                                  #template='seaborn',p
+                                  width=800, height=800)
+  p.update_layout(
+     paper_bgcolor='rgba(255,255,255,0)',
+     plot_bgcolor='rgba(255,255,255,0)',
+  )
+  p.update_xaxes(showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False)
+  p.update_yaxes(showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False)
+  #p.update_traces()
+  p.show(renderer='png')
+#+end_src
 
-* Pie Charts
+* TODO Pie Charts
 TODO: remove labels for convenience
 
 How datasets under consideration distribute their sample of the alloy axes
 ** make and label shares
 #+begin_src jupyter-python :exports results :results raw drawer
   PBE_comp = mc
-  HSE_comp = mc.reindex(index=my.dropna(how="any", axis=0).index)
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 *** alloy shares
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -65,10 +96,6 @@ How datasets under consideration distribute their sample of the alloy axes
   HSE_alloy_share.name=""
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 *** total comp
 #+begin_src jupyter-python :exports results :results raw drawer :pandoc org
   PBE_total = PBE_comp.count()
@@ -77,19 +104,11 @@ How datasets under consideration distribute their sample of the alloy axes
   HSE_total.name = "Total"
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 *** comp per group
 #+begin_src jupyter-python :exports results :results raw drawer :pandoc org
   PBE_total_group = PBE_alloy_group.count()
   HSE_total_group = HSE_alloy_group.count()
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 ** plot shares
 *** define plot functions
@@ -134,10 +153,6 @@ How datasets under consideration distribute their sample of the alloy axes
       return fig
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 *** PBE
 #+begin_src jupyter-python :exports results :results raw drawer
   fig1 = plot_alloy_shares(PBE_alloy_share)
@@ -149,10 +164,6 @@ How datasets under consideration distribute their sample of the alloy axes
   fig3.show()
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 #+begin_src jupyter-python :exports results :results raw drawer
   fig1.savefig("./PBE_Alloy_Representations.png", dpi = mydpi, transparent=True)
   fig2.savefig("./PBE_Constituent_Representations.png", dpi = mydpi, transparent=True)
@@ -160,10 +171,6 @@ How datasets under consideration distribute their sample of the alloy axes
 
   plt.show()
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 *** HSE
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -214,10 +221,6 @@ ratios are explored with respect to the alloy class.
   # eliminate the "zeros" (missing values) to focus on the meaningful data
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 #+begin_src jupyter-python :exports results :results raw drawer
   with sns.plotting_context("poster"):
       p = sns.catplot(x="value", col="element", data=nmc, col_wrap=5, kind="count", hue="mix",
@@ -239,18 +242,10 @@ ratios are explored with respect to the alloy class.
   smp = pd.melt(pmp, id_vars=['mix', 'org']).replace(0, np.NaN).dropna() # eliminate "zeros" (missing values) to focus on the meaningful data
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 #+begin_src jupyter-python :exports results :results raw drawer
   with sns.plotting_context("notebook"):
       p = sns.displot(x="value", col=smp.iloc[:,3], row="site", data=smp, kind="hist", hue="mix", multiple='stack')
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 * Multivariate relations
 To get a better idea of what structures statistical models might be
 able to find in the complete dataset, the structure and effects of
@@ -307,22 +302,12 @@ pca can be truncated for speed, but with these dimensions it is not necessary.
   sns.move_legend(p, "upper left", bbox_to_anchor=(1, 1))
 #+end_src
 
-#+RESULTS:
-:results:
-: [INFO] 2022-05-22 19:04:21 - sklearn.decomposition.PCA.fit: running accelerated version on CPU
-: [INFO] 2022-05-22 19:04:21 - sklearn.decomposition.PCA.transform: running accelerated version on CPU
-:end:
-
 #+begin_src jupyter-python :exports results :results raw drawer
   #p.figure.savefig("./comp_ratio_projection.png", transparent=True)
   p.figure.savefig('./site_avg_properties_projection', transparent=True)
   #p.figure.savefig("./PBE_cascade.png", transparent=True)
   #p.figure.savefig("./HSE_cascade.png", transparent=True)
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 At this point it is readily apparent that this dataset is highly
 topological. The data exists on a mostly bounded domain in high
@@ -336,12 +321,6 @@ it can also be a bias-inducing hindrance.
   kpcaxis = KernelPCA(n_components=min(df.shape), kernel="rbf", gamma=20, fit_inverse_transform=True, alpha=0.1)
   kpcaxis.fit(df)
 #+end_src
-
-  #+RESULTS:
-  :results:
-  : KernelPCA(alpha=0.1, fit_inverse_transform=True, gamma=20, kernel='rbf',
-  :           n_components=14)
-  :end:
   
 #+begin_src jupyter-python :exports results :results raw drawer
   kdf = pd.DataFrame(
@@ -351,18 +330,10 @@ it can also be a bias-inducing hindrance.
   )
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 #+begin_src jupyter-python :exports results :results raw drawer
   p = sns.scatterplot(data=kdf, x='pc_0', y='pc_1', style='mix', hue='org')
   sns.move_legend(p, "upper left", bbox_to_anchor=(1, 1))
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 * Truncated SVD
 A basic method for factor analysis
@@ -379,18 +350,10 @@ A basic method for factor analysis
   )
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 #+begin_src jupyter-python :exports results :results raw drawer
   p = sns.scatterplot(data=svdf, x='pc_0', y='pc_1', style='mix', hue='org')
   p.figure.show()
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 * TSNE
 tSNE method initializes itself using the PCA transformation of the fit
@@ -418,28 +381,6 @@ instances in the feature array.
   tsnedf = pd.concat(tsnedf_list, axis=0)
 #+end_src
 
-#+RESULTS:
-:results:
-#+begin_example
-  [INFO] 2022-05-22 18:48:42 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:42 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:43 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:43 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:44 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:44 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:45 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:45 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:46 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:46 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:47 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:47 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:48 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:48 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:50 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-  [INFO] 2022-05-22 18:48:50 - sklearn.neighbors.KNeighborsMixin.kneighbors: fallback to original Scikit-learn
-#+end_example
-:end:
-
 #+begin_src jupyter-python :exports both :results raw drawer
   p = px.scatter(tsnedf,
                  facet_col='perplexity', facet_col_wrap=4,
@@ -457,17 +398,9 @@ instances in the feature array.
   p.figure.show()
 #+end_src
 
-#+RESULTS:
-:results:
-:end:
-
 #+begin_src jupyter-python :exports both :results raw drawer
   p.figure.savefig('./tsne_comp_DecoE_clusters', transparent=True)
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 ** DecoE clustering
 - hamming distance
