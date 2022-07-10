@@ -3,7 +3,7 @@
 #+EMAIL: pmangana@purdue.edu
 #+PROPERTY: header-args :session mrg :kernel mrg :async yes :pandoc org
 * COMMENT DEV dependencies
-#+INCLUDE: /home/panos/MannodiGroup/publications/Commun-Mat_DFT+ML+GA/dev_dependencies.org
+#+INCLUDE: /home/panos/MannodiGroup/publications/Perovskites_dataset_manifest/dev_dependencies.org
 #+begin_src jupyter-python :exports results :results raw drawer
   sys.path.append(os.path.expanduser("~/src/umap"))
   import umap
@@ -13,12 +13,65 @@
   #transformers
   from sklearn.decomposition import PCA, TruncatedSVD, KernelPCA
   from sklearn.manifold import TSNE
-  #visualization
-  from spyglass.spyglass import biplot
 #+end_src
 
+#+RESULTS:
+:results:
+:end:
+
 * load data
-#+INCLUDE: /home/panos/MannodiGroup/publications/Commun-Mat_DFT+ML+GA/load_full_domain.org
+#+INCLUDE: /home/panos/MannodiGroup/publications/Perovskites_dataset_manifest/load_full_domain.org
+* preprocess data
+#+begin_src jupyter-python :exports results :results raw drawer
+  # composition vectors for preprocessing
+  comp_features = mm.select_dtypes(np.number).columns[
+      mm.select_dtypes(np.number).columns.get_level_values(level=1).str.match(r'^[^E\a]\w{0,2}?$')
+  ].to_list()
+
+  # site-avg properties for preprocessing
+  prop_features = mm.select_dtypes(np.number).columns[
+      ~mm.select_dtypes(np.number).columns.get_level_values(level=1).str.match(r'^[^E\a]\w{0,2}?$')
+  ].to_list()
+
+  # categorical properties for preprocessing
+  cat_features = mm.select_dtypes('object').columns.to_list()
+
+  # define preprocessing
+  fillna = SimpleImputer(strategy="constant", fill_value=0.0)
+  mkratio = Normalizer(norm='l1')
+  mknormal = StandardScaler()
+  mkbound = MinMaxScaler(feature_range=(0,1), clip=False) #not statistical, should work for anything
+
+  comp_transformer = mkpipe(fillna, mkratio, mkbound)
+  prop_transformer = mkpipe(mknormal, mkbound)
+  cat_transformer = ohe(handle_unknown="ignore")
+
+  preprocessor = colt(
+      transformers=[
+          ("comp", comp_transformer, comp_features),
+          ("prop", prop_transformer, prop_features),
+          ("cat", cat_transformer, cat_features),
+      ]
+  )
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  fit = SerializeMI(preprocessor.fit)
+  fit(
+
+  X = pd.DataFrame(preprocessor.transform(mm),
+                   columns=preprocessor.get_feature_names_out(),
+                   index=mm.index)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
 * Target space
 properties collected from DFT computations using the PBE and HSE
 functionals can be explored here.
@@ -34,9 +87,13 @@ The target space is briefly summarized in both uni-variate and bi-variate views
 #+begin_src jupyter-python :exports results :results raw drawer
   df = my.select_dtypes(np.number).filter(regex=r'^(?!efficiency|.*dbg)', axis=1).dropna(axis=1, how='all')
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
   
 ploty.js is being extended to enable improved sploms
-#+begin_src jupyter-python :exports results :results raw drawer
+#+begin_src jupyter-python :exports results :results raw drawer :file ./pairplots/PBE_pairplot_2.png
   p = px.scatter_matrix(df,
                         dimensions=df.select_dtypes(np.number).columns,
                         color=mix[my.LoT=='PBE'],
@@ -48,7 +105,6 @@ ploty.js is being extended to enable improved sploms
   #)
   p.update_traces(marker=dict(size=2), diagonal=dict())
   def select_trace(trace):
-      print(trace)
       return True
   p.update_xaxes(selector=select_trace, showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False)
   p.update_xaxes(selector=select_trace)
@@ -191,7 +247,28 @@ How datasets under consideration distribute their sample of the alloy axes
   plt.show()
 #+end_src
 
-* Feature space
+* TODO Sample Space
+show sparse alloy space coverage
+#+begin_src jupyter-python :exports none :results raw drawer     
+  rownames = [zip(comptuple, Cl_ABmixing_decomp.index.names) for comptuple in Cl_ABmixing_decomp.index.to_flat_index()]
+  rownames = [list(labelzip) for labelzip in rownames]
+  colnames = [zip(comptuple, Cl_ABmixing_decomp.columns.names) for comptuple in Cl_ABmixing_decomp.columns.to_flat_index()]
+  colnames = [list(labelzip) for labelzip in colnames]
+  %matplotlib inline
+  Cl_array_AorBmix = Cl_ABmixing_decomp.to_numpy()
+  fig, ax = plt.subplots(figsize=[30,30])
+  im, cbar = heatmap(Cl_array_AorBmix, rownames[::-1], colnames[::-1], ax=ax,
+                     cmap="magma_r", cbarlabel="PBE Decomp E [eV p.f.u]")
+  cbar.ax.tick_params(labelsize=35)
+  cbar.set_label(label = cbar.ax.get_title(), fontsize=40)
+  texts = annotate_heatmap(im, valfmt="{x:.1f} eV", fontsize='xx-small')
+  fig.tight_layout()
+  ax.set_title('PBE Predicted Decomp E for Cl X-site Perovskites\n composed of 5 A-site and 6 B-site candidates in N fractions of 8',
+               fontsize = 40)  
+  plt.show()
+#+end_src
+
+* TODO Feature space
 ** Composition Distributions
 composition vectors are a set of primary descriptors for the
 Perovskites being examined -- most other meaningful features are at
@@ -211,13 +288,8 @@ Here, uni-variate distributions over finite bounds on composition
 ratios are explored with respect to the alloy class.
 
 #+begin_src jupyter-python :exports results :results raw drawer
-  pmc = pd.DataFrame(
-      mc.fillna(0).pipe(Normalizer(norm="l1").fit_transform),
-      index=mc.index,
-      columns=mc.columns
-  ).assign(mix=mix).assign(org=org)
-  #normalizing the data by each vector's manhattan length gives proportional quantities
-  nmc = pd.melt(pmc, id_vars=["mix", "org"]).replace(0, np.NaN).dropna()
+  pmc = X[comp_features].assign(mix=mix).assign(org=org)
+  nmc = pd.melt(X, id_vars=["mix", "org"]).replace(0, np.NaN).dropna()
   # eliminate the "zeros" (missing values) to focus on the meaningful data
 #+end_src
 
@@ -229,17 +301,15 @@ ratios are explored with respect to the alloy class.
       sns.move_legend(p, bbox_to_anchor=(0.85, 0.15), loc="center")
 #+end_src
 
+#+begin_src jupyter-python :exports results :results raw drawer :file ./domains/
+  p = px.box()
+#+end_src
+
 ** Site-Averaged Properties Distributions 
 #+begin_src jupyter-python :exports results :results raw drawer
-  dxr = pd.IndexSlice
-  some_axes = mp.loc[:, dxr[:, mp.columns.get_level_values(1)[0:4]]] #change these level value slices to focus on different site axes or remove slicing to see all
-
-  pmp = pd.DataFrame(
-          some_axes.pipe(StandardScaler().fit_transform), #Z transform scales dimensions so they are comparable
-          columns=some_axes.columns,
-          index=some_axes.index).assign(mix=mix).assign(org=org)
-
-  smp = pd.melt(pmp, id_vars=['mix', 'org']).replace(0, np.NaN).dropna() # eliminate "zeros" (missing values) to focus on the meaningful data
+  pmc = X[prop_features].assign(mix=mix).assign(org=org)
+  smp = pd.melt(pmp, id_vars=['mix', 'org']).replace(0, np.NaN).dropna()
+  # eliminate "zeros" (missing values) to focus on the meaningful data
 #+end_src
 
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -247,6 +317,9 @@ ratios are explored with respect to the alloy class.
       p = sns.displot(x="value", col=smp.iloc[:,3], row="site", data=smp, kind="hist", hue="mix", multiple='stack')
 #+end_src
 * Multivariate relations
+:PROPERTIES:
+:ID:       117889c3-28f7-4266-9fe2-8ae3a849cb3a
+:END:
 To get a better idea of what structures statistical models might be
 able to find in the complete dataset, the structure and effects of
 many variables at a time must be inspected.
@@ -279,27 +352,38 @@ multivariate assemblies:
   #df = my.filter(regex=r'^(?!PBE|.*dbg|.*PV|SLME|dielc)').select_dtypes(np.number).dropna() #HSE cascade
   #df = pmc.select_dtypes(np.number) #rational composition vectors
   #df = pmp.select_dtypes(np.number) #standardized site-averaged properties or naive subset as defined previously
-  df = mp.select_dtypes(np.number) #site-averaged properties
+  df = mc.copy(deep=True).select_dtypes(np.number).fillna(0) #site-averaged properties
   #df = pd.concat([pmc.select_dtypes(np.number), mp.select_dtypes(np.number)], axis=1) #combined rational comp and site properties
 #+end_src
 
 if using a combined assembly, it's likely that further standardization is necessary.
 #+begin_src jupyter-python :exports results :results none
   df = pd.DataFrame(
-      StandardScaler().fit_transform(df), #optionally standardize. will affect the projection's orientation
+      MinMaxScaler().fit_transform(df),
+      #StandardScaler().fit_transform(df), #optionally standardize. will affect the projection's orientation
       index=df.index,
       columns=df.columns
   )
 #+end_src
 * PCA
-pca can be truncated for speed, but with these dimensions it is not necessary.
-#+begin_src jupyter-python :exports results :results none
-  pcaxis = PCA(n_components = min(df.shape), svd_solver = 'full') 
+:PROPERTIES:
+:ID:       693a9e96-3d0d-489a-a178-656687b5ac6c
+:END:
+#+begin_src jupyter-python :exports results :results raw drawer
+  pcaxis = PCA(n_components = min(df.shape), svd_solver = 'full')
+  pcaxis.fit(df)
 #+end_src
 
+#+RESULTS:
+:results:
+: PCA(n_components=14, svd_solver='full')
+:end:
+
 #+begin_src jupyter-python :exports results :results raw drawer
-  p = biplot(pcaxis=pcaxis.fit(df), data=df, x='pc_0', y='pc_1', style='mix', hue='org')
-  sns.move_legend(p, "upper left", bbox_to_anchor=(1, 1))
+  p, pcadata = biplot(pcaxis=pcaxis, data=df, x=0, y=1)
+  #sns.move_legend(p, "upper left", bbox_to_anchor=(1, 1))
+  p.show(renderer='png')
+  #p.write_html('./test.html')
 #+end_src
 
 #+begin_src jupyter-python :exports results :results raw drawer
