@@ -1,0 +1,273 @@
+#+title: Procedure for Creating Multi fidelity Domain using discrete tables
+#+AUTHOR: Panayotis Manganaris
+#+EMAIL: pmangana@purdue.edu
+#+PROPERTY: header-args :session mrg :kernel mrg :async yes :pandoc org
+* Load Data
+#+begin_src jupyter-python :exports results :results raw drawer
+  mannodi_pbe_q = """SELECT *
+                     FROM mannodi_pbe"""
+  mannodi_hse_q = """SELECT *
+                     FROM mannodi_hse"""
+  mannodi_hsc_q = """SELECT *
+                     FROM mannodi_hsesoc"""
+  almora_q = """SELECT *
+                FROM almora"""
+  ref_q = """SELECT *
+             FROM mannodi_ref_elprop"""
+  with sqlite3.connect(os.path.expanduser("~/src/cmcl/cmcl/db/perovskites.db")) as conn:
+      mannodi_pbe = pd.read_sql(mannodi_pbe_q, conn, index_col="index")
+      mannodi_hse = pd.read_sql(mannodi_hse_q, conn, index_col="index")
+      mannodi_hsc = pd.read_sql(mannodi_hsc_q, conn, index_col="index")
+      almora = pd.read_sql(almora_q, conn, index_col='index')
+      lookup = pd.read_sql(ref_q, conn, index_col='index')
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** lookup indexing
+#+begin_src jupyter-python :exports results :results raw drawer
+  lookup = lookup.set_index("Formula")
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+* Clean Data and label
+going forward we just assume that almora consists primarily of cubic phase crystals
+#+begin_src jupyter-python
+  #use index to transfer categorical variables through aggregation
+  target = ['bg_eV'] #used to drop nans in desired target
+  mannodi_pbe[target] = mannodi_pbe[target].apply(pd.to_numeric, errors='coerce')
+  mannodi_hse[target] = mannodi_hse[target].apply(pd.to_numeric, errors='coerce')
+  almora[target] = almora[target].applymap(pd.to_numeric, errors='coerce')
+  mannodi_hsc[target] = mannodi_hsc[target].applymap(pd.to_numeric, errors='coerce')    
+#+end_src
+
+#+RESULTS:
+
+** subset based on deviation from cubicity
+#+begin_src jupyter-python :exports results :results raw drawer
+  exclude = ["Rb0.375Cs0.625GeBr3", "RbGeBr1.125Cl1.875", "K0.75Cs0.25GeI3", "K8Sn8I9Cl15"]
+  mannodi_pbe = mannodi_pbe[~mannodi_pbe.Formula.isin(exclude)]
+  mannodi_hse = mannodi_hse[~mannodi_hse.Formula.isin(exclude)]
+  mannodi_hsc = mannodi_hsc[~mannodi_hsc.Formula.isin(exclude)]  
+  almora = almora[~almora.Formula.isin(exclude)]
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** create LoT axis
+#+begin_src jupyter-python :exports results :results raw drawer
+  mannodi_pbe = mannodi_pbe.assign(LoT='PBE')
+  mannodi_hse = mannodi_hse.assign(LoT='HSE')
+  mannodi_hsc = mannodi_hsc.assign(LoT='HSC')  
+  almora = almora.assign(LoT='EXP')
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+* Compute Base
+** Compute Composition Vectors
+#+begin_src jupyter-python :exports results :results raw drawer
+  pc = mannodi_pbe.ft.comp().iloc[:, :14:]
+  hc = mannodi_hse.ft.comp().iloc[:, :14:]
+  hsc = mannodi_hsc.ft.comp().iloc[:, :14:]
+  ec = almora.ft.comp()
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** subset index
+*** cut down pbe by comp total
+#+begin_src jupyter-python :exports results :results raw drawer
+  size = mannodi_pbe.sim_cell.isin(["2x2x2"])
+  pc = pc.collect.abx()
+  g = pc.groupby(level=0, axis=1).sum()
+  vB, vX, vA, = g.A.isin([1, 8]), g.B.isin([1, 8]), g.X.isin([3, 24])
+  #subset indexes
+  focus = size*vB*vA*vX
+  pc = pc[focus]
+  mannodi_pbe = mannodi_pbe[focus]
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+*** cut down hse by comp total
+#+begin_src jupyter-python :exports results :results raw drawer
+  size = mannodi_hse.sim_cell.isin(["2x2x2"])
+  hc = hc.collect.abx()
+  g = hc.groupby(level=0, axis=1).sum()
+  vB, vX, vA, = g.A.isin([1, 8]), g.B.isin([1, 8]), g.X.isin([3, 24])
+  #subset indexes
+  focus = size*vB*vA*vX
+  hc = hc[focus]
+  mannodi_hse = mannodi_hse[focus]
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+*** cut down exp by comp total
+#+begin_src jupyter-python :exports results :results raw drawer
+  ec = ec.applymap(pd.to_numeric, errors='coerce')
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  ec = ec.collect.abx()
+  g = ec.groupby(level=0, axis=1).sum()
+  vB, vX, vA, = g.A.isin([1, 8]), g.B.isin([1, 8]), g.X.isin([3, 24])
+  #subset indexes
+  focus = vB*vA*vX
+  ec = ec[focus]
+  almora = almora[focus]
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+*** cut down hsc by comp total
+#+begin_src jupyter-python :exports results :results raw drawer
+  size = mannodi_hsc.sim_cell.isin(["2x2x2"])
+  hsc = hsc.collect.abx()
+  g = hsc.groupby(level=0, axis=1).sum()
+  vB, vX, vA, = g.A.isin([1, 8]), g.B.isin([1, 8]), g.X.isin([3, 24])
+  #subset indexes
+  focus = size*vB*vA*vX
+  hsc = hsc[focus]
+  mannodi_hsc = mannodi_hsc[focus]
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** Compute Site Properties
+#+begin_src jupyter-python :exports results :results raw drawer
+  pp = join3(mannodi_pbe.Formula.to_frame(), pc, lookup, thru='element', right_on='Formula').reset_index(drop=True)
+  hp = join3(mannodi_hse.Formula.to_frame(), hc, lookup, thru='element', right_on='Formula').reset_index(drop=True)
+  ep = join3(almora.Formula.to_frame(), ec, lookup, thru='element', right_on='Formula').reset_index(drop=True)
+  hsp = join3(mannodi_hsc.Formula.to_frame(), pc, lookup, thru='element', right_on='Formula').reset_index(drop=True)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** assign categorical features
+#+begin_src jupyter-python :exports results :results raw drawer
+  ec = ec.assign(LoT=almora.LoT)
+  pc = pc.assign(LoT=mannodi_pbe.LoT)
+  hc = hc.assign(LoT=mannodi_hse.LoT)
+  hsc = hsc.assign(LoT=mannodi_hsc.LoT)  
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+* Build and Cluster Domain
+Base Domain will be mutated based on feature's Predictive Power
+** Basic Domains
+#+begin_src jupyter-python :exports results :results raw drawer
+  mc = pd.concat([pc, hc, ec, hsc], axis=0).reset_index(drop=True)
+  mp = pd.concat([pp, hp, ep, hsp], axis=0).reset_index(drop=True)
+  mm = pd.concat([mc, mp], axis=1)
+  my = pd.concat([mannodi_pbe, mannodi_hse, almora, mannodi_hsc], axis=0).reset_index(drop=True)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** Generate Mix Categories
+this helps with visualizing the final model performance.
+#+begin_src jupyter-python :exports results :results raw drawer
+  mixlog = mc.groupby(level=0, axis=1).count()
+  mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** filter out BandX
+#+begin_src jupyter-python :exports results :results raw drawer
+  mixfilter = mix.isin(['A', 'B', 'X', 'pure'])
+  mm = mm[mixfilter]
+  my = my[mixfilter]
+  mix = mix[mixfilter]
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** generate Organics Categories
+#+begin_src jupyter-python :exports results :results raw drawer
+  organics = my.ft.comp().collect.org()
+  orglog = organics.groupby(level=0, axis=1).count()
+  org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+* for single fidelity visualization
+** trim domain by cluster
+#+begin_src jupyter-python :exports results :results raw drawer
+  cluster_filter = mm.LoT=="PBE"
+  mm = mm[cluster_filter]
+  my = my[cluster_filter]
+  mix = mix[cluster_filter]
+  org = org[cluster_filter]
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+
+* for multifideltiy comparison
+** trim and aggregate possible targets
+repeated record measures are aggregated
+#+begin_src jupyter-python :exports results :results raw drawer
+  almora = almora.groupby('Formula').agg({'bg_eV':'median', #make an auto dict...
+                                          'efficiency':'median',
+                                          'citation':'first',}
+                                         ).reset_index().dropna(subset=target)
+  mannodi_pbe = mannodi_pbe.groupby('Formula').agg({'bg_eV':'median',
+                                                    'efficiency':'median',
+                                                    'sim_cell':'first',
+                                                    'bgType':'first',}
+                                                   ).reset_index().dropna(subset=target)
+  mannodi_hse = mannodi_hse.groupby('Formula').agg({'bg_eV':'median',
+                                                    'sim_cell':'first',
+                                                    'bgType':'first',}
+                                                   ).reset_index().dropna(subset=target)
+  mannodi_hsc = mannodi_hsc.groupby('Formula').agg({'bg_eV':'median',
+                                                    'sim_cell':'first',}
+                                                   ).reset_index().dropna(subset=target)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
