@@ -161,7 +161,7 @@ utilizing the transformation.
 #+CAPTION: \label{fig:outline} 
 #+CAPTION: (a) Chemical space of ABX_3 perovskites. (b) Number of samples
 #+CAPTION: representing each kind of primary alloy. (c) Detailed outline.
-[[file:outline.png]]
+[[file:./figs/outline.png]]
 
 * TODO Methodology
 :PROPERTIES:
@@ -219,7 +219,7 @@ samples.
 #+CAPTION: \label{fig:chemspace_uni}
 #+CAPTION: Plots showing number of Perovskites representing a constituent
 #+CAPTION: at a certain atomic fraction of a complete Perovskite.
-[[file:variability_of_composition_vectors.png]]
+[[file:./domains/variability_of_composition_vectors.png]]
 
 #+ATTR_LATEX: :float multicolumn
 #+CAPTION: \label{fig:sample_map}
@@ -309,7 +309,7 @@ for each record.
 #+CAPTION: \label{fig:pairplots} 
 #+CAPTION: DFT Results: PBE and HSE properties; lattice constants,
 #+CAPTION: decomposition energies, band gaps, and converter efficiencies.
-[[file:Figure2.png]]
+[[file:./figs/screening_properties.png]]
 
 *** DONE Lattice constant PBE vs HSE
 :PROPERTIES:
@@ -339,7 +339,7 @@ the focus of this report.
 #+CAPTION: \label{fig:lc_lot_vs}
 #+CAPTION: Comparing lattice constants obtain by full PBE and HSE
 #+CAPTION: relax calculations
-[[file:pbe_v_hse_LC.png]]
+[[file:./expval/pbe_v_hse_LC.png]]
 
 *** TODO Comparing synthetic to physical data
 :STATUSLOG:
@@ -349,8 +349,8 @@ the focus of this report.
 #+CAPTION: \label{fig:lc_val_vs} 
 #+CAPTION: Comparison of PBE and HSE computed pseudo-cubic lattice
 #+CAPTION: constants with crystallographic measures for lattice constants
-[[file:pbe_v_exp_LC.png]]
-[[file:hse_v_exp_LC.png]]
+[[file:./expval/pbe_v_exp_LC.png]]
+[[file:./expval/hse_v_exp_LC.png]]
 
 The physical data used in the Lattice Constant Comparisons is
 collected from the works of
@@ -421,13 +421,13 @@ goes to zero due to the high band gap values.
 #+CAPTION: \label{fig:pearson_pcomp}
 #+CAPTION: Pearson linear correlation coefficients between 14 composition variables,
 #+CAPTION: and 4 PBE computed properties
-[[file:PBE_v_comp_pearson2.png]]
+[[file:./expval/PBE_v_comp_pearson2.png]]
 
 #+ATTR_LATEX: :float multicolumn
 #+CAPTION: \label{fig:pearson_psite}
 #+CAPTION: Pearson linear correlation coefficients between 36 elemental descriptors
 #+CAPTION: and 4 PBE computed properties
-[[file:PBE_v_site_prop_pearson.png]]
+[[file:./expval/PBE_v_site_prop_pearson.png]]
 
 No target is adequately explained by a single composition or
 composition derived axis. But there are helpful relations that aid
@@ -453,7 +453,7 @@ accurate model will have to be formed on a multidimensional domain.
 #+ATTR_LATEX: :float multicolumn
 #+CAPTION: \label{fig:pca}
 #+CAPTION: PCA
-[[file:comp_ratio_projection_annot.png]]
+[[file:./multivar/comp_ratio_projection_annot.png]]
 
 
 However, in a homogeneous domain of the sort outlined by the ABX3
@@ -488,7 +488,7 @@ accuracy, it can also be a bias-inducing hindrance.
 #+ATTR_LATEX: :float multicolumn
 #+CAPTION: \label{fig:tsne}
 #+CAPTION: t-SNE 
-[[file:tsne_comp_DecoE_clusters.png]]
+[[file:./multivar/tsne_comp_DecoE_clusters.png]]
 
 ** DONE Screening process of all samples in database
 :PROPERTIES:
@@ -520,18 +520,18 @@ constraint.
 #+CAPTION: Screening results of Decomposition Energy for (a) octahedral factor
 #+CAPTION: (b) Tolerance Factor (c) Bartel Tolerance Factor (d) Deviation of
 #+CAPTION: Cubicity.
-[[file:screening_factor.png]]
+[[file:./figs/screening_factor.png]]
 
 #+ATTR_LATEX: :float multicolumn
 #+CAPTION: \label{fig:leftover}
 #+CAPTION: 49 Screened perovskites analysis, (a) pie chart of element
 #+CAPTION: distribution, (b) pie chart of site mixing
-[[file:screening_pie.png]]
+[[file:./figs/screening_pie.png]]
 
 #+ATTR_LATEX: :float multicolumn
 #+CAPTION: \label{fig:leftover_comp}
 #+CAPTION: Plots of element fraction for A, B, X sites of all screened perovskites.
-[[file:Element_Frac.jpg]]
+[[file:./figs/Element_Frac.png]]
 
 *** TODO Deviation from Cubicity
 :PROPERTIES:
@@ -726,28 +726,28 @@ bibliography:./main.bib
 #+CAPTION: \label{fig:pearson_hcomp}
 #+CAPTION: Pearson linear correlation coefficients between 14 composition variables,
 #+CAPTION: and 4 HSE computed properties
-[[file:HSE_v_comp_pearson2.png]]
+[[file:./expval/HSE_v_comp_pearson2.png]]
 
 #+ATTR_LATEX: :float multicolumn
 #+CAPTION: \label{fig:pearson_hsite}
 #+CAPTION: Pearson linear correlation coefficients between 36 composition variables,
 #+CAPTION: and 4 HSE computed properties
-[[file:HSE_v_site_prop_pearson.png]]
+[[file:./expval/HSE_v_site_prop_pearson.png]]
 
 #+ATTR_LATEX: :float multicolumn
 #+CAPTION: \label{fig:sreened_frac_A}
 #+CAPTION: Element Fraction for A site elements among all screened perovskites
-file:Element_AFrac.jpg
+file:./expval/Element_AFrac.jpg
 
 #+ATTR_LATEX: :float multicolumn
 #+CAPTION: \label{fig:sreened_frac_B}
 #+CAPTION: Element Fraction for B site elements among all screened perovskites
-[[file:Element_BFrac.jpg]]
+[[file:./expval/Element_BFrac.jpg]]
 
 #+ATTR_LATEX: :float multicolumn
 #+CAPTION: \label{fig:sreened_frac_X}
 #+CAPTION: Element Fraction for X site elements among all screened perovskites
-[[file:Element_XFrac.jpg]]
+[[file:./expval/Element_XFrac.jpg]]
 
 
 #+name: glossary
