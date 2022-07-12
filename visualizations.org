@@ -501,7 +501,7 @@ instances in the feature array.
           tsne.fit_transform(Xc.select_dtypes(np.number)),
           index = Xc.index,
           columns = [f'{i}' for i in range(tsne.n_components)]
-      ).assign(perplexity=perp)
+      ).assign(perplexity=perp).assign(mix=mix).assign(org=org).assign(formula=my.Formula)
 
       tsnedf_list.append(tsnedf)
 
@@ -543,9 +543,10 @@ instances in the feature array.
   p = px.scatter(tsnedf,
                  facet_col='perplexity', facet_col_wrap=4,
                  x='0', y='1',
-                 color=Y.dielc.to_list()*8)
-  p.update_yaxes(matches=None)
-  p.update_xaxes(matches=None)
+                 color=Y.DecoE_eV.to_list()*8, hover_name=tsnedf.formula)
+  p.update_layout(coloraxis=dict(colorbar=dict(title="Decomposition Energy [eV]", title_side='right')))
+  p.update_yaxes(matches=None, visible=False)
+  p.update_xaxes(matches=None, visible=False)
   p.show(renderer='png')
 #+end_src
 
@@ -614,6 +615,11 @@ instances in the feature array.
 [[file:./.ob-jupyter/c3bb81765be2211bc707e296ae82c5e5b1cffac8.png]]
 :end:
 
+* TODO
+- slide on GNNs
+- all figures all ways
+  - paper
+  - proposal contents
 * reference
 bibliographystyle:plain
 bibliography:~/org/bibliotex/bibliotex.bib
