@@ -22,6 +22,8 @@
 * load data
 #+INCLUDE: /home/panos/MannodiGroup/publications/Perovskites_dataset_manifest/load_full_domain.org
 * preprocess data
+** basis
+*** create preprocessing pipeline
 #+begin_src jupyter-python :exports results :results raw drawer
   # composition vectors for preprocessing
   comp_features = mm.select_dtypes(np.number).columns[
@@ -59,12 +61,12 @@
 :results:
 :end:
 
+*** fit data and create visualization df
 #+begin_src jupyter-python :exports results :results raw drawer
-  fit = SerializeMI(preprocessor.fit)
-  fit(
+  preprocessor.fit(mm)
 
   X = pd.DataFrame(preprocessor.transform(mm),
-                   columns=preprocessor.get_feature_names_out(),
+                   columns=preprocessor.get_feature_names_out(mm.columns.to_list()),
                    index=mm.index)
 #+end_src
 
@@ -72,6 +74,8 @@
 :results:
 :end:
 
+** targets
+no target transformations yet
 * Target space
 properties collected from DFT computations using the PBE and HSE
 functionals can be explored here.
@@ -84,51 +88,43 @@ candidates for further DFT calculation.
 
 The target space is briefly summarized in both uni-variate and bi-variate views
 
-#+begin_src jupyter-python :exports results :results raw drawer
-  df = my.select_dtypes(np.number).filter(regex=r'^(?!efficiency|.*dbg)', axis=1).dropna(axis=1, how='all')
+#+begin_src jupyter-python :exports results :results none
+  Y = my.select_dtypes(np.number).filter(regex=r'^(?!efficiency|.*dbg)', axis=1).dropna(axis=1, how='all')
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
   
 ploty.js is being extended to enable improved sploms
-#+begin_src jupyter-python :exports results :results raw drawer :file ./pairplots/PBE_pairplot_2.png
-  p = px.scatter_matrix(df,
-                        dimensions=df.select_dtypes(np.number).columns,
+#+begin_src jupyter-python :exports results :results raw drawer :file ./domains/PBE_pairplot_2.png
+  p = px.scatter_matrix(Y,
+                        dimensions=Y.select_dtypes(np.number).columns,
                         color=mix[my.LoT=='PBE'],
-                        template='seaborn',
+                        template='simple_white',
                         width=800, height=800)
-  #p.update_layout(
-  #    paper_bgcolor='rgba(255,255,255,0)',
-  #    plot_bgcolor='rgba(255,255,255,0)',
-  #)
-  p.update_traces(marker=dict(size=2), diagonal=dict())
-  def select_trace(trace):
-      return True
-  p.update_xaxes(selector=select_trace, showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False)
-  p.update_xaxes(selector=select_trace)
-  p.update_yaxes(showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False)
-  # for in p.layout
-  #     if prop.startswith('xaxis') or prop.startswith('yaxis'):
-  #         p.update_xaxes(showline=True, linewidth=2, linecolor='black', ticks='outside')
-  # p.update_yaxes(showline=True, linewidth=2, linecolor='black', )
+  p.update_layout(
+      # paper_bgcolor='rgba(255,255,255,0)',
+      # plot_bgcolor='rgba(255,255,255,0)',
+      legend=dict(itemsizing='constant')
+  )
+  p.update_traces(marker=dict(size=2), diagonal=dict(visible=False))
+  # p.update_xaxes(showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False)
+  # p.update_yaxes(showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False)
   p.show(renderer='png')
+  p.write_html('./test.html')
 #+end_src
 
-#+begin_src jupyter-python :exports results :results raw drawer
+#+begin_src jupyter-python :exports results :results raw drawer :file ./domains/PBE_pairplot_3.png
   import plotly.figure_factory as ff
-  df1 = df.assign(mix=mix[my.LoT=='PBE'])
-  p = ff.create_scatterplotmatrix(df1, diag='histogram',
+  Y1 = Y.assign(mix=mix[my.LoT=='PBE'])
+  p = ff.create_scatterplotmatrix(Y1, diag='histogram',
                                   index='mix', size=2,
-                                  #template='seaborn',p
+                                  #template='seaborn',
                                   width=800, height=800)
   p.update_layout(
-     paper_bgcolor='rgba(255,255,255,0)',
-     plot_bgcolor='rgba(255,255,255,0)',
+      paper_bgcolor='rgba(255,255,255,0)',
+      plot_bgcolor='rgba(255,255,255,0)',
+      legend=dict(itemsizing='constant')
   )
-  p.update_xaxes(showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False)
-  p.update_yaxes(showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False)
+  p.update_xaxes(showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False, zeroline=False)
+  p.update_yaxes(showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False, zeroline=False)
   #p.update_traces()
   p.show(renderer='png')
 #+end_src
@@ -268,7 +264,10 @@ show sparse alloy space coverage
   plt.show()
 #+end_src
 
-* TODO Feature space
+* DONE Feature space
+:STATUSLOG:
+- State "DONE"       from "TODO"       [2022-07-11 Mon 03:46]
+:END:
 ** Composition Distributions
 composition vectors are a set of primary descriptors for the
 Perovskites being examined -- most other meaningful features are at
@@ -288,35 +287,86 @@ Here, uni-variate distributions over finite bounds on composition
 ratios are explored with respect to the alloy class.
 
 #+begin_src jupyter-python :exports results :results raw drawer
-  pmc = X[comp_features].assign(mix=mix).assign(org=org)
-  nmc = pd.melt(X, id_vars=["mix", "org"]).replace(0, np.NaN).dropna()
+  Xc = X.iloc[
+      :, strings_where(np.array(comp_features), X.columns.to_numpy())
+  ].iloc[:,:-3].assign(mix=mix).assign(org=org)
+
+  Xcm = pd.melt(Xc, id_vars=["mix", "org"]).replace(0, np.NaN).dropna()
   # eliminate the "zeros" (missing values) to focus on the meaningful data
 #+end_src
 
+#+RESULTS:
+:results:
+:end:
+
 #+begin_src jupyter-python :exports results :results raw drawer
   with sns.plotting_context("poster"):
-      p = sns.catplot(x="value", col="element", data=nmc, col_wrap=5, kind="count", hue="mix",
+      p = sns.catplot(x="value", col="element", data=Xcm, col_wrap=5, kind="count", hue="mix",
                       col_order=["Ba", "Ge", "Cl", "Br", "I", "Sn", "Pb", "Cs", "FA", "MA", "Sr", "Ca", "Rb", "K"])
       (p.set_xticklabels(rotation=90))
       sns.move_legend(p, bbox_to_anchor=(0.85, 0.15), loc="center")
 #+end_src
 
-#+begin_src jupyter-python :exports results :results raw drawer :file ./domains/
-  p = px.box()
+#+begin_src jupyter-python :exports results :results raw drawer :file ./domains/variability_of_composition_vectors2.png
+  p = px.histogram(Xcm, x="value", facet_col='variable', facet_col_wrap=5, color="mix", template='seaborn',
+                   #category_orders={'variable':["Ba", "Ge", "Cl", "Br", "I", "Sn", "Pb", "Cs", "FA", "MA", "Sr", "Ca", "Rb", "K"]}
+                   barmode='group')
+  p.update_layout(
+      paper_bgcolor='rgba(255,255,255,0)',
+      plot_bgcolor='rgba(255,255,255,0)',
+      legend=dict(itemsizing='constant')
+  )
+  p.for_each_annotation(lambda a: a.update(text="".join(a.text[16:-1].split("'"))))
+  p.update_xaxes(showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False)
+  p.update_yaxes(showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False)
+  p.show(renderer="png")
 #+end_src
+
+#+RESULTS:
+:results:
+#+attr_org: :width 700
+[[file:./domains/variability_of_composition_vectors2.png]]
+:end:
 
 ** Site-Averaged Properties Distributions 
 #+begin_src jupyter-python :exports results :results raw drawer
-  pmc = X[prop_features].assign(mix=mix).assign(org=org)
-  smp = pd.melt(pmp, id_vars=['mix', 'org']).replace(0, np.NaN).dropna()
-  # eliminate "zeros" (missing values) to focus on the meaningful data
+  Xp = X.iloc[
+      :, strings_where(np.array(prop_features), X.columns.to_numpy())
+  ].assign(mix=mix).assign(org=org)
+
+  Xpm = pd.melt(Xp, id_vars=["mix", "org"]).replace(0, np.NaN).dropna()
+  # eliminate the "zeros" (missing values) to focus on the meaningful data
 #+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 #+begin_src jupyter-python :exports results :results raw drawer
   with sns.plotting_context("notebook"):
-      p = sns.displot(x="value", col=smp.iloc[:,3], row="site", data=smp, kind="hist", hue="mix", multiple='stack')
+      p = sns.displot(x="value", col=smp.iloc[:,3], row="site", data=Xpm, kind="hist", hue="mix", multiple='stack')
 #+end_src
-* Multivariate relations
+
+#+begin_src jupyter-python :exports results :results raw drawer :file ./domains/variability_of_site_avg_prop_vectors.png
+  p = px.histogram(Xpm, x="value", facet_col='variable', facet_col_wrap=6, color="mix", template='seaborn',
+                   barmode='overlay', width=1000, height=1000)
+  p.update_layout(
+      # paper_bgcolor='rgba(255,255,255,0)',
+      # plot_bgcolor='rgba(255,255,255,0)',
+      legend=dict(itemsizing='constant')
+  )
+  p.for_each_annotation(lambda a: a.update(text="".join(a.text.split("'")[1:-1])))
+  p.update_xaxes(showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False)
+  p.update_yaxes(showline=True, linewidth=2, linecolor='black', ticks='outside', showgrid=False)
+  p.show(renderer="png")
+#+end_src
+
+#+RESULTS:
+:results:
+[[file:./domains/variability_of_site_avg_prop_vectors.png]]
+:end:
+
+* Notes on Multivariate relations
 :PROPERTIES:
 :ID:       117889c3-28f7-4266-9fe2-8ae3a849cb3a
 :END:
@@ -344,34 +394,13 @@ Various projections are generated
 - the site-averaged property vector space is more ambiguous. However,
   some topology is still evident. Again, X-site alloy compounds appear
   to constitute most of the "spread" in the projection, with other mixed 
-- 
-
-multivariate assemblies:
-#+begin_src jupyter-python :exports results :results none
-  #df = my.filter(regex=r'^(?!HSE|.*dbg|.*PV|SLME)').select_dtypes(np.number) #pbe cascade
-  #df = my.filter(regex=r'^(?!PBE|.*dbg|.*PV|SLME|dielc)').select_dtypes(np.number).dropna() #HSE cascade
-  #df = pmc.select_dtypes(np.number) #rational composition vectors
-  #df = pmp.select_dtypes(np.number) #standardized site-averaged properties or naive subset as defined previously
-  df = mc.copy(deep=True).select_dtypes(np.number).fillna(0) #site-averaged properties
-  #df = pd.concat([pmc.select_dtypes(np.number), mp.select_dtypes(np.number)], axis=1) #combined rational comp and site properties
-#+end_src
-
-if using a combined assembly, it's likely that further standardization is necessary.
-#+begin_src jupyter-python :exports results :results none
-  df = pd.DataFrame(
-      MinMaxScaler().fit_transform(df),
-      #StandardScaler().fit_transform(df), #optionally standardize. will affect the projection's orientation
-      index=df.index,
-      columns=df.columns
-  )
-#+end_src
 * PCA
 :PROPERTIES:
 :ID:       693a9e96-3d0d-489a-a178-656687b5ac6c
 :END:
 #+begin_src jupyter-python :exports results :results raw drawer
-  pcaxis = PCA(n_components = min(df.shape), svd_solver = 'full')
-  pcaxis.fit(df)
+  pcaxis = PCA(n_components = min(Xc.select_dtypes(np.number).shape), svd_solver = 'full')
+  pcaxis.fit(Xc.select_dtypes(np.number))
 #+end_src
 
 #+RESULTS:
@@ -379,19 +408,16 @@ if using a combined assembly, it's likely that further standardization is necess
 : PCA(n_components=14, svd_solver='full')
 :end:
 
-#+begin_src jupyter-python :exports results :results raw drawer
-  p, pcadata = biplot(pcaxis=pcaxis, data=df, x=0, y=1)
-  #sns.move_legend(p, "upper left", bbox_to_anchor=(1, 1))
+#+begin_src jupyter-python :exports results :results raw drawer :file ./multivar/comp_ratio_bound_projection.png
+  p, pcadata = biplot(pcaxis=pcaxis, data=Xc.select_dtypes(np.number), x=0, y=1, color=Xc.mix)
   p.show(renderer='png')
-  #p.write_html('./test.html')
 #+end_src
 
-#+begin_src jupyter-python :exports results :results raw drawer
-  #p.figure.savefig("./comp_ratio_projection.png", transparent=True)
-  p.figure.savefig('./site_avg_properties_projection', transparent=True)
-  #p.figure.savefig("./PBE_cascade.png", transparent=True)
-  #p.figure.savefig("./HSE_cascade.png", transparent=True)
-#+end_src
+#+RESULTS:
+:results:
+#+attr_org: :width 700
+[[file:./multivar/comp_ratio_bound_projection.png]]
+:end:
 
 At this point it is readily apparent that this dataset is highly
 topological. The data exists on a mostly bounded domain in high
@@ -402,22 +428,39 @@ explanation of Perovskite variation, this can be useful for accuracy,
 it can also be a bias-inducing hindrance.
 * Kernel PCA
 #+begin_src jupyter-python :exports results :results raw drawer
-  kpcaxis = KernelPCA(n_components=min(df.shape), kernel="rbf", gamma=20, fit_inverse_transform=True, alpha=0.1)
-  kpcaxis.fit(df)
+  kpcaxis = KernelPCA(n_components=min(Xc.select_dtypes(np.number).shape),
+                      kernel="rbf", gamma=0.6, fit_inverse_transform=True, alpha=0.1)
+  kpcaxis.fit(Xc.select_dtypes(np.number))
 #+end_src
+
+#+RESULTS:
+:results:
+: KernelPCA(alpha=0.1, fit_inverse_transform=True, gamma=0.6, kernel='rbf',
+:           n_components=14)
+:end:
   
 #+begin_src jupyter-python :exports results :results raw drawer
   kdf = pd.DataFrame(
-      kpcaxis.transform(df),
-      index=df.index,
-      columns=[f'pc_{i}' for i in range(kpcaxis.n_components)]
+      kpcaxis.transform(Xc.select_dtypes(np.number)),
+      index=Xc.index,
+      columns=kpcaxis.get_feature_names_out()
   )
 #+end_src
 
+#+RESULTS:
+:results:
+:end:
+
 #+begin_src jupyter-python :exports results :results raw drawer
-  p = sns.scatterplot(data=kdf, x='pc_0', y='pc_1', style='mix', hue='org')
-  sns.move_legend(p, "upper left", bbox_to_anchor=(1, 1))
+  p = px.scatter(kdf, x='kernelpca0', y='kernelpca1', color=Xc.mix)
+  p.show(renderer='png')
 #+end_src
+
+#+RESULTS:
+:results:
+#+attr_org: :width 700
+[[file:./.ob-jupyter/41d1c805330cbe31a8f4adce403223dfb1487e8c.png]]
+:end:
 
 * Truncated SVD
 A basic method for factor analysis
@@ -455,9 +498,9 @@ instances in the feature array.
                   init="pca", metric='hamming',
                   learning_rate=200, random_state=1)
       tsnedf = pd.DataFrame(
-          tsne.fit_transform(df),
-          index = df.index,
-          columns = [f'e_{i}' for i in range(tsne.n_components)]
+          tsne.fit_transform(Xc.select_dtypes(np.number)),
+          index = Xc.index,
+          columns = [f'{i}' for i in range(tsne.n_components)]
       ).assign(perplexity=perp)
 
       tsnedf_list.append(tsnedf)
@@ -465,15 +508,52 @@ instances in the feature array.
   tsnedf = pd.concat(tsnedf_list, axis=0)
 #+end_src
 
-#+begin_src jupyter-python :exports both :results raw drawer
+#+RESULTS:
+:results:
+#+begin_example
+  /opt/miniconda3/envs/mrg/lib/python3.10/site-packages/sklearn/manifold/_t_sne.py:991: FutureWarning:
+
+  The PCA initialization in TSNE will change to have the standard deviation of PC1 equal to 1e-4 in 1.2. This will ensure better convergence.
+
+  /opt/miniconda3/envs/mrg/lib/python3.10/site-packages/sklearn/manifold/_t_sne.py:991: FutureWarning:
+
+  The PCA initialization in TSNE will change to have the standard deviation of PC1 equal to 1e-4 in 1.2. This will ensure better convergence.
+  /opt/miniconda3/envs/mrg/lib/python3.10/site-packages/sklearn/manifold/_t_sne.py:991: FutureWarning:
+
+  The PCA initialization in TSNE will change to have the standard deviation of PC1 equal to 1e-4 in 1.2. This will ensure better convergence.
+  /opt/miniconda3/envs/mrg/lib/python3.10/site-packages/sklearn/manifold/_t_sne.py:991: FutureWarning:
+
+  The PCA initialization in TSNE will change to have the standard deviation of PC1 equal to 1e-4 in 1.2. This will ensure better convergence.
+  /opt/miniconda3/envs/mrg/lib/python3.10/site-packages/sklearn/manifold/_t_sne.py:991: FutureWarning:
+
+  The PCA initialization in TSNE will change to have the standard deviation of PC1 equal to 1e-4 in 1.2. This will ensure better convergence.
+  /opt/miniconda3/envs/mrg/lib/python3.10/site-packages/sklearn/manifold/_t_sne.py:991: FutureWarning:
+
+  The PCA initialization in TSNE will change to have the standard deviation of PC1 equal to 1e-4 in 1.2. This will ensure better convergence.
+  /opt/miniconda3/envs/mrg/lib/python3.10/site-packages/sklearn/manifold/_t_sne.py:991: FutureWarning:
+
+  The PCA initialization in TSNE will change to have the standard deviation of PC1 equal to 1e-4 in 1.2. This will ensure better convergence.
+  /opt/miniconda3/envs/mrg/lib/python3.10/site-packages/sklearn/manifold/_t_sne.py:991: FutureWarning:
+
+  The PCA initialization in TSNE will change to have the standard deviation of PC1 equal to 1e-4 in 1.2. This will ensure better convergence.
+#+end_example
+:end:
+
+#+begin_src jupyter-python :exports both :results raw drawer :file ./multivar/tsne_comp_bound_DecoE_clusters.png
   p = px.scatter(tsnedf,
                  facet_col='perplexity', facet_col_wrap=4,
-                 x='e_0', y='e_1',
-                 color='org', symbol='mix')
+                 x='0', y='1',
+                 color=Y.dielc.to_list()*8)
   p.update_yaxes(matches=None)
   p.update_xaxes(matches=None)
-  p.show()
+  p.show(renderer='png')
 #+end_src
+
+#+RESULTS:
+:results:
+#+attr_org: :width 700
+[[file:./multivar/tsne_comp_bound_DecoE_clusters.png]]
+:end:
 
 #+begin_src jupyter-python :exports both :results raw drawer
   p = sns.relplot(data=tsnedf, col='perplexity', col_wrap=4, x='e_0', y='e_1', hue=pd.concat([my.dielc]*8, axis=0), palette='magma', style='mix',
@@ -501,8 +581,8 @@ instances in the feature array.
                          min_dist=0.1,
                          metric='euclidean')
       umapdf = pd.DataFrame(
-          mapper.fit_transform(df),
-          index = df.index,
+          mapper.fit_transform(Xc.select_dtypes(np.number)),
+          index = Xc.index,
           columns = [f'm_{i}' for i in range(mapper.n_components)]
       ).assign(perplexity=perp).assign(mix=mix).assign(org=org).assign(formula=my.Formula)
 
@@ -511,16 +591,28 @@ instances in the feature array.
   umapdf = pd.concat(umapdf_list, axis=0)
 #+end_src
 
+#+RESULTS:
+:results:
+:end:
+
 #+begin_src jupyter-python :exports both :results raw drawer 
   p = px.scatter(umapdf,
                  facet_col='perplexity', facet_col_wrap=4,
                  x='m_0', y='m_1',
-                 color='org', symbol='mix', hover_name="formula")
+                 color='org',
+                 symbol='mix',
+                 hover_name="formula")
   p.update_yaxes(matches=None,
                  scaleanchor="x", )
   p.update_xaxes(matches=None)
   p.show(renderer='png')
 #+end_src
+
+#+RESULTS:
+:results:
+#+attr_org: :width 700
+[[file:./.ob-jupyter/c3bb81765be2211bc707e296ae82c5e5b1cffac8.png]]
+:end:
 
 * reference
 bibliographystyle:plain

@@ -10,6 +10,8 @@
 
 #+RESULTS:
 :results:
+: The autoreload extension is already loaded. To reload it, use:
+:   %reload_ext autoreload
 :end:
   
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -29,6 +31,7 @@
   from cmcl import Categories
   # multi-criterion model evaluation
   from yogi.transforms import join3, robust_compare
+  from yogi.indexing import strings_where
   from yogi.model_selection import summarize_HPO
   from yogi.model_selection import pandas_validation_curve as pvc
   from yogi.metrics import PandasScoreAdaptor as PSA

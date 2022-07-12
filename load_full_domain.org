@@ -38,7 +38,6 @@
 * Clean Data and label
 going forward we just assume that almora consists primarily of cubic phase crystals
 #+begin_src jupyter-python
-  #use index to transfer categorical variables through aggregation
   target = ['bg_eV'] #used to drop nans in desired target
   mannodi_pbe[target] = mannodi_pbe[target].apply(pd.to_numeric, errors='coerce')
   mannodi_hse[target] = mannodi_hse[target].apply(pd.to_numeric, errors='coerce')
