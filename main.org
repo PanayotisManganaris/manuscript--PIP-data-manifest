@@ -2,7 +2,7 @@
 #+options: author:nil broken-links:nil c:nil creator:nil
 #+options: d:(not "LOGBOOK") date:t e:t email:nil f:t inline:t num:nil
 #+options: p:nil pri:nil prop:nil stat:t tags:t tasks:("TODO" "DONE" "NEXT") tex:t
-#+options: timestamp:t title:nil toc:nil todo:t |:t
+#+options: timestamp:t title:nil toc:nil todo:nil |:t
 #+title: A High-Throughput Computational Dataset of Halide Perovskite Alloys\textsuperscript{\dag}
 #+AUTHOR: Panayotis Manganaris
 #+language: en
@@ -31,12 +31,13 @@
 \footnotetext{\textsuperscript{\dag}Electronic Supplementary Information (ESI) available: https://www.github.com/PanayotisManganaris/REPO_TODO. See DOI: 00.0000/00000000.}
 #+end_export
 
-* TODO Introduction
+* DONE Introduction
 :PROPERTIES:
 :CUSTOM_ID: introduction
 :CLASS: unnumbered
 :END:
 :STATUSLOG:
+- State "DONE"       from "TODO"       [2022-07-12 Tue 12:14]
 - State "DONE"       from              [2022-06-05 Sun 18:16]
 :END:
 The perovskite structure has been widely investigated by material
@@ -56,7 +57,7 @@ either inorganic (e.g Cs, K, Rb) elements or organic ligands (e.g
 [[acrfull:ma][Methylammonium (MA)]] and [[acrfull:fa][Formamidinium (FA)]]). The most commonly studied
 hybrid organic-inorganic [[acrlong:hap][halide perovskites]], MAPbI3 and FAPbI3, have
 relatively recently demonstrated extraordinary [[acrfull:pce][power conversion
-efficiency (PCE)]] between 20\% and 25\% when used as absorbers in
+efficiency (PCE)]] between 20% and 25% when used as absorbers in
 single or multi junction solar cells[XXX]. This is a five fold
 improvement over prior art and shows off the most attractive feature
 of halide perovskites, their unique tunability. Experimentally, it has
@@ -66,8 +67,69 @@ and octahedral (\mu) relations[XXX]. Even under these restrictions,
 the configuration space of [[acrshort:hap][HaP]] structures, alloy ratios, alloy
 ordering, and defects still poses a highly multidimensional
 optimization problem.  Generally speaking, [[acrlong:hap][halide perovskite]] design
-can be divided into several aspects. (1) Compounds: (2) Structure and
-phases: (3) Defects (4) Polymorphism.
+can be divided into several aspects.
+
+1. Compounds: The composition of halide perovskites is the most
+   critical aspect of PV performance. The recommended halide
+   perovskites as PV absorber usually contains a mix of MA, FA, and Cs
+   at the A-site, primarily Pb at the B-site with minor fractions of
+   other divalent cations such as Sn and Ge, and I or Br at the X-site
+   often with little Cl. As the researchers expanding the search into
+   complex alloys, more A-site organic ligands and Group IV, Group II,
+   or transition elements, which replace Pb at B site for
+   environmental purpose, are discovered.[XXX] The mixing in A site
+   improves the general stability to degradation, while B site and X
+   site mixing are modifying the properties of band gaps and optical
+   absorption.
+2. Structure and phases: Besides the well-known cubic halide
+   perovskites, ABX3 perovskites can also exist in tetragonal,
+   orthorhombic, or hexagonal phases [XXX]. The structure can further
+   change to corner-shared octahedral networks, discovered from
+   evolutionary or minima hopping algorithms [XXX]. 2D layered halide
+   perovskites are also a hot topic and widely researched phase for
+   halide perovskites.
+3. Defects: Vacancies, self-interstitials, or impurities may be
+   spontaneously present within HaPs, or intentionally introduced to
+   change the equilibrium conductivity [XXX]. It’s essential to halide
+   perovskites to study the effects of point defects on electronic
+   properties and structural stability.
+
+As the huge number of halide perovskites compounds, it rises
+challenges for experimentalists to screen over all
+possibilities. However, first principles simulation, such as density
+functional theory (DFT), have been systematically performed to model
+each of the factors mentioned above. More importantly, the expense of
+DFT modeling is much more acceptable when searching for new promising
+candidates in such boundaryless space. Recently, DFT simulations are
+known to be reliably applied for modeling structural information, heat
+of formation or decomposition, band gaps, optical absorption spectra,
+and defect formation energies of a variety of HaPs, with mixed
+accuracy compared to experiments.[XXX] DFT simulation also
+successfully screening a large set of hybrid and inorganic ABX3 halide
+perovskites. Castelli et al [XXX] present a halide perovskite dataset
+of 240 hybrid and inorganic perovskites, with Cs, MA, and FA as A-site
+cations, Pb and Sn at the B-site, and some mix of Cl, Br, and I at the
+X-site, in the cubic, tetragonal, and two types of orthorhombic
+phases. This work investigates the formation of mixed halide compounds
+and trends of band gaps, revealing the correct combination of A
+cation, B cation, perovskite phase, and X-site mixing which yields a
+PV-suitable band gap and good stability.
+
+The limitation of DFT screening is the expensive cost for suitable
+accurate level of theory for a huge set of data set. To better explore
+the perovskite space, coupling DFT calculations with state-of-the-art
+machine learning (ML) or artificial intelligence (AI) techniques is a
+new direction for high throughput simulation on halide perovskite
+screening. Park et al. [XXX] employed a DFT+ML approach to investigate
+the inherent (dis)similarity of various chalcogenide and halide
+perovskites. They used GGA-PBE calculations on 120 ABX3 compounds to
+generate the dataset, and then training random forest regression model
+with t, µ, and tabulated elemental properties as inputs were able to
+predict band gaps and octahedral distortion, and reveal the
+descriptors of most importance to each property. A reliable DFT data
+set with large numbers of mixed halide perovskites will serve as great
+training data for ML models and accelerate the exploring of new halide
+perovskite compounds.
 
 # The challenge of optimizing Perovskite performance is one with many
 # facets. Almost every detail of a Perovskite crystal's structure and
@@ -207,7 +269,7 @@ of the total site occupancy, and it allows X site doping to be modeled
 in 1/24^th fractions. At these mixing levels, it is appropriate to
 call all these Perovskites alloys.
 
-following the process above, 126 A-site mixing samples, 151 B-site
+Following this procedure, 126 A-site mixing samples, 151 B-site
 mixing samples and 127 X-site mixing samples are generated. All
 resulting structures are optimized using a [[acrshort:dft][DFT]] variable-cell
 relaxation under [[acrfull:pbe][PBE]]. These same initial structures also underwent a
@@ -683,12 +745,33 @@ potentially SONG.
 For this reason, kernel learning methods appear to be particularly
 promising for high speed optimization of the space.
 
-* TODO Conclusions
+* DONE Conclusions
 :PROPERTIES:
 :CUSTOM_ID: conclusions
 :CLASS: unnumbered
 :END:
-...\\
+:STATUSLOG:
+- State "DONE"       from "TODO"       [2022-07-12 Tue 12:14]
+:END:
+In this work, we present a DFT calculated perovskite data set with 495
+pseudo-cubic perovskite samples with A-site, B-site and X-site
+mixing. The mixing arrangements are built using SQS methods. All
+perovskite structures are optimized by GGA-PBE calculations and
+furthermore, 299 samples are also relaxed by HSE06
+functional. Validating the efficacy of both relaxation methods against
+experimentally determined structures shows that, conveniently, PBE-GGA
+is more effective for determining the pseudo-cubic lattice
+constant. Both PBE and HSE functionals are not very effective at
+predicting band gaps. In addition, we analyze trends in stability and
+various electronic properties and optical properties by identifying
+linear correlations and utilizing clustering methods. These analyses
+show promise for using compositional properties alone to predict
+perovskite stability by predicting decomposition energy. Finally,
+screening on derived factors and predicted targets is also used to
+filter the 495 perovskite data set down to some promising perovskite
+candidates with high stability and suitable electronic and optical
+properties. This data set will be used in the future to train
+statistical models and inform inverse design pipelines.
 
 * Conflicts of Interest
 :PROPERTIES:
