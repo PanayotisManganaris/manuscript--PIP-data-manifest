@@ -1,6 +1,6 @@
 % Created 2022-07-13 Wed 10:22
 % Intended LaTeX compiler: pdflatex
-\documentclass[twoside, twocolumn, 9pt, draft]{article}
+\documentclass[twoside, twocolumn, 9pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
@@ -486,7 +486,7 @@ E_{decomp} = E_{opt}(ABX_3) - E_{opt}(AX) - E_{opt}(BX2)
 The \gls{slme} metric developed by \citet{yu-2012-ident-poten} is used as the
 primary criterion screening perovskites for their photovoltaic
 merits. The \gls{slme} value is computed considering a 5\(\mu\)m absorption
-layer for every Perovskite according to equation \eqref{eq:slme}.
+layer for every Perovskite according to equation \eqref{eq:absorbtion_alpha}.
 
 \begin{equation}\label{eq:absorption_alpha}
 a(E)=1-e^{-2\alpha(E)L}
@@ -567,13 +567,13 @@ explain the disagreement in the parity plots.
 \begin{tabular}{ll}
 HSE v EXP & PBE v EXP\\
 \hline
- & \\
+0.5798 & 0.3338\\
 \end{tabular}
 \end{table}
 
 \subsubsection*{Decomposition energy vs band gap PBE and HSE}
 \label{sec:org27907dd}
-Fig 2(b) is showing the \acrshort{pbe} band gap compared to the
+Fig \ref{fig:pairplots}(b) is showing the \acrshort{pbe} band gap compared to the
 \acrshort{pbe} decomposition energy. It presents the diversity
 of our Perovskite dataset. The data sets cover a large range of band
 gap and decomposition energy. For example, we have Perovskite with low
@@ -582,7 +582,7 @@ decomposition energy (good stability) and suitable band gap value
 we can also find samples with low stability and large band gap. The
 distribution of band gap and decomposition energy shows a great
 diversity of all Perovskite samples and indicates that our data set
-can statistically represent a sufficient Perovskite space. Fig 2(c)
+can statistically represent a sufficient Perovskite space. Fig \ref{fig:pairplots}(c)
 shows the plot of \acrshort{pbe} band gaps and
 \acrshort{hse} decomposition energy. Since we applied
 \acrshort{hse} calculations for part of the samples, it shows
@@ -592,11 +592,11 @@ decomposition energy region and suitable band gap region.
 
 \subsubsection*{Spectroscopic Limited Maximum Efficiency (SLME) vs PBE Band gap}
 \label{sec:org7f0e476}
-Fig 2(d) presents the \gls{slme} values related to the
+Fig \ref{fig:pairplots}(d) presents the \gls{slme} values related to the
 \acrshort{pbe} band gap. \gls{slme} is a proven proxy
 for photovoltaic performance
 \cite{yu-2012-ident-poten}. \gls{slme} measures the
-absorption efficiency of light for the Perovskite. As Fig 2(d)
+absorption efficiency of light for the Perovskite. As Fig \ref{fig:pairplots}(d)
 showing, a peak around 1.5 eV is obvious. The peak indicates that
 these samples with 1.5 eV \acrshort{pbe} band gap will also
 have best absorption efficiency as photovoltaic materials. As the band
@@ -689,7 +689,7 @@ constraint.
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{./figs/screening_factor.png}
-\caption{\label{fig:cuts} Screening results of Decomposition Energy for (a) octahedral factor (b) Tolerance Factor (c) Bartel Tolerance Factor (d) Deviation of Cubicity.}
+\caption{\label{fig:cuts} Screening results of Decomposition Energy for (a) octahedral factor (b) Tolerance Factor (c) Bartel Tolerance Factor (d) Deviation from Cubicity.}
 \end{figure*}
 
 \begin{figure*}
@@ -712,45 +712,73 @@ elements. For these largely deformed samples, they are no longer
 remain a cubic perovskite structure. In this section, we want to
 analyst how the structure is apart from the cubic perovskite structure
 and rule out these largely deformed samples. Firstly, we need to
-define deviation of cubicity. For each perovskite sample, we measure
+define deviation from cubicity. For each perovskite sample, we measure
 the difference between b, c lattice parameter against a lattice,
-showing in Equation X. If the lattice deviation of cubicity is larger
+showing in Equation \ref{eq:cubicity_l}. If the lattice deviation from cubicity is larger
 than 10\%, we will consider this perovskite is no longer remain a cubic
 perovskite and exclude it.  Similarly, we also need to consider 3
-angles, , and , to make sure the angle also remain 90 degrees. We
-calculated the difference of , and versus 90 degrees, showing in
-Equation X, and take this as angular deviation of cubicity. We also
-consider the samples that have more than 5\% of angular deviation of
-cubicity are not cubic perovskites and exclude them. Fig 7 (d) shows
-the screening results for angle deviation of cubicity. SI Fig X shows
-the screening results for b, c lattice and , angle. Most of the
+angles $\alpha$, $\beta$, and $\gamma$, to make sure the angle also remain 90 degrees. We
+calculated the difference of each angle versus 90 degrees, showing in
+Equation \ref{eq:cubicity_aplha}, and take this as angular deviation from cubicity. We also
+consider the samples that have more than 5\% of angular deviation from
+cubicity are not cubic perovskites and exclude them. 
+Fig \ref{fig:cuts}(d) shows
+the screening results for average deviation from cubicity. Figure \ref{fig:cub_b}, \ref{fig:cub_c},  \ref{fig:cub_alpha}, \ref{fig:cub_beta}, and \ref{fig:cub_gamma}shows
+the screening results for b, c lattice and $\alpha$,$\beta$,$\gamma$ angle respectively. Most of the
 samples with non-cubic perovskites structures are organic-inorganic
 hybrid perovskites. A large part of the excluded samples are A-mixing
 hybrid perovskites. It indicates that organic ligands in A site
 sometimes increase the lattice along some direction and make the
 perovskite deformed.
 
+\begin{equation}\label{eq:cubicity_l}
+DC_b=\frac{|b-a|}{a}
+\end{equation}
+\begin{equation}\label{eq:cubicity_aplha}
+DC_\alpha=\frac{|\alpha-90^{\circ}|}{90^{\circ}}
+\end{equation}
+\begin{equation}\label{eq:cubicity_avg}
+DC_{avg}=\frac{DC_b+DC_c+DC_\alpha+DC_\beta+DC_\gamma}{5}
+\end{equation}
+
+
 \subsubsection*{Octahedral factor, tolerance factor, and Bartel tolerance factor}
 \label{sec:orgb08e02b}
 The stability of Perovskite can be predicted by using the atom radius
 of all components. There are 3 types of factors are usually
 considered, Octahedral factor, tolerance factor, and Bartel tolerance
-factor. The formula of these three factors are shown in equation
-XXX. In our screening process, we set the criteria for Octahedral
+factor.\cite{bartel-2019-new-toler} The formula of these three factors are shown in equation
+\ref{eq:factor_o}, \ref{eq:factor_t} and \ref{eq:factor_b}. In our screening process, we set the criteria for Octahedral
 factor as 0.442 -- 0.895. The criteria for tolerance factor is set to
 be 0.813 -- 1.107.  The criteria for Bartel tolerance factor is set to
-be less than 4.18.  Fig 7 (a) shows the Octahedral factor versus
-decomposition energy plot.  Fig 7 (b) shows the tolerance factor
+be less than 4.18.  Fig \ref{fig:cuts}(a) shows the Octahedral factor versus
+decomposition energy plot.  Fig \ref{fig:cuts}(b) shows the tolerance factor
 versus decomposition energy plot.  The tolerance factor shows a trend
 that as the tolerance factor increases, the decomposition energy
-decreases. Fig 7 (c) shows the Bartel tolerance factor versus
+decreases. Fig \ref{fig:cuts}(c) shows the Bartel tolerance factor versus
 decomposition energy plot. Within the criteria of Bartel tolerance
 factor, the decomposition energy is rapidly decreased.
+\\
+\\
+octahedral factor:
+\begin{equation}\label{eq:factor_o}
+o=\frac{r_B}{r_X}
+\end{equation}
+\\
+tolerance factor: 
+\begin{equation}\label{eq:factor_t}
+t=\frac{r_A+r_X}{\sqrt{2}(r_B+r_X)}
+\end{equation}
+\\
+Bartel\cite{bartel-2019-new-toler} tolerance factor: 
+\begin{equation}\label{eq:factor_b}
+t_{Bartel}=\frac{r_X}{r_B}-[1-\frac{\frac{r_A}{r_B}}{ln(\frac{r_A}{r_B})}]
+\end{equation}
 
 \subsubsection*{Screening Results}
 \label{sec:orgda8a4ea}
-The table XXX shows all 41 promising candidates we screened from our
-dataset by using the cutoff criteria mentioned above. FigXXX shows the
+The Fig\ref{fig:screen_table} shows all 41 promising candidates we screened from our
+dataset by using the cutoff criteria mentioned above. Fig\ref{fig:leftover}(a) shows the
 element distribution of all decent samples. It indicates that MA and
 FA are the most common A site choices for a Perovskite with great
 stability and suitable band gap and photovoltaic properties. For
@@ -758,10 +786,10 @@ inorganic A sites, Cs also contributes a large portion. In B site
 element selection, Pb and Sn are the most selected than other B site
 elements. For X site halide elements, Br is appears the most, and I is
 the second. It tells us that Br and I are preferred in a stable
-Perovskite structure. In figure XXX, the mixing distribution indicates
+Perovskite structure. In Fig\ref{fig:leftover}(b), the mixing distribution indicates
 that X-site mixing is more favorable to generate a stable Perovskite
 with required properties. Tuning in A sites and B sites can also lead
-to a promising results but more risky.  The FigXXX and SI FIGXXX shows
+to a promising results but more risky.  The Figure\ref{fig:leftover_comp}, \ref{fig:screened_frac_A}, \ref{fig:screened_frac_B} and \ref{fig:screened_frac_X} shows
 the element fraction for each of the screened samples. It indicates if
 certain element prefer to be mixing or non-mixing. For example, Cl is
 preferred to be pure in X site than mixing with other elements. Also
@@ -898,19 +926,56 @@ clusters at Purdue.
 
 \begin{figure*}
 \centering
+\includegraphics[width=.9\linewidth]{./figs/cub_b_decomp.png}
+\caption{\label{fig:cub_b} PBE Deviation from Cubicity plot at b axis}
+\end{figure*}
+
+\begin{figure*}
+\centering
+\includegraphics[width=.9\linewidth]{./figs/cub_c_decomp.png}
+\caption{\label{fig:cub_c} PBE Deviation from Cubicity plot at c axis}
+\end{figure*}
+
+\begin{figure*}
+\centering
+\includegraphics[width=.9\linewidth]{./figs/cub_alpha_decomp.png}
+\caption{\label{fig:cub_alpha} PBE Deviation from Cubicity plot at alpha}
+\end{figure*}
+
+\begin{figure*}
+\centering
+\includegraphics[width=.9\linewidth]{./figs/cub_beta_decomp.png}
+\caption{\label{fig:cub_beta} PBE Deviation from Cubicity plot at beta}
+\end{figure*}
+
+\begin{figure*}
+\centering
+\includegraphics[width=.9\linewidth]{./figs/cub_gamma_decomp.png}
+\caption{\label{fig:cub_gamma} PBE Deviation from Cubicity plot at gamma}
+\end{figure*}
+
+
+\begin{figure*}
+\centering
 \includegraphics[width=.9\linewidth]{./expval/Element_AFrac.jpg}
-\caption{\label{fig:sreened_frac_A} Element Fraction for A site elements among all screened perovskites}
+\caption{\label{fig:screened_frac_A} Element Fraction for A site elements among all screened perovskites}
 \end{figure*}
 
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{./expval/Element_BFrac.jpg}
-\caption{\label{fig:sreened_frac_B} Element Fraction for B site elements among all screened perovskites}
+\caption{\label{fig:screened_frac_B} Element Fraction for B site elements among all screened perovskites}
 \end{figure*}
 
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{./expval/Element_XFrac.jpg}
-\caption{\label{fig:sreened_frac_X} Element Fraction for X site elements among all screened perovskites}
+\caption{\label{fig:screened_frac_X} Element Fraction for X site elements among all screened perovskites}
+\end{figure*}
+
+\begin{figure*}
+\centering
+\includegraphics[width=.7\linewidth]{./figs/Screening_formula.png}
+\caption{\label{fig:screen_table} Promising Perovskite Compounds Selected from Screening}
 \end{figure*}
 \end{document}
