@@ -1,4 +1,4 @@
-% Created 2022-07-12 Tue 12:15
+% Created 2022-07-12 Tue 23:33
 % Intended LaTeX compiler: pdflatex
 \documentclass[twoside, twocolumn, 9pt, draft]{article}
 \usepackage[utf8]{inputenc}
@@ -216,7 +216,7 @@ and improved performance across many optoelectronic applications.
 \footnotetext{\textsuperscript{\dag}Electronic Supplementary Information (ESI) available: https://www.github.com/PanayotisManganaris/REPO_TODO. See DOI: 00.0000/00000000.}
 
 \section*{Introduction}
-\label{sec:orgbc3f094}
+\label{sec:org6281a41}
 \begin{itemize}
 \item State "DONE"       from "TODO"       \textit{[2022-07-12 Tue 12:14]}
 \item State "DONE"       from              \textit{[2022-06-05 Sun 18:16]}
@@ -230,24 +230,27 @@ perovskite structure is a network of BX6 octahedra which are held in
 place by large A-site cations. This unique structure makes the
 crystal's electronic properties incredibly tunable. Numerous research
 efforts are devoted to \acrfull{hap}, specifically, as a
-promising solar cell absorption material\cite{RN7,RN10,RN20,RN25}. ABX3 \acrlong{hap}
-X-sites anions consist of halogens such as I and Br, B-site cations
-may be divalent elements such as Pb and Sn, and the A-site is occupied
-by large monovalent cations. The A-site cation can be so large that
-either inorganic (e.g Cs, K, Rb) elements or organic ligands (e.g
-\acrfull{ma} and \acrfull{fa}). The most commonly studied
-hybrid organic-inorganic \acrlong{hap}, MAPbI3 and FAPbI3, have
-relatively recently demonstrated extraordinary \acrfull{pce} between 20\% and 25\% when used as absorbers in
-single or multi junction solar cells\cite{RN24,RN13}. This is a five fold
-improvement over prior art and shows off the most attractive feature
-of halide perovskites, their unique tunability. Experimentally, it has
-been shown that a perovskite structure is considered stable if A-site,
-B-site, and X-site ionic radii satisfy the well-known tolerance (t)
-and octahedral (\(\mu\)) relations\cite{RN12}. Even under these restrictions,
-the configuration space of \acrshort{hap} structures, alloy ratios, alloy
-ordering, and defects still poses a highly multidimensional
-optimization problem.  Generally speaking, \acrlong{hap} design
-can be divided into several aspects.
+promising solar cell absorption
+material\cite{ansari-2018-front-oppor,yin-2015-halid-perov,manser-2016-intrig-optoel,brenner-2016-hybrid-organ}. ABX3
+\acrlong{hap} X-sites anions consist of halogens such as I and Br,
+B-site cations may be divalent elements such as Pb and Sn, and the
+A-site is occupied by large monovalent cations. The A-site cation can
+be so large that either inorganic (e.g Cs, K, Rb) elements or organic
+ligands (e.g \acrfull{ma} and \acrfull{fa}). The most
+commonly studied hybrid organic-inorganic \acrlong{hap}, MAPbI3
+and FAPbI3, have relatively recently demonstrated extraordinary \acrfull{pce} between 20\% and 25\% when used as absorbers
+in single or multi junction solar
+cells\cite{cui-2019-planar-p,jeong-2020-stabl-perov}. This is a five
+fold improvement over prior art and shows off the most attractive
+feature of halide perovskites, their unique
+tunability. Experimentally, it has been shown that a perovskite
+structure is considered stable if A-site, B-site, and X-site ionic
+radii satisfy the well-known tolerance (t) and octahedral (\(\mu\))
+relations\cite{bartel-2019-new-toler}. Even under these restrictions, the configuration space
+of \acrshort{hap} structures, alloy ratios, alloy ordering, and defects still
+poses a highly multidimensional optimization problem.  Generally
+speaking, \acrlong{hap} design can be divided into several
+aspects.
 
 \begin{enumerate}
 \item Compounds: The composition of halide perovskites is the most
@@ -258,22 +261,24 @@ other divalent cations such as Sn and Ge, and I or Br at the X-site
 often with little Cl. As the researchers expanding the search into
 complex alloys, more A-site organic ligands and Group IV, Group II,
 or transition elements, which replace Pb at B site for
-environmental purpose, are discovered.\cite{RN18,RN17,RN19,RN11} The mixing in A site
-improves the general stability to degradation, while B site and X
-site mixing are modifying the properties of band gaps and optical
-absorption.
+environmental purpose, are
+discovered.\cite{zhu-2019-struc-elect,banerjee-2019-rashb-trigg,ding-2019-cesium-decreas,greenland-2020-correl-phase}
+The mixing in A site improves the general stability to degradation,
+while B site and X site mixing are modifying the properties of band
+gaps and optical absorption.
 \item Structure and phases: Besides the well-known cubic halide
 perovskites, ABX3 perovskites can also exist in tetragonal,
-orthorhombic, or hexagonal phases\cite{RN14}. The structure can further
+orthorhombic, or hexagonal phases\cite{kar-2018-comput-screen}. The structure can further
 change to corner-shared octahedral networks, discovered from
-evolutionary or minima hopping algorithms\cite{RN23}. 2D layered halide
+evolutionary or minima hopping algorithms\cite{kim-2017-hybrid-organ}. 2D layered halide
 perovskites are also a hot topic and widely researched phase for
 halide perovskites.
 \item Defects: Vacancies, self-interstitials, or impurities may be
 spontaneously present within HaPs, or intentionally introduced to
-change the equilibrium conductivity\cite{RN22,RN9}. It’s essential to halide
-perovskites to study the effects of point defects on electronic
-properties and structural stability.
+change the equilibrium
+conductivity\cite{mannodi-kanakkithodi-2019-compr-comput,mannodi-kanakkithodi-2022-data-driven}. It’s
+essential to halide perovskites to study the effects of point
+defects on electronic properties and structural stability.
 \end{enumerate}
 
 As the huge number of halide perovskites compounds, it rises
@@ -286,38 +291,40 @@ candidates in such boundaryless space. Recently, DFT simulations are
 known to be reliably applied for modeling structural information, heat
 of formation or decomposition, band gaps, optical absorption spectra,
 and defect formation energies of a variety of HaPs, with mixed
-accuracy compared to experiments.\cite{RN9,RN10} DFT simulation also
-successfully screening a large set of hybrid and inorganic ABX3 halide
-perovskites. Castelli et al \cite{RN16} present a halide perovskite dataset
-of 240 hybrid and inorganic perovskites, with Cs, MA, and FA as A-site
-cations, Pb and Sn at the B-site, and some mix of Cl, Br, and I at the
-X-site, in the cubic, tetragonal, and two types of orthorhombic
-phases. This work investigates the formation of mixed halide compounds
-and trends of band gaps, revealing the correct combination of A
-cation, B cation, perovskite phase, and X-site mixing which yields a
-PV-suitable band gap and good stability.
+accuracy compared to
+experiments.\cite{mannodi-kanakkithodi-2022-data-driven,yin-2015-halid-perov}
+DFT simulation also successfully screening a large set of hybrid and
+inorganic ABX3 halide perovskites. \citet{castelli-2014-bandg-calcul}
+present a halide perovskite dataset of 240 hybrid and inorganic
+perovskites, with Cs, MA, and FA as A-site cations, Pb and Sn at the
+B-site, and some mix of Cl, Br, and I at the X-site, in the cubic,
+tetragonal, and two types of orthorhombic phases. This work
+investigates the formation of mixed halide compounds and trends of
+band gaps, revealing the correct combination of A cation, B cation,
+perovskite phase, and X-site mixing which yields a PV-suitable band
+gap and good stability.
 
 The limitation of DFT screening is the expensive cost for suitable
 accurate level of theory for a huge set of data set. To better explore
 the perovskite space, coupling DFT calculations with state-of-the-art
 machine learning (ML) or artificial intelligence (AI) techniques is a
 new direction for high throughput simulation on halide perovskite
-screening. Park et al.\cite{RN8} employed a DFT+ML approach to investigate
-the inherent (dis)similarity of various chalcogenide and halide
-perovskites. They used GGA-PBE calculations on 120 ABX3 compounds to
-generate the dataset, and then training random forest regression model
-with t, µ, and tabulated elemental properties as inputs were able to
-predict band gaps and octahedral distortion, and reveal the
-descriptors of most importance to each property. A reliable DFT data
-set with large numbers of mixed halide perovskites will serve as great
-training data for ML models and accelerate the exploring of new halide
-perovskite compounds.
+screening. \citet{park-2019-explor-new} employed a DFT+ML approach to
+investigate the inherent (dis)similarity of various chalcogenide and
+halide perovskites. They used GGA-PBE calculations on 120 ABX3
+compounds to generate the dataset, and then training random forest
+regression model with t, µ, and tabulated elemental properties as
+inputs were able to predict band gaps and octahedral distortion, and
+reveal the descriptors of most importance to each property. A reliable
+DFT data set with large numbers of mixed halide perovskites will serve
+as great training data for ML models and accelerate the exploring of
+new halide perovskite compounds.
 
 We report a synthetic dataset collected for 495 chemically distinct,
 pseudo cubic Halide Perovskites. This dataset builds on that of 229
 samples which formed the foundation of the prior work by
 \citet{mannodi-kanakkithodi-2022-data-driven}. The \acrfull{dft} computed properties we collected and the levels of theory
-used are discussed in \hyperref[sec:org65606f1]{Methodology}. The relatively large size of this
+used are discussed in \hyperref[sec:org003c655]{Methodology}. The relatively large size of this
 dataset is intended to provide an initial sampling suitable for
 guiding exploration of the alloy space. In this dataset, structures
 are constantly pseudo-cubic, instead we focus on studying the effects
@@ -396,9 +403,9 @@ utilizing the transformation.
 \end{figure*}
 
 \section*{Methodology}
-\label{sec:org65606f1}
+\label{sec:org003c655}
 \subsection*{Building Perovskite Dataset}
-\label{sec:org2c91cd1}
+\label{sec:orgc2dba14}
 \begin{itemize}
 \item State "NEXT"       from "TODO"       \textit{[2022-06-05 Sun 22:11]}
 \end{itemize}
@@ -421,11 +428,11 @@ space sees combinatorial scaling and must be sparsely sampled (Figure
 \ref{fig:sample_map}).
 
 To generate site-mixing structures with high representativeness,
-\acrfull{sqs}\cite{RN3} are applied. The \acrshort{sqs} method is
-to build a special periodic structure and make the first
-nearest-neighbor shells as similar to the target random alloy as
-possible. The \acrshort{sqs} can be considered the best possible periodic unit
-cell representing a given random alloy.
+\acrfull{sqs}\cite{jiang-2016-special-quasir}
+are applied. The \acrshort{sqs} method is to build a special periodic structure
+and make the first nearest-neighbor shells as similar to the target
+random alloy as possible. The \acrshort{sqs} can be considered the best possible
+periodic unit cell representing a given random alloy.
 
 Each computational run is performed using a 2x2x2 supercell, this
 allows A and B site doping to be modeled in discrete 1/8\textsuperscript{th} fractions
@@ -433,7 +440,7 @@ of the total site occupancy, and it allows X site doping to be modeled
 in 1/24\textsuperscript{th} fractions. At these mixing levels, it is appropriate to
 call all these Perovskites alloys.
 
-following the process above, 126 A-site mixing samples, 151 B-site
+Following this procedure, 126 A-site mixing samples, 151 B-site
 mixing samples and 127 X-site mixing samples are generated. All
 resulting structures are optimized using a \acrshort{dft} variable-cell
 relaxation under \acrfull{pbe}. These same initial structures also underwent a
@@ -448,7 +455,7 @@ samples.
 \end{figure*}
 
 \subsection*{Calculation Details}
-\label{sec:orgb3e2866}
+\label{sec:orgc0d208d}
 \begin{itemize}
 \item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 17:17]}
 \end{itemize}
@@ -463,12 +470,12 @@ Monkhorst-Pack k-point mesh. The structural force convergence
 threshold is set to be 0.005 eV/\AA{}.
 
 \subsection*{Discussion of DFT Computed Properties}
-\label{sec:org63034c0}
+\label{sec:org3fe0b10}
 \begin{itemize}
 \item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 17:19]}
 \end{itemize}
 \subsubsection*{Decomposition Energy}
-\label{sec:org0abf987}
+\label{sec:org39c873c}
 \begin{itemize}
 \item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 00:43]}
 \end{itemize}
@@ -485,7 +492,7 @@ E_{decomp} = E_{opt}(ABX_3) - E_{opt}(AX) - E_{opt}(BX2)
 \end{equation}
 
 \subsubsection*{SLME calculations}
-\label{sec:org18da948}
+\label{sec:orgc4789c2}
 \begin{itemize}
 \item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 17:30]}
 \end{itemize}
@@ -495,12 +502,14 @@ merits. The \gls{slme} value is computed considering a 5\(\mu\)m absorption
 layer for every Perovskite according to equation \eqref{eq:slme}.
 
 \begin{equation}\label{eq:slme}
-SLME=
+\begin{align*}
+SLME&= \\
+a(E)&=1-e^{-2\alpha(E)L}
+\end{align*}
 \end{equation}
 
-\begin{equation}\label{eq:absorbtion_alpha}
-a(E)=1-e^{-2\alpha(E)L}, where \alpha(E) is the calculated absorption coefficient, L is the thickness
-\end{equation}
+Where \(\alpha(E)\) is the calculated absorption coefficient, \(L\) is
+the thickness.
 
 This calculation is performed using Logan William's SL3ME
 \cite{williams-2022-sl3me}. Based on absorption spectra obtained from
@@ -509,9 +518,9 @@ gaps and the \acrshort{hse} band gaps, resulting in two synthetic efficiencies
 for each record.
 
 \section*{Results and discussion}
-\label{sec:org7a12534}
+\label{sec:orgb32fdef}
 \subsection*{Visualization of DFT Data}
-\label{sec:orga9a2720}
+\label{sec:org494c58d}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{./figs/screening_properties.png}
@@ -519,7 +528,7 @@ for each record.
 \end{figure*}
 
 \subsubsection*{Lattice constant PBE vs HSE}
-\label{sec:orgbf33b39}
+\label{sec:org9a1df96}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-06-06 Mon 01:02]}
 \end{itemize}
@@ -545,7 +554,7 @@ the focus of this report.
 \end{center}
 
 \subsubsection*{Comparing synthetic to physical data}
-\label{sec:org2a9d3b6}
+\label{sec:org71aa91e}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-06-06 Mon 01:01]}
 \end{itemize}
@@ -568,7 +577,7 @@ The synthetic lattice constants do mostly agree with experiment. The
 It should be noted that the physical \acrshort{fa}SnI\textsubscript{3} measure reported by
 \citet{chen-2015-under-spotl} is clearly an orthorhombic phase. The
 validating lattice constant here is obtained by averaging lattice
-parameters. However, per the \hyperref[sec:orgbcc269e]{Deviation from Cubicity} metric, this
+parameters. However, per the \hyperref[sec:orgbcece9b]{Deviation from Cubicity} metric, this
 phase is still approximately cubic, with angles near enough to 90
 degrees that we consider the data point valid. However, this does
 explain the disagreement in the parity plots.
@@ -584,7 +593,7 @@ HSE v EXP & PBE v EXP\\
 \end{table}
 
 \subsubsection*{Decomposition energy vs band gap PBE and HSE}
-\label{sec:orgf876448}
+\label{sec:org1edf0b3}
 Fig 2(b) is showing the \acrshort{pbe} band gap compared to the
 \acrshort{pbe} decomposition energy. It presents the diversity
 of our Perovskite dataset. The data sets cover a large range of band
@@ -603,7 +612,7 @@ some grouping on low decomposition energy. Compared to
 decomposition energy region and suitable band gap region.
 
 \subsubsection*{Spectroscopic Limited Maximum Efficiency (SLME) vs PBE Band gap}
-\label{sec:orgaa22ba0}
+\label{sec:org7519dcc}
 Fig 2(d) presents the \gls{slme} values related to the
 \acrshort{pbe} band gap. \gls{slme} is a proven proxy
 for photovoltaic performance
@@ -616,7 +625,7 @@ gap increases, the \gls{slme} value decreases and eventually
 goes to zero due to the high band gap values.
 
 \subsection*{Pearson Correlation Results}
-\label{sec:org2cd18ae}
+\label{sec:org4749fd6}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{./expval/PBE_v_comp_pearson2.png}
@@ -639,7 +648,7 @@ trending, but always with extensive variability. Evidently, an
 accurate model will have to be formed on a multidimensional domain.
 
 \subsection*{PCA}
-\label{sec:org3cbef82}
+\label{sec:org5495dea}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{./multivar/comp_ratio_projection_annot.png}
@@ -672,7 +681,7 @@ explanation for why Perovskite properties vary, this can be useful for
 accuracy, it can also be a bias-inducing hindrance.
 
 \subsection*{t-SNE visualization of stability clustering}
-\label{sec:org66b05f7}
+\label{sec:org8b8edd4}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{./multivar/tsne_comp_DecoE_clusters.png}
@@ -680,7 +689,7 @@ accuracy, it can also be a bias-inducing hindrance.
 \end{figure*}
 
 \subsection*{Screening process of all samples in database}
-\label{sec:orgb60b359}
+\label{sec:org9c2fbde}
 \begin{itemize}
 \item State "DONE"       from              \textit{[2022-05-24 Tue 13:31]}
 \end{itemize}
@@ -720,7 +729,7 @@ constraint.
 \end{figure*}
 
 \subsubsection*{Deviation from Cubicity}
-\label{sec:orgbcc269e}
+\label{sec:orgbcece9b}
 For all the compositions we tested in our data set, some of them will
 have large strain and deformation because of the combination of
 elements. For these largely deformed samples, they are no longer
@@ -746,7 +755,7 @@ sometimes increase the lattice along some direction and make the
 perovskite deformed.
 
 \subsubsection*{Octahedral factor, tolerance factor, and Bartel tolerance factor}
-\label{sec:org1122557}
+\label{sec:org749a082}
 The stability of Perovskite can be predicted by using the atom radius
 of all components. There are 3 types of factors are usually
 considered, Octahedral factor, tolerance factor, and Bartel tolerance
@@ -763,7 +772,7 @@ decomposition energy plot. Within the criteria of Bartel tolerance
 factor, the decomposition energy is rapidly decreased.
 
 \subsubsection*{Screening Results}
-\label{sec:org7a4ec72}
+\label{sec:org1dbd614}
 The table XXX shows all 41 promising candidates we screened from our
 dataset by using the cutoff criteria mentioned above. FigXXX shows the
 element distribution of all decent samples. It indicates that MA and
@@ -793,7 +802,7 @@ compounds and tell us what kinds of compounds we should put in to test
 next.
 
 \section*{Perspective and Future Work}
-\label{sec:org2b97ab5}
+\label{sec:orgd78f36f}
 The high-throughput DFT Perovskite dataset is containing huge amount of
 information of perovskites compounds, structure and properties. It
 leads us to perform screening, clustering and other process so that
@@ -836,10 +845,10 @@ For the calculation of future data points obtained by a surrogate
 optimizer, we will follow a strategy of performing full structural
 optimization at a \acrshort{pbe} level of theory unless circumstances demand
 otherwise. This is justified by Figure \ref{fig:lc_lot_vs} and the
-section \hyperref[sec:org2a9d3b6]{Comparing synthetic to physical data}
+section \hyperref[sec:org71aa91e]{Comparing synthetic to physical data}
 
 Also, we will explore methods for combining the insights of the \acrshort{pbe}
-and \acrshort{hse} datasets in training surrogates, e.g. in section \hyperref[sec:org18da948]{SLME calculations} the two \gls{slme} spectra could be used together to converge
+and \acrshort{hse} datasets in training surrogates, e.g. in section \hyperref[sec:orgc4789c2]{SLME calculations} the two \gls{slme} spectra could be used together to converge
 on a physically accurate \acrshort{pce} value.
 
 We anticipate our principal challenge will be in extracting useful
@@ -857,30 +866,36 @@ For this reason, kernel learning methods appear to be particularly
 promising for high speed optimization of the space.
 
 \section*{Conclusions}
-\label{sec:org0b6e640}
+\label{sec:orgdcad055}
 \begin{itemize}
 \item State "DONE"       from "TODO"       \textit{[2022-07-12 Tue 12:14]}
 \end{itemize}
 In this work, we present a DFT calculated perovskite data set with 495
 pseudo-cubic perovskite samples with A-site, B-site and X-site
-mixing. The mixing of perovskites are build by SQS methods and
-optimized by GGA-PBE calculations. Furthermore, 299 samples are
-relaxed by HSE06 functional for higher accuracy on lattice parameters
-and band gaps. We analysis the trends of stability, electronic
-properties and optical properties, using linear correlation and
-clustering methods, and reveal the trends of running the compounds of
-halide perovskite mixing. A screening process is also applied to the
-495 perovskite data set in order to pick promising perovskite
+mixing. The mixing arrangements are built using SQS methods. All
+perovskite structures are optimized by GGA-PBE calculations and
+furthermore, 299 samples are also relaxed by HSE06
+functional. Validating the efficacy of both relaxation methods against
+experimentally determined structures shows that, conveniently, PBE-GGA
+is more effective for determining the pseudo-cubic lattice
+constant. Both PBE and HSE functionals are not very effective at
+predicting band gaps. In addition, we analyze trends in stability and
+various electronic properties and optical properties by identifying
+linear correlations and utilizing clustering methods. These analyses
+show promise for using compositional properties alone to predict
+perovskite stability by predicting decomposition energy. Finally,
+screening on derived factors and predicted targets is also used to
+filter the 495 perovskite data set down to some promising perovskite
 candidates with high stability and suitable electronic and optical
-properties. This data set will be further used for machine learning
-training and other applications.
+properties. This data set will be used in the future to train
+statistical models and inform inverse design pipelines.
 
 \section*{Conflicts of Interest}
-\label{sec:orga9949ec}
+\label{sec:orgdfbee76}
 There are no conflicts to declare.
 
 \section*{Acknowledgements}
-\label{sec:org89dfb57}
+\label{sec:orgaf19798}
 Extensive discussions with and scientific feedback from UC San Diego
 researchers David Fenning and Rishi Kumar and Argonne National Lab
 scientist Maria Chan are acknowledged. This work was performed at
@@ -892,9 +907,8 @@ clusters at Purdue.
 
 \bibliographystyle{rsc}
 \bibliography{../../../org/bibliotex/bibliotex}
-\bibliography{main}
 \section*{Supplemental Material}
-\label{sec:orgd818b29}
+\label{sec:orgac068e7}
 \printglossaries
 
 \begin{figure*}

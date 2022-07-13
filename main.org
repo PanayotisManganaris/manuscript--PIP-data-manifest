@@ -49,25 +49,28 @@ perovskite structure is a network of BX6 octahedra which are held in
 place by large A-site cations. This unique structure makes the
 crystal's electronic properties incredibly tunable. Numerous research
 efforts are devoted to [[acrfull:hap][halide perovskites (HaP)]], specifically, as a
-promising solar cell absorption material[XXX]. ABX3 [[acrlong:hap][halide perovskite]]
-X-sites anions consist of halogens such as I and Br, B-site cations
-may be divalent elements such as Pb and Sn, and the A-site is occupied
-by large monovalent cations. The A-site cation can be so large that
-either inorganic (e.g Cs, K, Rb) elements or organic ligands (e.g
-[[acrfull:ma][Methylammonium (MA)]] and [[acrfull:fa][Formamidinium (FA)]]). The most commonly studied
-hybrid organic-inorganic [[acrlong:hap][halide perovskites]], MAPbI3 and FAPbI3, have
-relatively recently demonstrated extraordinary [[acrfull:pce][power conversion
-efficiency (PCE)]] between 20% and 25% when used as absorbers in
-single or multi junction solar cells[XXX]. This is a five fold
-improvement over prior art and shows off the most attractive feature
-of halide perovskites, their unique tunability. Experimentally, it has
-been shown that a perovskite structure is considered stable if A-site,
-B-site, and X-site ionic radii satisfy the well-known tolerance (t)
-and octahedral (\mu) relations[XXX]. Even under these restrictions,
-the configuration space of [[acrshort:hap][HaP]] structures, alloy ratios, alloy
-ordering, and defects still poses a highly multidimensional
-optimization problem.  Generally speaking, [[acrlong:hap][halide perovskite]] design
-can be divided into several aspects.
+promising solar cell absorption
+material[[cite:&ansari-2018-front-oppor;&yin-2015-halid-perov;&manser-2016-intrig-optoel;&brenner-2016-hybrid-organ]]. ABX3
+[[acrlong:hap][halide perovskite]] X-sites anions consist of halogens such as I and Br,
+B-site cations may be divalent elements such as Pb and Sn, and the
+A-site is occupied by large monovalent cations. The A-site cation can
+be so large that either inorganic (e.g Cs, K, Rb) elements or organic
+ligands (e.g [[acrfull:ma][Methylammonium (MA)]] and [[acrfull:fa][Formamidinium (FA)]]). The most
+commonly studied hybrid organic-inorganic [[acrlong:hap][halide perovskites]], MAPbI3
+and FAPbI3, have relatively recently demonstrated extraordinary [[acrfull:pce][power
+conversion efficiency (PCE)]] between 20% and 25% when used as absorbers
+in single or multi junction solar
+cells[[cite:&cui-2019-planar-p;&jeong-2020-stabl-perov]]. This is a five
+fold improvement over prior art and shows off the most attractive
+feature of halide perovskites, their unique
+tunability. Experimentally, it has been shown that a perovskite
+structure is considered stable if A-site, B-site, and X-site ionic
+radii satisfy the well-known tolerance (t) and octahedral (\mu)
+relations[[cite:&bartel-2019-new-toler]]. Even under these restrictions, the configuration space
+of [[acrshort:hap][HaP]] structures, alloy ratios, alloy ordering, and defects still
+poses a highly multidimensional optimization problem.  Generally
+speaking, [[acrlong:hap][halide perovskite]] design can be divided into several
+aspects.
 
 1. Compounds: The composition of halide perovskites is the most
    critical aspect of PV performance. The recommended halide
@@ -77,22 +80,24 @@ can be divided into several aspects.
    often with little Cl. As the researchers expanding the search into
    complex alloys, more A-site organic ligands and Group IV, Group II,
    or transition elements, which replace Pb at B site for
-   environmental purpose, are discovered.[XXX] The mixing in A site
-   improves the general stability to degradation, while B site and X
-   site mixing are modifying the properties of band gaps and optical
-   absorption.
+   environmental purpose, are
+   discovered.[[cite:&zhu-2019-struc-elect;&banerjee-2019-rashb-trigg;&ding-2019-cesium-decreas;&greenland-2020-correl-phase]]
+   The mixing in A site improves the general stability to degradation,
+   while B site and X site mixing are modifying the properties of band
+   gaps and optical absorption.
 2. Structure and phases: Besides the well-known cubic halide
    perovskites, ABX3 perovskites can also exist in tetragonal,
-   orthorhombic, or hexagonal phases [XXX]. The structure can further
+   orthorhombic, or hexagonal phases[[cite:&kar-2018-comput-screen]]. The structure can further
    change to corner-shared octahedral networks, discovered from
-   evolutionary or minima hopping algorithms [XXX]. 2D layered halide
+   evolutionary or minima hopping algorithms[[cite:&kim-2017-hybrid-organ]]. 2D layered halide
    perovskites are also a hot topic and widely researched phase for
    halide perovskites.
 3. Defects: Vacancies, self-interstitials, or impurities may be
    spontaneously present within HaPs, or intentionally introduced to
-   change the equilibrium conductivity [XXX]. It’s essential to halide
-   perovskites to study the effects of point defects on electronic
-   properties and structural stability.
+   change the equilibrium
+   conductivity[[cite:&mannodi-kanakkithodi-2019-compr-comput;&mannodi-kanakkithodi-2022-data-driven]]. It’s
+   essential to halide perovskites to study the effects of point
+   defects on electronic properties and structural stability.
 
 As the huge number of halide perovskites compounds, it rises
 challenges for experimentalists to screen over all
@@ -104,32 +109,34 @@ candidates in such boundaryless space. Recently, DFT simulations are
 known to be reliably applied for modeling structural information, heat
 of formation or decomposition, band gaps, optical absorption spectra,
 and defect formation energies of a variety of HaPs, with mixed
-accuracy compared to experiments.[XXX] DFT simulation also
-successfully screening a large set of hybrid and inorganic ABX3 halide
-perovskites. Castelli et al [XXX] present a halide perovskite dataset
-of 240 hybrid and inorganic perovskites, with Cs, MA, and FA as A-site
-cations, Pb and Sn at the B-site, and some mix of Cl, Br, and I at the
-X-site, in the cubic, tetragonal, and two types of orthorhombic
-phases. This work investigates the formation of mixed halide compounds
-and trends of band gaps, revealing the correct combination of A
-cation, B cation, perovskite phase, and X-site mixing which yields a
-PV-suitable band gap and good stability.
+accuracy compared to
+experiments.[[cite:&mannodi-kanakkithodi-2022-data-driven;&yin-2015-halid-perov]]
+DFT simulation also successfully screening a large set of hybrid and
+inorganic ABX3 halide perovskites. [[citet:&castelli-2014-bandg-calcul]]
+present a halide perovskite dataset of 240 hybrid and inorganic
+perovskites, with Cs, MA, and FA as A-site cations, Pb and Sn at the
+B-site, and some mix of Cl, Br, and I at the X-site, in the cubic,
+tetragonal, and two types of orthorhombic phases. This work
+investigates the formation of mixed halide compounds and trends of
+band gaps, revealing the correct combination of A cation, B cation,
+perovskite phase, and X-site mixing which yields a PV-suitable band
+gap and good stability.
 
 The limitation of DFT screening is the expensive cost for suitable
 accurate level of theory for a huge set of data set. To better explore
 the perovskite space, coupling DFT calculations with state-of-the-art
 machine learning (ML) or artificial intelligence (AI) techniques is a
 new direction for high throughput simulation on halide perovskite
-screening. Park et al. [XXX] employed a DFT+ML approach to investigate
-the inherent (dis)similarity of various chalcogenide and halide
-perovskites. They used GGA-PBE calculations on 120 ABX3 compounds to
-generate the dataset, and then training random forest regression model
-with t, µ, and tabulated elemental properties as inputs were able to
-predict band gaps and octahedral distortion, and reveal the
-descriptors of most importance to each property. A reliable DFT data
-set with large numbers of mixed halide perovskites will serve as great
-training data for ML models and accelerate the exploring of new halide
-perovskite compounds.
+screening. [[citet:&park-2019-explor-new]] employed a DFT+ML approach to
+investigate the inherent (dis)similarity of various chalcogenide and
+halide perovskites. They used GGA-PBE calculations on 120 ABX3
+compounds to generate the dataset, and then training random forest
+regression model with t, µ, and tabulated elemental properties as
+inputs were able to predict band gaps and octahedral distortion, and
+reveal the descriptors of most importance to each property. A reliable
+DFT data set with large numbers of mixed halide perovskites will serve
+as great training data for ML models and accelerate the exploring of
+new halide perovskite compounds.
 
 # The challenge of optimizing Perovskite performance is one with many
 # facets. Almost every detail of a Perovskite crystal's structure and
@@ -257,11 +264,11 @@ space sees combinatorial scaling and must be sparsely sampled (Figure
 ref:fig:sample_map).
 
 To generate site-mixing structures with high representativeness,
-[[acrfull:sqs][special quasi-random structures (SQS)]] are applied. The [[acrshort:sqs][SQS]] method is
-to build a special periodic structure and make the first
-nearest-neighbor shells as similar to the target random alloy as
-possible. The [[acrshort:sqs][SQS]] can be considered the best possible periodic unit
-cell representing a given random alloy.
+[[acrfull:sqs][special quasi-random structures (SQS)]][[cite:&jiang-2016-special-quasir]]
+are applied. The [[acrshort:sqs][SQS]] method is to build a special periodic structure
+and make the first nearest-neighbor shells as similar to the target
+random alloy as possible. The [[acrshort:sqs][SQS]] can be considered the best possible
+periodic unit cell representing a given random alloy.
 
 Each computational run is performed using a 2x2x2 supercell, this
 allows A and B site doping to be modeled in discrete 1/8^th fractions
@@ -348,8 +355,14 @@ merits. The [[gls:slme][SLME]] value is computed considering a 5\mu{}m absorptio
 layer for every Perovskite according to equation eqref:eq:slme.
 
 \begin{equation}\label{eq:slme}
-
+\begin{align*}
+SLME&= \\
+a(E)&=1-e^{-2\alpha(E)L}
+\end{align*}
 \end{equation}
+
+Where \(\alpha(E)\) is the calculated absorption coefficient, \(L\) is
+the thickness.
 
 This calculation is performed using Logan William's SL3ME
 [[cite:&williams-2022-sl3me]]. Based on absorption spectra obtained from
@@ -796,7 +809,6 @@ clusters at Purdue.
 
 bibliographystyle:rsc
 bibliography:~/org/bibliotex/bibliotex.bib
-bibliography:./main.bib
 * Supplemental Material
 :PROPERTIES:
 :CUSTOM_ID: SI

@@ -1,7 +1,7 @@
 \providecommand*{\mcitethebibliography}{\thebibliography}
 \csname @ifundefined\endcsname{endmcitethebibliography}
 {\let\endmcitethebibliography\endthebibliography}{}
-\begin{mcitethebibliography}{12}
+\begin{mcitethebibliography}{29}
 \providecommand*{\natexlab}[1]{#1}
 \providecommand*{\mciteSetBstSublistMode}[1]{}
 \providecommand*{\mciteSetBstMaxWidthForm}[2]{}
@@ -18,10 +18,147 @@
 \mciteSetBstSublistLabelBeginEnd{\mcitemaxwidthsubitemform\space}
 {\relax}{\relax}
 
+\bibitem[Ansari \emph{et~al.}(2018)Ansari, Qurashi, and
+  Nazeeruddin]{ansari-2018-front-oppor}
+M.~I.~H. Ansari, A.~Qurashi and M.~K. Nazeeruddin, \emph{Journal of
+  Photochemistry and Photobiology C: Photochemistry Reviews}, 2018,
+  \textbf{35}, 1--24\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Yin \emph{et~al.}(2015)Yin, Yang, Kang, Yan, and
+  Wei]{yin-2015-halid-perov}
+W.-J. Yin, J.-H. Yang, J.~Kang, Y.~Yan and S.-H. Wei, \emph{Journal of
+  Materials Chemistry A}, 2015, \textbf{3}, 8926--8942\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Manser \emph{et~al.}(2016)Manser, Christians, and
+  Kamat]{manser-2016-intrig-optoel}
+J.~S. Manser, J.~A. Christians and P.~V. Kamat, \emph{Chemical Reviews}, 2016,
+  \textbf{116}, 12956--13008\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Brenner \emph{et~al.}(2016)Brenner, Egger, Kronik, Hodes, and
+  Cahen]{brenner-2016-hybrid-organ}
+T.~M. Brenner, D.~A. Egger, L.~Kronik, G.~Hodes and D.~Cahen, \emph{Nature
+  Reviews Materials}, 2016, \textbf{1}, 15007\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Cui \emph{et~al.}(2019)Cui, Wei, Ji, Huang, Jia, Dou, Wang, Wang, and
+  Li]{cui-2019-planar-p}
+P.~Cui, D.~Wei, J.~Ji, H.~Huang, E.~Jia, S.~Dou, T.~Wang, W.~Wang and M.~Li,
+  \emph{Nature Energy}, 2019, \textbf{4}, 150--159\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Jeong \emph{et~al.}(2020)Jeong, Choi~In, Go~Eun, Cho, Kim, Lee, Jeong,
+  Jo, Choi~Hye, Lee, Bae, Kwak~Sang, Kim~Dong, and
+  Yang]{jeong-2020-stabl-perov}
+M.~Jeong, W.~Choi~In, M.~Go~Eun, Y.~Cho, M.~Kim, B.~Lee, S.~Jeong, Y.~Jo,
+  W.~Choi~Hye, J.~Lee, J.-H. Bae, K.~Kwak~Sang, S.~Kim~Dong and C.~Yang,
+  \emph{Science}, 2020, \textbf{369}, 1615--1620\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Bartel~Christopher \emph{et~al.}(2019)Bartel~Christopher, Sutton,
+  Goldsmith~Bryan, Ouyang, Musgrave~Charles, Ghiringhelli~Luca, and
+  Scheffler]{bartel-2019-new-toler}
+J.~Bartel~Christopher, C.~Sutton, R.~Goldsmith~Bryan, R.~Ouyang,
+  B.~Musgrave~Charles, M.~Ghiringhelli~Luca and M.~Scheffler, \emph{Science
+  Advances}, 2019, \textbf{5}, eaav0693\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Zhu \emph{et~al.}(2019)Zhu, Ye, Zhao, and Qiu]{zhu-2019-struc-elect}
+S.~Zhu, J.~Ye, Y.~Zhao and Y.~Qiu, \emph{The Journal of Physical Chemistry C},
+  2019, \textbf{123}, 20476--20487\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Banerjee \emph{et~al.}(2019)Banerjee, Chakraborty, and
+  Ahuja]{banerjee-2019-rashb-trigg}
+A.~Banerjee, S.~Chakraborty and R.~Ahuja, \emph{ACS Applied Energy Materials},
+  2019, \textbf{2}, 6990--6997\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Ding \emph{et~al.}(2019)Ding, Du, Zhou, Yuan, Cheng, Jing, Yao, Zhang,
+  He, Cui, Zhan, and Sun]{ding-2019-cesium-decreas}
+J.~Ding, S.~Du, T.~Zhou, Y.~Yuan, X.~Cheng, L.~Jing, Q.~Yao, J.~Zhang, Q.~He,
+  H.~Cui, X.~Zhan and H.~Sun, \emph{The Journal of Physical Chemistry C}, 2019,
+  \textbf{123}, 14969--14975\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Greenland \emph{et~al.}(2020)Greenland, Shnier, Rajendran, Smith,
+  Game, Wamwangi, Turnbull, Samuel, Billing, and
+  Lidzey]{greenland-2020-correl-phase}
+C.~Greenland, A.~Shnier, S.~K. Rajendran, J.~A. Smith, O.~S. Game, D.~Wamwangi,
+  G.~A. Turnbull, I.~D.~W. Samuel, D.~G. Billing and D.~G. Lidzey,
+  \emph{Advanced Energy Materials}, 2020, \textbf{10}, 1901350\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Kar and K{\"o}rzd{\"o}rfer(2018)]{kar-2018-comput-screen}
+M.~Kar and T.~K{\"o}rzd{\"o}rfer, \emph{The Journal of Chemical Physics}, 2018,
+  \textbf{149}, 214701\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Kim \emph{et~al.}(2017)Kim, Huan, Krishnan, and
+  Ramprasad]{kim-2017-hybrid-organ}
+C.~Kim, T.~D. Huan, S.~Krishnan and R.~Ramprasad, \emph{Scientific Data}, 2017,
+  \textbf{4}, 170057\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Mannodi-Kanakkithodi \emph{et~al.}(2019)Mannodi-Kanakkithodi, Park,
+  Jeon, Cao, Gosztola, Martinson, and
+  Chan]{mannodi-kanakkithodi-2019-compr-comput}
+A.~Mannodi-Kanakkithodi, J.-S. Park, N.~Jeon, D.~H. Cao, D.~J. Gosztola,
+  A.~B.~F. Martinson and M.~K.~Y. Chan, \emph{Chemistry of Materials}, 2019,
+  \textbf{31}, 3599--3612\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
 \bibitem[Mannodi-Kanakkithodi and
   Chan(2022)]{mannodi-kanakkithodi-2022-data-driven}
 A.~Mannodi-Kanakkithodi and M.~K.~Y. Chan, \emph{Energy Environ. Sci.}, 2022,
   \textbf{15}, 1930--1949\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Castelli \emph{et~al.}(2014)Castelli, Garc{\'i}a-Lastra, Thygesen, and
+  Jacobsen]{castelli-2014-bandg-calcul}
+I.~E. Castelli, J.~M. Garc{\'i}a-Lastra, K.~S. Thygesen and K.~W. Jacobsen,
+  \emph{APL Materials}, 2014, \textbf{2}, 081514\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Park \emph{et~al.}(2019)Park, Mall, Alharbi, Sanvito, Tabet, Bensmail,
+  and El-Mellouhi]{park-2019-explor-new}
+H.~Park, R.~Mall, F.~H. Alharbi, S.~Sanvito, N.~Tabet, H.~Bensmail and
+  F.~El-Mellouhi, \emph{Physical Chemistry Chemical Physics}, 2019,
+  \textbf{21}, 1078--1088\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
@@ -68,6 +205,14 @@ L.~McInnes, J.~Healy, N.~Saul and L.~Grossberger, \emph{Python UMAP: Uniform
 G.~Pilania, A.~Mannodi-Kanakkithodi, B.~P. Uberuaga, R.~Ramprasad, J.~E.
   Gubernatis and T.~Lookman, \emph{Scientific Reports}, 2016, \textbf{6},
   year\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Jiang \emph{et~al.}(2016)Jiang, Nahas, Xu, Prosandeev, Wang, and
+  Bellaiche]{jiang-2016-special-quasir}
+Z.~Jiang, Y.~Nahas, B.~Xu, S.~Prosandeev, D.~Wang and L.~Bellaiche,
+  \emph{Journal of Physics: Condensed Matter}, 2016, \textbf{28}, 475901\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
