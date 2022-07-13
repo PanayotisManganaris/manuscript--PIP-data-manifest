@@ -10,8 +10,6 @@
 
 #+RESULTS:
 :results:
-: The autoreload extension is already loaded. To reload it, use:
-:   %reload_ext autoreload
 :end:
   
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -54,31 +52,31 @@
 :end:
 
 #+begin_src jupyter-python :exports results :results raw drawer
-   # data tools
-   import sqlite3
-   import pandas as pd
-   import numpy as np
-   # feature engineering
-   from sklearn.impute import SimpleImputer
-   from sklearn.preprocessing import OrdinalEncoder, Normalizer, StandardScaler
-   from sklearn.preprocessing import FunctionTransformer, MinMaxScaler
-   ## pipeline workflow
-   from sklearn.pipeline import make_pipeline as mkpipe
-   from sklearn.compose import ColumnTransformer as colt
-   from sklearn.preprocessing import OneHotEncoder as ohe
-   from sklearn.model_selection import KFold, GroupKFold
-   from sklearn.model_selection import learning_curve, validation_curve
-   from sklearn.model_selection import StratifiedShuffleSplit
-   from sklearn.model_selection import GridSearchCV as gsCV
-   # model eval
-   from sklearn.metrics import make_scorer, mean_squared_error, r2_score, explained_variance_score, max_error
-   import joblib
-   from sklearn.base import clone
-   #visualization
-   from sklearn import set_config
-   set_config(display="text")
-   from sklearn.utils import estimator_html_repr
-   import plotly.express as px
+  # data tools
+  import sqlite3
+  import pandas as pd
+  import numpy as np
+  # feature engineering
+  from sklearn.impute import SimpleImputer
+  from sklearn.preprocessing import OrdinalEncoder, Normalizer, StandardScaler
+  from sklearn.preprocessing import FunctionTransformer, MinMaxScaler
+  ## pipeline workflow
+  from sklearn.pipeline import make_pipeline as mkpipe
+  from sklearn.compose import ColumnTransformer as colt
+  from sklearn.preprocessing import OneHotEncoder as ohe
+  from sklearn.model_selection import KFold, GroupKFold
+  from sklearn.model_selection import learning_curve, validation_curve
+  from sklearn.model_selection import StratifiedShuffleSplit
+  from sklearn.model_selection import GridSearchCV as gsCV
+  # model eval
+  from sklearn.metrics import make_scorer, mean_squared_error, r2_score, explained_variance_score, max_error
+  import joblib
+  from sklearn.base import clone
+  #visualization
+  from sklearn import set_config
+  set_config(display="text")
+  from sklearn.utils import estimator_html_repr
+  import plotly.express as px
 #+end_src
 
 #+RESULTS:

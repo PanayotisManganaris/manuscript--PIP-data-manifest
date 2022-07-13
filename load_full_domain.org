@@ -1,4 +1,4 @@
-#+title: Procedure for Creating Multi fidelity Domain using discrete tables
+l#+title: Procedure for Creating Multi fidelity Domain using discrete tables
 #+AUTHOR: Panayotis Manganaris
 #+EMAIL: pmangana@purdue.edu
 #+PROPERTY: header-args :session mrg :kernel mrg :async yes :pandoc org
@@ -35,18 +35,63 @@
 :results:
 :end:
 
-* Clean Data and label
-going forward we just assume that almora consists primarily of cubic phase crystals
+* clean data
+** manipulations per column
 #+begin_src jupyter-python
-  target = ['bg_eV'] #used to drop nans in desired target
-  mannodi_pbe[target] = mannodi_pbe[target].apply(pd.to_numeric, errors='coerce')
-  mannodi_hse[target] = mannodi_hse[target].apply(pd.to_numeric, errors='coerce')
-  almora[target] = almora[target].applymap(pd.to_numeric, errors='coerce')
-  mannodi_hsc[target] = mannodi_hsc[target].applymap(pd.to_numeric, errors='coerce')    
+  almora_num = almora.columns[[1,2,3,4,5]].to_list()
+  hsc_num = mannodi_hsc.columns[[2,3]].to_list()
+  hse_num = mannodi_hse.columns[[2,4,5,6,7]].to_list()
+  pbe_num = mannodi_pbe.columns[[2,4,5,6,7,8,9,10,11]].to_list()
+
+  almora_obj = [col for col in almora.columns if col not in almora_num]
+  hsc_obj = [col for col in mannodi_hsc.columns if col not in hsc_num]
+  hse_obj = [col for col in mannodi_hse.columns if col not in hse_num]
+  pbe_obj = [col for col in mannodi_pbe.columns if col not in pbe_num]
 #+end_src
 
 #+RESULTS:
 
+** control dtypes
+#+begin_src jupyter-python
+  #used to drop nans in desired target
+  mannodi_pbe[pbe_num] = mannodi_pbe[pbe_num].applymap(pd.to_numeric, errors='coerce')
+  mannodi_hse[hse_num] = mannodi_hse[hse_num].applymap(pd.to_numeric, errors='coerce')
+  almora[almora_num] = almora[almora_num].applymap(pd.to_numeric, errors='coerce')
+  mannodi_hsc[hsc_num] = mannodi_hsc[hsc_num].applymap(pd.to_numeric, errors='coerce')    
+#+end_src
+
+#+RESULTS:
+
+* for fidelity comparisons
+** define collection operation dictionaries
+#+begin_src jupyter-python
+  def make_ops(obj, num):
+      ops = {**dict(zip(obj, ['first']*len(obj))), **dict(zip(num, ['median']*len(num)))}
+      return ops
+
+  almora_ops = make_ops(almora_obj, almora_num)
+  hsc_ops = make_ops(hsc_obj, hsc_num)
+  hse_ops = make_ops(hse_obj, hse_num)
+  pbe_ops = make_ops(pbe_obj, pbe_num)
+#+end_src
+
+#+RESULTS:
+
+** trim and aggregate possible targets
+repeated record measures are aggregated
+#+begin_src jupyter-python :exports results :results raw drawer
+  almora = almora.groupby('Formula').agg(almora_ops).reset_index(drop=True)
+  mannodi_pbe = mannodi_pbe.groupby('Formula').agg(pbe_ops).reset_index(drop=True)
+  mannodi_hse = mannodi_hse.groupby('Formula').agg(hse_ops).reset_index(drop=True)
+  mannodi_hsc = mannodi_hsc.groupby('Formula').agg(hsc_ops).reset_index(drop=True)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+* Clean Data and label
+going forward we just assume that almora consists primarily of cubic phase crystals
 ** subset based on deviation from cubicity
 #+begin_src jupyter-python :exports results :results raw drawer
   exclude = ["Rb0.375Cs0.625GeBr3", "RbGeBr1.125Cl1.875", "K0.75Cs0.25GeI3", "K8Sn8I9Cl15"]
@@ -169,6 +214,7 @@ going forward we just assume that almora consists primarily of cubic phase cryst
 :results:
 :end:
 
+* For multifi modeling/multivariate visualization
 ** assign categorical features
 #+begin_src jupyter-python :exports results :results raw drawer
   ec = ec.assign(LoT=almora.LoT)
@@ -180,8 +226,70 @@ going forward we just assume that almora consists primarily of cubic phase cryst
 #+RESULTS:
 :results:
 :end:
+* separate Domains
+** assign categorical features
+#+begin_src jupyter-python :exports results :results raw drawer
+  mixlog = pc.groupby(level=0, axis=1).count()
+  mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
 
-* Build and Cluster Domain
+  organics = mannodi_pbe.ft.comp().collect.org()
+  orglog = organics.groupby(level=0, axis=1).count()
+  org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
+
+  mannodi_pbe = mannodi_pbe.assign(mix=mix).assign(org=org)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  mixlog = hc.groupby(level=0, axis=1).count()
+  mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
+
+  organics = mannodi_hse.ft.comp().collect.org()
+  orglog = organics.groupby(level=0, axis=1).count()
+  org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
+
+  mannodi_hse = mannodi_hse.assign(mix=mix).assign(org=org)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  mixlog = hsc.groupby(level=0, axis=1).count()
+  mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
+
+  organics = mannodi_hsc.ft.comp().collect.org()
+  orglog = organics.groupby(level=0, axis=1).count()
+  org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
+
+  mannodi_hsc = mannodi_hsc.assign(mix=mix).assign(org=org)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  mixlog = ec.groupby(level=0, axis=1).count()
+  mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
+
+  organics = almora.ft.comp().collect.org()
+  orglog = organics.groupby(level=0, axis=1).count()
+  org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
+
+  almora = almora.assign(mix=mix).assign(org=org)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+
+* Unified Domain
 Base Domain will be mutated based on feature's Predictive Power
 ** Basic Domains
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -195,16 +303,6 @@ Base Domain will be mutated based on feature's Predictive Power
 :results:
 :end:
 
-** Generate Mix Categories
-this helps with visualizing the final model performance.
-#+begin_src jupyter-python :exports results :results raw drawer
-  mixlog = mc.groupby(level=0, axis=1).count()
-  mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
-#+end_src
-
-#+RESULTS:
-:results:
-:end:
 
 ** filter out BandX
 #+begin_src jupyter-python :exports results :results raw drawer
@@ -218,18 +316,17 @@ this helps with visualizing the final model performance.
 :results:
 :end:
 
-** generate Organics Categories
+* for single fidelity visualization
+** assign catagorical features
 #+begin_src jupyter-python :exports results :results raw drawer
-  organics = my.ft.comp().collect.org()
-  orglog = organics.groupby(level=0, axis=1).count()
-  org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
+  my = my.assign(org=org).assign(mix=mix)
 #+end_src
 
 #+RESULTS:
 :results:
 :end:
 
-* for single fidelity visualization
+
 ** trim domain by cluster
 #+begin_src jupyter-python :exports results :results raw drawer
   cluster_filter = mm.LoT=="PBE"
@@ -238,35 +335,4 @@ this helps with visualizing the final model performance.
   mix = mix[cluster_filter]
   org = org[cluster_filter]
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
-
-
-* for multifideltiy comparison
-** trim and aggregate possible targets
-repeated record measures are aggregated
-#+begin_src jupyter-python :exports results :results raw drawer
-  almora = almora.groupby('Formula').agg({'bg_eV':'median', #make an auto dict...
-                                          'efficiency':'median',
-                                          'citation':'first',}
-                                         ).reset_index().dropna(subset=target)
-  mannodi_pbe = mannodi_pbe.groupby('Formula').agg({'bg_eV':'median',
-                                                    'efficiency':'median',
-                                                    'sim_cell':'first',
-                                                    'bgType':'first',}
-                                                   ).reset_index().dropna(subset=target)
-  mannodi_hse = mannodi_hse.groupby('Formula').agg({'bg_eV':'median',
-                                                    'sim_cell':'first',
-                                                    'bgType':'first',}
-                                                   ).reset_index().dropna(subset=target)
-  mannodi_hsc = mannodi_hsc.groupby('Formula').agg({'bg_eV':'median',
-                                                    'sim_cell':'first',}
-                                                   ).reset_index().dropna(subset=target)
-#+end_src
-
-#+RESULTS:
-:results:
-:end:
 

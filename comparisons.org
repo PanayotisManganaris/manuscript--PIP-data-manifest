@@ -4,6 +4,7 @@
 #+PROPERTY: header-args :session mrg :kernel mrg :async yes :pandoc org
 * load data
 #+INCLUDE: /home/panos/MannodiGroup/publications/Perovskites_dataset_manifest/load_full_domain.org
+** load experimental data collected from various sources
 as of yet disorganized experimental data to supplement our dataset
 #+begin_src jupyter-python :exports results :results raw drawer
   briones = pd.read_csv('./briones_LC.csv')
@@ -16,8 +17,8 @@ as of yet disorganized experimental data to supplement our dataset
 :results:
 :end:
 
-* Clean Data
-** subset based on deviation from cubicity
+** Clean Data
+*** subset based on deviation from cubicity
 #+begin_src jupyter-python :exports results :results raw drawer
   lattice = lattice[~lattice.Formula.isin(exclude)]
 #+end_src
@@ -25,19 +26,20 @@ as of yet disorganized experimental data to supplement our dataset
 #+RESULTS:
 :results:
 :end:
-** adjust formula strings for comparability
+*** adjust formula strings for comparability
 #+begin_src jupyter-python :exports results :results raw drawer
   lattice.Formula = lattice.Formula.str.replace("NH4","AM")
+  lattice.Formula = lattice.Formula.str.replace('[\_\{\}]', "", regex=True)
 #+end_src
 
 #+RESULTS:
 :results:
 :end:
 
-** Comp vs Experimental directivity
+*** Comp vs Experimental directivity
 - trim and aggregate LC
 #+begin_src jupyter-python :exports results :results raw drawer
-  lattice = lattice.groupby('Formula').agg({'LC_A':'median'}).reset_index()
+  lattice = lattice.groupby('Formula').agg({'Formula':'first', 'LC_A':'median'}).reset_index(drop=True)
   lattice = lattice.reindex(index=lattice['LC_A'].dropna().index)
 #+end_src
 
@@ -47,7 +49,7 @@ as of yet disorganized experimental data to supplement our dataset
 
 * Compute Composition Vectors
 #+begin_src jupyter-python :exports results :results raw drawer
-  lc = lattice.ft.comp()
+  lc = lattice.ft.comp().collect.abx()
 #+end_src
 
 #+RESULTS:
@@ -69,11 +71,11 @@ as of yet disorganized experimental data to supplement our dataset
 
 * TODO build comparisons tables
 #+begin_src jupyter-python :exports results :results raw drawer
-  hse_v_pbe = robust_compare(mannodi_hse, hc, mannodi_pbe.drop(['mix', 'org'], axis=1), pc, suf1='hse', suf2='pbe')
-  ebg_v_pbe = robust_compare(almora, ac, mannodi_pbe.drop(['mix', 'org'], axis=1), pc, suf1='exp', suf2='pbe')
-  ebg_v_hse = robust_compare(almora, ac, mannodi_hse.drop(['mix', 'org'], axis=1), hc, suf1='exp', suf2='hse')
-  elc_v_pbe = robust_compare(lattice, lc, mannodi_pbe.drop(['mix', 'org'], axis=1), pc, suf1='exp', suf2='pbe')
-  elc_v_hse = robust_compare(lattice, lc, mannodi_hse.drop(['mix', 'org'], axis=1), hc, suf1='exp', suf2='hse')
+  hse_v_pbe = robust_compare(mannodi_hse, hc, mannodi_pbe, pc, suf1='hse', suf2='pbe')
+  ebg_v_pbe = robust_compare(almora, ec, mannodi_pbe, pc, suf1='exp', suf2='pbe')
+  ebg_v_hse = robust_compare(almora, ec, mannodi_hse, hc, suf1='exp', suf2='hse')
+  elc_v_pbe = robust_compare(lattice, lc, mannodi_pbe, pc, suf1='exp', suf2='pbe')
+  elc_v_hse = robust_compare(lattice, lc, mannodi_hse, hc, suf1='exp', suf2='hse')
 #+end_src
 
 #+RESULTS:
@@ -82,44 +84,31 @@ as of yet disorganized experimental data to supplement our dataset
 
 * Computed Targets vs Experimental Targets
 ** PBE v HSE band gaps
-#+begin_src jupyter-python :exports both :results raw drawer
-  plt.style.use('default')
-  %matplotlib qt
+#+begin_src jupyter-python :exports both :results raw drawer :file ./expval/pbe_v_hse_LC.png
+  p = px.scatter(hse_v_pbe,
+                 x='bg_eV_pbe', y='bg_eV_hse', color='mix_pbe', template='simple_white')
+  p.add_trace(dict(x=hse_v_pbe.bg_eV_pbe, y=hse_v_pbe.bg_eV_pbe, name='parity'))
+  p.show(renderer='png')
 #+end_src
 
 #+RESULTS:
 :results:
+#+attr_org: :width 700
+[[file:./expval/pbe_v_hse_LC.png]]
 :end:
-  
-#+begin_src jupyter-python :exports both :results raw drawer
-  with sns.plotting_context('poster'):
-    p = sns.relplot(data=hse_v_pbe,
-                    x='bg_eV_pbe', y='bg_eV_hse', hue='org', style='mix',
-                    height=6, aspect=1.2)
-    xlims = p.figure.axes[0].get_xlim()
-    ylims = p.figure.axes[0].get_ylim()
-    plt.axline((min(xlims+ylims), min(xlims+ylims)),
-               (max(xlims+ylims), max(xlims+ylims)),
-               c='k')
-    p.savefig('./pbe_v_hse_bg.png', transparent=True)
-#+end_src
 
 ** PBE v HSE Lattice Constants
 #+begin_src jupyter-python :exports both :results raw drawer
-  with sns.plotting_context('poster'):
-    p = sns.relplot(data=hse_v_pbe,
-                    x='LC_A_pbe', y='LC_A_hse', hue='org', style='mix',
-                    height=6, aspect=1.3)
-    xlims = p.figure.axes[0].get_xlim()
-    ylims = p.figure.axes[0].get_ylim()
-    plt.axline((min(xlims+ylims), min(xlims+ylims)),
-               (max(xlims+ylims), max(xlims+ylims)),
-               c='k')
-    p.savefig('./pbe_v_hse_LC.png', transparent=True)
+  p = px.scatter(hse_v_pbe,
+                 x='LC_A_pbe', y='LC_A_hse', color='mix_pbe', template='simple_white')
+  p.add_trace(dict(x=hse_v_pbe.LC_A_pbe, y=hse_v_pbe.LC_A_pbe, name='parity'))
+  p.show(renderer='png')
 #+end_src
 
 #+RESULTS:
 :results:
+#+attr_org: :width 700
+[[file:./.ob-jupyter/d76e0608dd020837a582738c6a591ede328adf9a.png]]
 :end:
 
 ** PBE v experimental band gaps/efficiencies
@@ -136,101 +125,97 @@ parity comparisons indicate PBE underestimates bandgaps and HSE
 overestimates bandgaps systematically
 
 #+begin_src jupyter-python :exports both :results raw drawer
-  with sns.plotting_context('poster'):
-    p = sns.relplot(data=ebg_v_pbe,
-                    x='bg_eV_exp', y='bg_eV_pbe', hue='org', style='mix',
-                    height=6, aspect=1.2)
-    xlims = p.figure.axes[0].get_xlim()
-    ylims = p.figure.axes[0].get_ylim()
-    plt.axline((min(xlims+ylims), min(xlims+ylims)),
-               (max(xlims+ylims), max(xlims+ylims)),
-               c='k')
-    p.savefig('./pbe_v_almora_bg.png', transparent=True)
+  p = px.scatter(ebg_v_pbe,
+                 x='bg_eV_exp', y='bg_eV_pbe', color='mix_pbe', template='simple_white')
+  p.add_trace(dict(x=hse_v_pbe.bg_eV_pbe, y=hse_v_pbe.bg_eV_pbe, name='parity'))
+  p.show(renderer='png')
 #+end_src
 
 #+RESULTS:
 :results:
+#+attr_org: :width 700
+[[file:./.ob-jupyter/dfb49c8868993bc86bc74061a83b608d3eb3d42f.png]]
 :end:
 
 #+begin_src jupyter-python :exports both :results raw drawer
-  with sns.plotting_context('poster'):
-    p = sns.relplot(data=ebg_v_pbe,
-                    x='efficiency_exp', y='efficiency_pbe', hue='org', style='mix',
-                    height=6, aspect=1.2)
-    xlims = p.figure.axes[0].get_xlim()
-    ylims = p.figure.axes[0].get_ylim()
-    plt.axline((min(xlims+ylims), min(xlims+ylims)),
-               (max(xlims+ylims), max(xlims+ylims)),
-               c='k')
-    p.savefig('./pbe_v_almora_eff.png', transparent=True)
+  p = px.scatter(ebg_v_pbe,
+                 x='efficiency_exp', y='efficiency_pbe', color='mix_pbe', template='simple_white')
+  p.add_trace(dict(x=hse_v_pbe.bg_eV_pbe, y=hse_v_pbe.bg_eV_pbe, name='parity'))
+  p.show(renderer='png')
 #+end_src
 
 #+RESULTS:
 :results:
+#+attr_org: :width 700
+[[file:./.ob-jupyter/8b2a2d1e2ad600ec1d1a116cfd9d0b9ebba63d0c.png]]
 :end:
 
 ** hse v experimental band gaps
 #+begin_src jupyter-python :exports both :results raw drawer
-  with sns.plotting_context('poster'):
-    p = sns.relplot(data=ebg_v_hse,
-                    x='bg_eV_exp', y='bg_eV_hse', hue='org', style='mix',
-                    height=6, aspect=1.2)
-    xlims = p.figure.axes[0].get_xlim()
-    ylims = p.figure.axes[0].get_ylim()
-    plt.axline((min(xlims+ylims), min(xlims+ylims)),
-               (max(xlims+ylims), max(xlims+ylims)),
-               c='k')
-    p.savefig('./hse_v_almora_bg.png', transparent=True)
+  p = px.scatter(ebg_v_hse,
+                 x='bg_eV_exp', y='bg_eV_hse', color='mix_hse', template='simple_white')
+  p.add_trace(dict(x=hse_v_pbe.bg_eV_pbe, y=hse_v_pbe.bg_eV_pbe, name='parity'))
+  p.show(renderer='png')
 #+end_src
 
 #+RESULTS:
 :results:
+#+attr_org: :width 700
+[[file:./.ob-jupyter/0421a789544bf38e1b93ffe383845c915db14c04.png]]
 :end:
 
 ** PBE v experimental LC
-#+begin_src jupyter-python :exports both :results raw drawer
-  with sns.plotting_context('poster'):
-    p = sns.relplot(data=elc_v_pbe,
-                    x='LC_A_exp', y='LC_A_pbe', hue='org', style='mix',
-                    height=6, aspect=1.2)
-    xlims = p.figure.axes[0].get_xlim()
-    ylims = p.figure.axes[0].get_ylim()
-    plt.axline((min(xlims+ylims), min(xlims+ylims)),
-               (max(xlims+ylims), max(xlims+ylims)),
-               c='k')
-    mplcursors.cursor(multiple=True).connect(
-        "add", lambda sel: sel.annotation.set_text(
-          elc_v_pbe["Formula_exp"].iloc[sel.index]
-          )
-      )
-    #p.savefig('./pbe_v_exp_LC.png', transparent=True)
+#+begin_src jupyter-python :exports both :results raw drawer :file ./expval/pbe_v_exp_LC.png
+  p = px.scatter(elc_v_pbe,
+                 x='LC_A_exp', y='LC_A_pbe', color='mix', template='simple_white')
+  p.add_trace(dict(x=elc_v_pbe.LC_A_exp, y=elc_v_pbe.LC_A_exp, name='parity', mode='lines'))
+  p.show(renderer='png')
 #+end_src
 
 #+RESULTS:
 :results:
+#+attr_org: :width 700
+[[file:./expval/pbe_v_exp_LC.png]]
+:end:
+
+#+begin_src jupyter-python :exports both :results raw drawer :file ./expval/pbe_v_exp_LC.png
+  e = elc_v_pbe.LC_A_exp - elc_v_pbe.LC_A_pbe
+  se = e**2
+  sse = se.sum()
+  rmse = np.sqrt(sse.mean())
+  rmse
+#+end_src
+
+#+RESULTS:
+:results:
+: 0.33380827955579595
 :end:
 
 ** HSE v experimental LC
-#+begin_src jupyter-python :exports both :results raw drawer
-  with sns.plotting_context('poster'):
-    p = sns.relplot(data=elc_v_hse,
-                    x='LC_A_exp', y='LC_A_hse', hue='org', style='mix',
-                    height=6, aspect=1.2)
-    xlims = p.figure.axes[0].get_xlim()
-    ylims = p.figure.axes[0].get_ylim()
-    plt.axline((min(xlims+ylims), min(xlims+ylims)),
-               (max(xlims+ylims), max(xlims+ylims)),
-               c='k')
-    mplcursors.cursor(multiple=True).connect(
-        "add", lambda sel: sel.annotation.set_text(
-          elc_v_hse["Formula_exp"].iloc[sel.index]
-          )
-      )
-    #p.savefig('./hse_v_exp_LC.png', transparent=True)
+#+begin_src jupyter-python :exports both :results raw drawer :file ./expval/hse_v_exp_LC.png
+  p = px.scatter(elc_v_hse,
+                 x='LC_A_exp', y='LC_A_hse', color='mix', template='simple_white')
+  p.add_trace(dict(x=elc_v_pbe.LC_A_exp, y=elc_v_pbe.LC_A_exp, name='parity', mode='lines'))
+  p.show(renderer='png')
 #+end_src
 
 #+RESULTS:
 :results:
+#+attr_org: :width 700
+[[file:./expval/hse_v_exp_LC.png]]
+:end:
+
+#+begin_src jupyter-python :exports both :results raw drawer :file ./expval/pbe_v_exp_LC.png
+  e = elc_v_hse.LC_A_exp - elc_v_hse.LC_A_hse
+  se = e**2
+  sse = se.sum()
+  rmse = np.sqrt(sse.mean())
+  rmse
+#+end_src
+
+#+RESULTS:
+:results:
+: 0.5797557237319871
 :end:
 
 * again, but improving figure layouts
