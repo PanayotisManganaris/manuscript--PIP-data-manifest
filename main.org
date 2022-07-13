@@ -808,7 +808,7 @@ Computing Resource Center at Argonne National Laboratory, and the RCAC
 clusters at Purdue.
 
 bibliographystyle:rsc
-bibliography:~/org/bibliotex/bibliotex.bib
+bibliography:./main.bib
 * Supplemental Material
 :PROPERTIES:
 :CUSTOM_ID: SI
