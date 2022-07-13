@@ -1,4 +1,4 @@
-% Created 2022-07-13 Wed 00:32
+% Created 2022-07-13 Wed 10:22
 % Intended LaTeX compiler: pdflatex
 \documentclass[twoside, twocolumn, 9pt, draft]{article}
 \usepackage[utf8]{inputenc}
@@ -212,15 +212,17 @@ and improved performance across many optoelectronic applications.
 
 %INCLUDE -- notice abstract is contained in titleblock
 
-\footnotetext{\textsuperscript{a}School of Materials Engineering, Purdue University, West Lafayette, IN 47907, USA; E-mail: amannodi@purdue.edu}
-\footnotetext{\textsuperscript{\dag}Electronic Supplementary Information (ESI) available: https://www.github.com/PanayotisManganaris/REPO_TODO. See DOI: 00.0000/00000000.}
+\footnotetext{%
+  \textsuperscript{a}School of Materials Engineering, Purdue University, West Lafayette, IN 47907, USA; E-mail: amannodi@purdue.edu
+}
+\footnotetext{%
+  \textsuperscript{\dag}Electronic Supplementary Information (ESI) available:
+  \url{https://github.com/PanayotisManganaris/manuscript--PIP-data-manifest}
+  See DOI: 00.0000/00000000.
+}
 
 \section*{Introduction}
-\label{sec:orgaf3aef9}
-\begin{itemize}
-\item State "DONE"       from "TODO"       \textit{[2022-07-12 Tue 12:14]}
-\item State "DONE"       from              \textit{[2022-06-05 Sun 18:16]}
-\end{itemize}
+\label{sec:org0d387a5}
 The perovskite structure has been widely investigated by material
 scientists in recent decades for its promising industry
 applications. A perovskite unit cell contains a generalized
@@ -324,7 +326,7 @@ We report a synthetic dataset collected for 495 chemically distinct,
 pseudo cubic Halide Perovskites. This dataset builds on that of 229
 samples which formed the foundation of the prior work by
 \citet{mannodi-kanakkithodi-2022-data-driven}. The \acrfull{dft} computed properties we collected and the levels of theory
-used are discussed in \hyperref[sec:org6e86bb0]{Methodology}. The relatively large size of this
+used are discussed in \hyperref[sec:org07ee6cc]{Methodology}. The relatively large size of this
 dataset is intended to provide an initial sampling suitable for
 guiding exploration of the alloy space. In this dataset, structures
 are constantly pseudo-cubic, instead we focus on studying the effects
@@ -403,12 +405,9 @@ utilizing the transformation.
 \end{figure*}
 
 \section*{Methodology}
-\label{sec:org6e86bb0}
+\label{sec:org07ee6cc}
 \subsection*{Building Perovskite Dataset}
-\label{sec:orgff4dac1}
-\begin{itemize}
-\item State "NEXT"       from "TODO"       \textit{[2022-06-05 Sun 22:11]}
-\end{itemize}
+\label{sec:org5584dcb}
 The dataset we report is based on standard cubic phase ABX\textsubscript{3}
 Perovskite structures originally obtained from Computational Materials
 Repository (CMR)\cite{pilania-2016-machin-learn}. Fourteen common
@@ -455,10 +454,7 @@ samples.
 \end{figure*}
 
 \subsection*{Calculation Details}
-\label{sec:org99debcb}
-\begin{itemize}
-\item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 17:17]}
-\end{itemize}
+\label{sec:org57234d7}
 DFT calculations are performed with \gls{vasp} version 6.2. The \acrlong{paw} potentials were used as pseudopotentials. The
 \acrlong{gga} of \acrshort{pbe} and the hybrid \acrshort{hse}06
 (\(\alpha\)=0.25 and \(\omega\)=0.2) functionals are used as
@@ -470,15 +466,9 @@ Monkhorst-Pack k-point mesh. The structural force convergence
 threshold is set to be 0.005 eV/\AA{}.
 
 \subsection*{Discussion of DFT Computed Properties}
-\label{sec:org0d5501f}
-\begin{itemize}
-\item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 17:19]}
-\end{itemize}
+\label{sec:org7a2b2e8}
 \subsubsection*{Decomposition Energy}
-\label{sec:orgcc8dde4}
-\begin{itemize}
-\item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 00:43]}
-\end{itemize}
+\label{sec:org11cd63c}
 The decomposition energy indicates the stability of a compound. To
 calculate the decomposition energy for an ABX3 Perovskite, we assume
 it will decompose to two phases, AX and BX2. Using \acrshort{dft} calculations,
@@ -492,18 +482,18 @@ E_{decomp} = E_{opt}(ABX_3) - E_{opt}(AX) - E_{opt}(BX2)
 \end{equation}
 
 \subsubsection*{SLME calculations}
-\label{sec:org8181ddd}
-\begin{itemize}
-\item State "DONE"       from "TODO"       \textit{[2022-06-06 Mon 17:30]}
-\end{itemize}
+\label{sec:org21fb725}
 The \gls{slme} metric developed by \citet{yu-2012-ident-poten} is used as the
 primary criterion screening perovskites for their photovoltaic
 merits. The \gls{slme} value is computed considering a 5\(\mu\)m absorption
-layer for every Perovskite according to equation \eqref{eq:absorbtion_alpha}.
+layer for every Perovskite according to equation \eqref{eq:slme}.
 
-\begin{equation}\label{eq:absorbtion_alpha}
+\begin{equation}\label{eq:absorption_alpha}
 a(E)=1-e^{-2\alpha(E)L}
 \end{equation}
+
+Where \(\alpha(E)\) is the calculated absorption coefficient, \(L\) is
+the thickness of the absorber.
 
 This calculation is performed using Logan William's SL3ME
 \cite{williams-2022-sl3me}. Based on absorption spectra obtained from
@@ -512,20 +502,11 @@ gaps and the \acrshort{hse} band gaps, resulting in two synthetic efficiencies
 for each record.
 
 \section*{Results and discussion}
-\label{sec:org2f99e00}
+\label{sec:org3dda365}
 \subsection*{Visualization of DFT Data}
-\label{sec:orgbcb58cd}
-\begin{figure*}
-\centering
-\includegraphics[width=.9\linewidth]{./figs/screening_properties.png}
-\caption{\label{fig:pairplots} DFT Results: PBE and HSE properties; lattice constants, decomposition energies, band gaps, and converter efficiencies.}
-\end{figure*}
-
+\label{sec:org6aec487}
 \subsubsection*{Lattice constant PBE vs HSE}
-\label{sec:orgfeff0e3}
-\begin{itemize}
-\item State "DONE"       from              \textit{[2022-06-06 Mon 01:02]}
-\end{itemize}
+\label{sec:org568e45c}
 Fig \ref{fig:lc_lot_vs} presents the lattice parameter comparison of
 \acrshort{pbe} calculation and \acrshort{hse}
 calculations. Full relaxations at both levels of theory mostly agree
@@ -548,18 +529,22 @@ the focus of this report.
 \end{center}
 
 \subsubsection*{Comparing synthetic to physical data}
-\label{sec:orge8e5d04}
-\begin{itemize}
-\item State "DONE"       from              \textit{[2022-06-06 Mon 01:01]}
-\end{itemize}
+\label{sec:org923b673}
 \begin{center}
 \includegraphics[width=.9\linewidth]{./expval/pbe_v_exp_LC.png}
-\captionof{figure}{\label{fig:lc_val_vs} Comparison of PBE and HSE computed pseudo-cubic lattice constants with crystallographic measures for lattice constants}
+\captionof{figure}{\label{fig:lc_vs_pbe} Comparison of PBE computed pseudo-cubic lattice constants with crystallographic measures for lattice constants}
 \end{center}
+
 \begin{center}
 \includegraphics[width=.9\linewidth]{./expval/hse_v_exp_LC.png}
-\captionof{figure}{\label{fig:lc_val_vs} Comparison of PBE and HSE computed pseudo-cubic lattice constants with crystallographic measures for lattice constants}
+\captionof{figure}{\label{fig:lc_vs_hse} Comparison of HSE computed pseudo-cubic lattice constants with crystallographic measures for lattice constants}
 \end{center}
+
+\begin{figure*}[h]
+\centering
+\includegraphics[width=.9\linewidth]{./figs/screening_properties.png}
+\caption{\label{fig:pairplots} DFT Results: PBE and HSE properties; lattice constants, decomposition energies, band gaps, and converter efficiencies.}
+\end{figure*}
 
 The physical data used in the Lattice Constant Comparisons is
 collected from the works of
@@ -571,7 +556,7 @@ The synthetic lattice constants do mostly agree with experiment. The
 It should be noted that the physical \acrshort{fa}SnI\textsubscript{3} measure reported by
 \citet{chen-2015-under-spotl} is clearly an orthorhombic phase. The
 validating lattice constant here is obtained by averaging lattice
-parameters. However, per the \hyperref[sec:org21edc11]{Deviation from Cubicity} metric, this
+parameters. However, per the \hyperref[sec:org7105504]{Deviation from Cubicity} metric, this
 phase is still approximately cubic, with angles near enough to 90
 degrees that we consider the data point valid. However, this does
 explain the disagreement in the parity plots.
@@ -587,7 +572,7 @@ HSE v EXP & PBE v EXP\\
 \end{table}
 
 \subsubsection*{Decomposition energy vs band gap PBE and HSE}
-\label{sec:orgd5f50b1}
+\label{sec:org27907dd}
 Fig 2(b) is showing the \acrshort{pbe} band gap compared to the
 \acrshort{pbe} decomposition energy. It presents the diversity
 of our Perovskite dataset. The data sets cover a large range of band
@@ -606,7 +591,7 @@ some grouping on low decomposition energy. Compared to
 decomposition energy region and suitable band gap region.
 
 \subsubsection*{Spectroscopic Limited Maximum Efficiency (SLME) vs PBE Band gap}
-\label{sec:orge994582}
+\label{sec:org7f0e476}
 Fig 2(d) presents the \gls{slme} values related to the
 \acrshort{pbe} band gap. \gls{slme} is a proven proxy
 for photovoltaic performance
@@ -619,7 +604,7 @@ gap increases, the \gls{slme} value decreases and eventually
 goes to zero due to the high band gap values.
 
 \subsection*{Pearson Correlation Results}
-\label{sec:orgab2e9d8}
+\label{sec:orgf674393}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{./expval/PBE_v_comp_pearson2.png}
@@ -642,7 +627,7 @@ trending, but always with extensive variability. Evidently, an
 accurate model will have to be formed on a multidimensional domain.
 
 \subsection*{PCA}
-\label{sec:orgcd873d5}
+\label{sec:orgc2c6472}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{./multivar/comp_ratio_projection_annot.png}
@@ -675,7 +660,7 @@ explanation for why Perovskite properties vary, this can be useful for
 accuracy, it can also be a bias-inducing hindrance.
 
 \subsection*{t-SNE visualization of stability clustering}
-\label{sec:orgc7c6dac}
+\label{sec:org4e275ec}
 \begin{figure*}
 \centering
 \includegraphics[width=.9\linewidth]{./multivar/tsne_comp_DecoE_clusters.png}
@@ -683,10 +668,7 @@ accuracy, it can also be a bias-inducing hindrance.
 \end{figure*}
 
 \subsection*{Screening process of all samples in database}
-\label{sec:org40a86ee}
-\begin{itemize}
-\item State "DONE"       from              \textit{[2022-05-24 Tue 13:31]}
-\end{itemize}
+\label{sec:org267a164}
 The synthetic Perovskite data is collected for sampling variety and
 without regard for each compound's viability. In order to extract
 potentially high-performing candidates for synthesis, we screen all
@@ -723,7 +705,7 @@ constraint.
 \end{figure*}
 
 \subsubsection*{Deviation from Cubicity}
-\label{sec:org21edc11}
+\label{sec:org7105504}
 For all the compositions we tested in our data set, some of them will
 have large strain and deformation because of the combination of
 elements. For these largely deformed samples, they are no longer
@@ -749,7 +731,7 @@ sometimes increase the lattice along some direction and make the
 perovskite deformed.
 
 \subsubsection*{Octahedral factor, tolerance factor, and Bartel tolerance factor}
-\label{sec:orgd55ccd8}
+\label{sec:orgb08e02b}
 The stability of Perovskite can be predicted by using the atom radius
 of all components. There are 3 types of factors are usually
 considered, Octahedral factor, tolerance factor, and Bartel tolerance
@@ -766,7 +748,7 @@ decomposition energy plot. Within the criteria of Bartel tolerance
 factor, the decomposition energy is rapidly decreased.
 
 \subsubsection*{Screening Results}
-\label{sec:org964c0bc}
+\label{sec:orgda8a4ea}
 The table XXX shows all 41 promising candidates we screened from our
 dataset by using the cutoff criteria mentioned above. FigXXX shows the
 element distribution of all decent samples. It indicates that MA and
@@ -796,7 +778,7 @@ compounds and tell us what kinds of compounds we should put in to test
 next.
 
 \section*{Perspective and Future Work}
-\label{sec:org5576278}
+\label{sec:org54fe0ee}
 The high-throughput DFT Perovskite dataset is containing huge amount of
 information of perovskites compounds, structure and properties. It
 leads us to perform screening, clustering and other process so that
@@ -839,10 +821,10 @@ For the calculation of future data points obtained by a surrogate
 optimizer, we will follow a strategy of performing full structural
 optimization at a \acrshort{pbe} level of theory unless circumstances demand
 otherwise. This is justified by Figure \ref{fig:lc_lot_vs} and the
-section \hyperref[sec:orge8e5d04]{Comparing synthetic to physical data}
+section \hyperref[sec:org923b673]{Comparing synthetic to physical data}
 
 Also, we will explore methods for combining the insights of the \acrshort{pbe}
-and \acrshort{hse} datasets in training surrogates, e.g. in section \hyperref[sec:org8181ddd]{SLME calculations} the two \gls{slme} spectra could be used together to converge
+and \acrshort{hse} datasets in training surrogates, e.g. in section \hyperref[sec:org21fb725]{SLME calculations} the two \gls{slme} spectra could be used together to converge
 on a physically accurate \acrshort{pce} value.
 
 We anticipate our principal challenge will be in extracting useful
@@ -860,10 +842,7 @@ For this reason, kernel learning methods appear to be particularly
 promising for high speed optimization of the space.
 
 \section*{Conclusions}
-\label{sec:org29cf3b4}
-\begin{itemize}
-\item State "DONE"       from "TODO"       \textit{[2022-07-12 Tue 12:14]}
-\end{itemize}
+\label{sec:org2e4c684}
 In this work, we present a DFT calculated perovskite data set with 495
 pseudo-cubic perovskite samples with A-site, B-site and X-site
 mixing. The mixing arrangements are built using SQS methods. All
@@ -885,11 +864,11 @@ properties. This data set will be used in the future to train
 statistical models and inform inverse design pipelines.
 
 \section*{Conflicts of Interest}
-\label{sec:org5116adb}
+\label{sec:orgd744f29}
 There are no conflicts to declare.
 
 \section*{Acknowledgements}
-\label{sec:org5936278}
+\label{sec:org4e68e1f}
 Extensive discussions with and scientific feedback from UC San Diego
 researchers David Fenning and Rishi Kumar and Argonne National Lab
 scientist Maria Chan are acknowledged. This work was performed at
@@ -902,7 +881,7 @@ clusters at Purdue.
 \bibliographystyle{rsc}
 \bibliography{main}
 \section*{Supplemental Material}
-\label{sec:org26363f8}
+\label{sec:orgd6aaf75}
 \printglossaries
 
 \begin{figure*}

@@ -1,6 +1,6 @@
 #+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
 #+options: author:nil broken-links:nil c:nil creator:nil
-#+options: d:(not "LOGBOOK") date:t e:t email:nil f:t inline:t num:nil
+#+options: d:(not "STATUSLOG") date:t e:t email:nil f:t inline:t num:nil
 #+options: p:nil pri:nil prop:nil stat:t tags:t tasks:("TODO" "DONE" "NEXT") tex:t
 #+options: timestamp:t title:nil toc:nil todo:nil |:t
 #+title: A High-Throughput Computational Dataset of Halide Perovskite Alloys\textsuperscript{\dag}
@@ -27,8 +27,14 @@
 #+INCLUDE: ./frontmatter.org
 
 #+begin_export latex
-\footnotetext{\textsuperscript{a}School of Materials Engineering, Purdue University, West Lafayette, IN 47907, USA; E-mail: amannodi@purdue.edu}
-\footnotetext{\textsuperscript{\dag}Electronic Supplementary Information (ESI) available: https://www.github.com/PanayotisManganaris/REPO_TODO. See DOI: 00.0000/00000000.}
+\footnotetext{%
+  \textsuperscript{a}School of Materials Engineering, Purdue University, West Lafayette, IN 47907, USA; E-mail: amannodi@purdue.edu
+}
+\footnotetext{%
+  \textsuperscript{\dag}Electronic Supplementary Information (ESI) available:
+  \url{https://github.com/PanayotisManganaris/manuscript--PIP-data-manifest}
+  See DOI: 00.0000/00000000.
+}
 #+end_export
 
 * DONE Introduction
@@ -354,15 +360,12 @@ primary criterion screening perovskites for their photovoltaic
 merits. The [[gls:slme][SLME]] value is computed considering a 5\mu{}m absorption
 layer for every Perovskite according to equation eqref:eq:slme.
 
-\begin{equation}\label{eq:slme}
-\begin{align*}
-SLME&= \\
-a(E)&=1-e^{-2\alpha(E)L}
-\end{align*}
+\begin{equation}\label{eq:absorption_alpha}
+a(E)=1-e^{-2\alpha(E)L}
 \end{equation}
 
 Where \(\alpha(E)\) is the calculated absorption coefficient, \(L\) is
-the thickness.
+the thickness of the absorber.
 
 This calculation is performed using Logan William's SL3ME
 [[cite:&williams-2022-sl3me]]. Based on absorption spectra obtained from
@@ -380,12 +383,6 @@ for each record.
 :CUSTOM_ID: visualization-of-dft-data
 :CLASS: unnumbered
 :END:
-#+ATTR_LATEX: :float multicolumn
-#+CAPTION: \label{fig:pairplots} 
-#+CAPTION: DFT Results: PBE and HSE properties; lattice constants,
-#+CAPTION: decomposition energies, band gaps, and converter efficiencies.
-[[file:./figs/screening_properties.png]]
-
 *** DONE Lattice constant PBE vs HSE
 :PROPERTIES:
 :CUSTOM_ID: lattice-constant-pbe-vs-hse
@@ -421,11 +418,22 @@ the focus of this report.
 - State "DONE"       from              [2022-06-06 Mon 01:01]
 :END:
 #+ATTR_LATEX: :float 
-#+CAPTION: \label{fig:lc_val_vs} 
-#+CAPTION: Comparison of PBE and HSE computed pseudo-cubic lattice
+#+CAPTION: \label{fig:lc_vs_pbe} 
+#+CAPTION: Comparison of PBE computed pseudo-cubic lattice
 #+CAPTION: constants with crystallographic measures for lattice constants
 [[file:./expval/pbe_v_exp_LC.png]]
+
+#+ATTR_LATEX: :float 
+#+CAPTION: \label{fig:lc_vs_hse} 
+#+CAPTION: Comparison of HSE computed pseudo-cubic lattice
+#+CAPTION: constants with crystallographic measures for lattice constants
 [[file:./expval/hse_v_exp_LC.png]]
+
+#+ATTR_LATEX: :float multicolumn :placement [h]
+#+CAPTION: \label{fig:pairplots} 
+#+CAPTION: DFT Results: PBE and HSE properties; lattice constants,
+#+CAPTION: decomposition energies, band gaps, and converter efficiencies.
+[[file:./figs/screening_properties.png]]
 
 The physical data used in the Lattice Constant Comparisons is
 collected from the works of
