@@ -27,13 +27,13 @@
 #+begin_src jupyter-python :exports results :results raw drawer
   # composition vectors for preprocessing
   comp_features = mm.select_dtypes(np.number).columns[
-      mm.select_dtypes(np.number).columns.get_level_values(level=1).str.match(r'^[^E\a]\w{0,2}?$')
-  ].to_list()
+      mm.select_dtypes(np.number).columns.str.match(r"\('[ABX]', '[^E]\w{,2}'\)")
+  ]
 
   # site-avg properties for preprocessing
   prop_features = mm.select_dtypes(np.number).columns[
-      ~mm.select_dtypes(np.number).columns.get_level_values(level=1).str.match(r'^[^E\a]\w{0,2}?$')
-  ].to_list()
+      ~mm.select_dtypes(np.number).columns.str.match(r"\('[ABX]', '[^E]\w{,2}'\)")
+  ]
 
   # categorical properties for preprocessing
   cat_features = mm.select_dtypes('object').columns.to_list()
@@ -64,9 +64,37 @@
 *** fit data and create visualization df
 #+begin_src jupyter-python :exports results :results raw drawer
   preprocessor.fit(mm)
+#+end_src
 
+#+RESULTS:
+:results:
+#+begin_example
+  ColumnTransformer(transformers=[('comp',
+                                   Pipeline(steps=[('simpleimputer',
+                                                    SimpleImputer(fill_value=0.0,
+                                                                  strategy='constant')),
+                                                   ('normalizer',
+                                                    Normalizer(norm='l1')),
+                                                   ('minmaxscaler',
+                                                    MinMaxScaler())]),
+                                   Index(['('A', 'Cs')', '('A', 'FA')', '('A', 'K')', '('A', 'MA')',
+         '('A', 'Rb')', '('B', 'Ba')', '('B', 'Ca')', '('B', 'Ge')',
+         '('B', 'Pb')', '('B', 'Sn')', '('B', 'Sr')', '('X',...
+         '('B', 'En')', '('B', 'at_num')', '('B', 'period')',
+         '('X', 'ion_rad_Å')', '('X', 'Boiling_Point_K')',
+         '('X', 'Melting_Point_K')', '('X', 'dens_g/cc')', '('X', 'at_wt_u')',
+         '('X', 'El_aff_kJ/mol')', '('X', 'IonE_kJ/mol')',
+         '('X', 'Heat_of_fusion_kJ/mol')', '('X', 'Heat_of_vap_kJ/mol')',
+         '('X', 'En')', '('X', 'at_num')', '('X', 'period')'],
+        dtype='object')),
+                                  ('cat', OneHotEncoder(handle_unknown='ignore'),
+                                   ['LoT'])])
+#+end_example
+:end:
+
+#+begin_src jupyter-python :exports results :results raw drawer
   X = pd.DataFrame(preprocessor.transform(mm),
-                   columns=preprocessor.get_feature_names_out(mm.columns.to_list()),
+                   columns=preprocessor.get_feature_names_out(),
                    index=mm.index)
 #+end_src
 
@@ -288,11 +316,12 @@ ratios are explored with respect to the alloy class.
 
 #+begin_src jupyter-python :exports results :results raw drawer
   Xc = X.iloc[
-      :, strings_where(np.array(comp_features), X.columns.to_numpy())
-  ].iloc[:,:-3].assign(mix=mix).assign(org=org)
+      :, strings_where(np.array(comp_features.str.split(' ').to_list()), X.columns.to_numpy())
+  ].assign(mix=mix).assign(org=org)
 
   Xcm = pd.melt(Xc, id_vars=["mix", "org"]).replace(0, np.NaN).dropna()
   # eliminate the "zeros" (missing values) to focus on the meaningful data
+  Xcm = Xcm.rename({"value":"proportion"}, axis=1)
 #+end_src
 
 #+RESULTS:
@@ -308,9 +337,9 @@ ratios are explored with respect to the alloy class.
 #+end_src
 
 #+begin_src jupyter-python :exports results :results raw drawer :file ./domains/variability_of_composition_vectors2.png
-  p = px.histogram(Xcm, x="value", facet_col='variable', facet_col_wrap=5, color="mix", template='seaborn',
+  p = px.histogram(Xcm, x="proportion", facet_col='variable', facet_col_wrap=7, color="mix", template='seaborn',
                    #category_orders={'variable':["Ba", "Ge", "Cl", "Br", "I", "Sn", "Pb", "Cs", "FA", "MA", "Sr", "Ca", "Rb", "K"]}
-                   barmode='group')
+                   barmode='group', width=1500)
   p.update_layout(
       paper_bgcolor='rgba(255,255,255,0)',
       plot_bgcolor='rgba(255,255,255,0)',
@@ -324,18 +353,18 @@ ratios are explored with respect to the alloy class.
 
 #+RESULTS:
 :results:
-#+attr_org: :width 700
 [[file:./domains/variability_of_composition_vectors2.png]]
 :end:
 
 ** Site-Averaged Properties Distributions 
 #+begin_src jupyter-python :exports results :results raw drawer
   Xp = X.iloc[
-      :, strings_where(np.array(prop_features), X.columns.to_numpy())
+      :, strings_where(np.array(prop_features.str.split(' ').to_list()), X.columns.to_numpy())
   ].assign(mix=mix).assign(org=org)
 
   Xpm = pd.melt(Xp, id_vars=["mix", "org"]).replace(0, np.NaN).dropna()
   # eliminate the "zeros" (missing values) to focus on the meaningful data
+  Xpm = Xpm.rename({'value':'range of variation'}, axis=1)
 #+end_src
 
 #+RESULTS:
@@ -348,11 +377,11 @@ ratios are explored with respect to the alloy class.
 #+end_src
 
 #+begin_src jupyter-python :exports results :results raw drawer :file ./domains/variability_of_site_avg_prop_vectors.png
-  p = px.histogram(Xpm, x="value", facet_col='variable', facet_col_wrap=6, color="mix", template='seaborn',
-                   barmode='overlay', width=1000, height=1000)
+  p = px.histogram(Xpm, x="range of variation", facet_col='variable', facet_col_wrap=9, color="mix", template='seaborn',
+                   barmode='overlay', width=1500, facet_col_spacing=0.01)
   p.update_layout(
-      # paper_bgcolor='rgba(255,255,255,0)',
-      # plot_bgcolor='rgba(255,255,255,0)',
+      paper_bgcolor='rgba(255,255,255,0)',
+      plot_bgcolor='rgba(255,255,255,0)',
       legend=dict(itemsizing='constant')
   )
   p.for_each_annotation(lambda a: a.update(text="".join(a.text.split("'")[1:-1])))
@@ -366,7 +395,7 @@ ratios are explored with respect to the alloy class.
 [[file:./domains/variability_of_site_avg_prop_vectors.png]]
 :end:
 
-* Notes on Multivariate relations
+ * Notes on Multivariate relations
 :PROPERTIES:
 :ID:       117889c3-28f7-4266-9fe2-8ae3a849cb3a
 :END:
@@ -394,6 +423,49 @@ Various projections are generated
 - the site-averaged property vector space is more ambiguous. However,
   some topology is still evident. Again, X-site alloy compounds appear
   to constitute most of the "spread" in the projection, with other mixed 
+* Bi-variate relations
+it is unlikely that any of the targets is full explained by a single
+composition or composition derived axis. But there are probably
+relations.
+
+A Pearson correlation map will be produced to check for strong
+relations.
+
+Then, if any exist, they will be plotted in detail.
+** targets vs composition
+#+begin_src jupyter-python :exports results :results raw drawer
+  mcvt = pd.concat([my, pmc], axis=1).select_dtypes(np.number).fillna(0)
+  pearson = pd.DataFrame(np.corrcoef(mcvt, rowvar=False),
+                         columns=mcvt.columns,
+                         index=mcvt.columns)
+  subset = pearson.filter(regex=r"HSE", axis=0).filter(regex=r"^(?!PBE|HSE|SLME|dielc|PV_FOM)")
+  subset = pearson.filter(regex=r"HSE", axis=0).filter(regex=r"^(?!.*dbg|.*FormE|.*SLME_100)", axis=0).filter(regex=r"^(?!PBE|HSE|SLME|dielc|PV_FOM)")
+  #first filter picks targets, second selects bases
+  p = sns.heatmap(subset, vmax=1.0, vmin=-1.0, cmap="seismic", annot=True, square=True)
+  p.set_xticklabels(p.get_xticklabels(), rotation=45, horizontalalignment='right')
+#+end_src
+
+#+begin_src jupyter-python :exports results :results raw drawer :file ./bivar/HSE_v_comp_pearson2.png
+  p = sns.heatmap(subset, vmax=1.0, vmin=-1.0, cmap="seismic", annot=True, square=True,
+                  annot_kws=dict(fontsize=20),
+                  xticklabels=True,
+                  yticklabels = ['Lattice Constant', 'Band Gap', 'Decomposition Energy'],
+                  cbar_kws=dict(shrink=0.5))
+  p.set_xticklabels(p.get_xticklabels(), rotation=45, horizontalalignment='right', fontdict=dict(fontsize=20))
+  p.set_yticklabels(p.get_yticklabels(), rotation=30, verticalalignment='top', fontdict=dict(fontsize=20))  
+  p.figure.show()
+#+end_src
+
+** correlated axes
+#+begin_src jupyter-python :exports results :results raw drawer
+  sns.relplot(x=("X","I"), y="HSE_LC", data=mcvt, hue="mix")
+#+end_src
+
+#+RESULTS:
+:results:
+: <seaborn.axisgrid.FacetGrid at 0x7f591880fc50>
+:end:
+
 * PCA
 :PROPERTIES:
 :ID:       693a9e96-3d0d-489a-a178-656687b5ac6c
