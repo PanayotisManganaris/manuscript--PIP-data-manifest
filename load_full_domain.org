@@ -1,4 +1,4 @@
-l#+title: Procedure for Creating Multi fidelity Domain using discrete tables
+#+title: Procedure for Creating Multi fidelity Domain using discrete tables
 #+AUTHOR: Panayotis Manganaris
 #+EMAIL: pmangana@purdue.edu
 #+PROPERTY: header-args :session mrg :kernel mrg :async yes :pandoc org
@@ -130,72 +130,31 @@ going forward we just assume that almora consists primarily of cubic phase cryst
 :results:
 :end:
 
-** subset index
-*** cut down pbe by comp total
+** validate compositions
 #+begin_src jupyter-python :exports results :results raw drawer
-  size = mannodi_pbe.sim_cell.isin(["2x2x2"])
-  pc = pc.collect.abx()
-  g = pc.groupby(level=0, axis=1).sum()
-  vB, vX, vA, = g.A.isin([1, 8]), g.B.isin([1, 8]), g.X.isin([3, 24])
-  #subset indexes
-  focus = size*vB*vA*vX
-  pc = pc[focus]
-  mannodi_pbe = mannodi_pbe[focus]
+  def validate_composition(df, cdf):
+        if hasattr(df, 'sim_cell'):
+              size = df.sim_cell.isin(["2x2x2"])
+        else:
+              size = [True]*df.shape[0]
+        cdf = cdf.collect.abx()
+        g = cdf.groupby(level=0, axis=1).sum()
+        vB, vX, vA, = g.A.isin([1, 8]), g.B.isin([1, 8]), g.X.isin([3, 24])
+        #subset indexes
+        focus = size*vB*vA*vX
+        return df[focus], cdf[focus]
 #+end_src
 
 #+RESULTS:
 :results:
 :end:
 
-*** cut down hse by comp total
 #+begin_src jupyter-python :exports results :results raw drawer
-  size = mannodi_hse.sim_cell.isin(["2x2x2"])
-  hc = hc.collect.abx()
-  g = hc.groupby(level=0, axis=1).sum()
-  vB, vX, vA, = g.A.isin([1, 8]), g.B.isin([1, 8]), g.X.isin([3, 24])
-  #subset indexes
-  focus = size*vB*vA*vX
-  hc = hc[focus]
-  mannodi_hse = mannodi_hse[focus]
-#+end_src
-
-#+RESULTS:
-:results:
-:end:
-
-*** cut down exp by comp total
-#+begin_src jupyter-python :exports results :results raw drawer
+  mannodi_pbe, pc = validate_composition(mannodi_pbe, pc)
+  mannodi_hse, hc = validate_composition(mannodi_hse, hc)
+  mannodi_hsc, hsc = validate_composition(mannodi_hsc, hsc)
   ec = ec.applymap(pd.to_numeric, errors='coerce')
-#+end_src
-
-#+RESULTS:
-:results:
-:end:
-
-#+begin_src jupyter-python :exports results :results raw drawer
-  ec = ec.collect.abx()
-  g = ec.groupby(level=0, axis=1).sum()
-  vB, vX, vA, = g.A.isin([1, 8]), g.B.isin([1, 8]), g.X.isin([3, 24])
-  #subset indexes
-  focus = vB*vA*vX
-  ec = ec[focus]
-  almora = almora[focus]
-#+end_src
-
-#+RESULTS:
-:results:
-:end:
-
-*** cut down hsc by comp total
-#+begin_src jupyter-python :exports results :results raw drawer
-  size = mannodi_hsc.sim_cell.isin(["2x2x2"])
-  hsc = hsc.collect.abx()
-  g = hsc.groupby(level=0, axis=1).sum()
-  vB, vX, vA, = g.A.isin([1, 8]), g.B.isin([1, 8]), g.X.isin([3, 24])
-  #subset indexes
-  focus = size*vB*vA*vX
-  hsc = hsc[focus]
-  mannodi_hsc = mannodi_hsc[focus]
+  almora, ec = validate_composition(almora, ec)
 #+end_src
 
 #+RESULTS:
@@ -214,125 +173,52 @@ going forward we just assume that almora consists primarily of cubic phase cryst
 :results:
 :end:
 
-* For multifi modeling/multivariate visualization
-** assign categorical features
-#+begin_src jupyter-python :exports results :results raw drawer
-  ec = ec.assign(LoT=almora.LoT)
-  pc = pc.assign(LoT=mannodi_pbe.LoT)
-  hc = hc.assign(LoT=mannodi_hse.LoT)
-  hsc = hsc.assign(LoT=mannodi_hsc.LoT)  
-#+end_src
-
-#+RESULTS:
-:results:
-:end:
-* separate Domains
-** assign categorical features
-#+begin_src jupyter-python :exports results :results raw drawer
-  mixlog = pc.groupby(level=0, axis=1).count()
-  mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
-
-  organics = mannodi_pbe.ft.comp().collect.org()
-  orglog = organics.groupby(level=0, axis=1).count()
-  org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
-
-  mannodi_pbe = mannodi_pbe.assign(mix=mix).assign(org=org)
-#+end_src
-
-#+RESULTS:
-:results:
-:end:
-
-#+begin_src jupyter-python :exports results :results raw drawer
-  mixlog = hc.groupby(level=0, axis=1).count()
-  mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
-
-  organics = mannodi_hse.ft.comp().collect.org()
-  orglog = organics.groupby(level=0, axis=1).count()
-  org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
-
-  mannodi_hse = mannodi_hse.assign(mix=mix).assign(org=org)
-#+end_src
-
-#+RESULTS:
-:results:
-:end:
-
-#+begin_src jupyter-python :exports results :results raw drawer
-  mixlog = hsc.groupby(level=0, axis=1).count()
-  mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
-
-  organics = mannodi_hsc.ft.comp().collect.org()
-  orglog = organics.groupby(level=0, axis=1).count()
-  org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
-
-  mannodi_hsc = mannodi_hsc.assign(mix=mix).assign(org=org)
-#+end_src
-
-#+RESULTS:
-:results:
-:end:
-
-#+begin_src jupyter-python :exports results :results raw drawer
-  mixlog = ec.groupby(level=0, axis=1).count()
-  mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
-
-  organics = almora.ft.comp().collect.org()
-  orglog = organics.groupby(level=0, axis=1).count()
-  org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
-
-  almora = almora.assign(mix=mix).assign(org=org)
-#+end_src
-
-#+RESULTS:
-:results:
-:end:
-
-
-* Unified Domain
-Base Domain will be mutated based on feature's Predictive Power
+* Unify Domain
+Base Domain may be mutated based on feature's Predictive Power by individual pipelines
 ** Basic Domains
 #+begin_src jupyter-python :exports results :results raw drawer
+  my = pd.concat([mannodi_pbe, mannodi_hse, almora, mannodi_hsc], axis=0).reset_index(drop=True)
+
   mc = pd.concat([pc, hc, ec, hsc], axis=0).reset_index(drop=True)
   mp = pd.concat([pp, hp, ep, hsp], axis=0).reset_index(drop=True)
-  mm = pd.concat([mc, mp], axis=1)
-  my = pd.concat([mannodi_pbe, mannodi_hse, almora, mannodi_hsc], axis=0).reset_index(drop=True)
+  mm = pd.concat([mc, mp, my.LoT], axis=1)
+  mm.columns = list(map(str, mm.columns))
 #+end_src
 
 #+RESULTS:
 :results:
 :end:
+** unified categorical features
+#+begin_src jupyter-python :exports results :results raw drawer
+  mixlog = mc.groupby(level=0, axis=1).count()
+  mix = mixlog.pipe(Categories.logif, condition=lambda x: x>1, default="pure", catstring="and")
 
+  organics = my.ft.comp().collect.org()
+  orglog = organics.groupby(level=0, axis=1).count()
+  org = orglog.pipe(Categories.logif, condition=lambda x: x>=1, default="error", catstring="_&_")
+
+  my = my.assign(mix=mix).assign(org=org)
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
 
 ** filter out BandX
 #+begin_src jupyter-python :exports results :results raw drawer
-  mixfilter = mix.isin(['A', 'B', 'X', 'pure'])
+  mixfilter = my.mix.isin(['A', 'B', 'X', 'pure'])
   mm = mm[mixfilter]
   my = my[mixfilter]
-  mix = mix[mixfilter]
 #+end_src
 
 #+RESULTS:
 :results:
 :end:
 
-* for single fidelity visualization
-** assign catagorical features
+* Separate Domains
+easy to do, but can be set up here if needed
+** trim domains to apply multifi models to single-fi datasets
 #+begin_src jupyter-python :exports results :results raw drawer
-  my = my.assign(org=org).assign(mix=mix)
+  #py = my[my.LoT=='pbe']
+  #pf = mm[my.LoT=='pbe']
 #+end_src
-
-#+RESULTS:
-:results:
-:end:
-
-
-** trim domain by cluster
-#+begin_src jupyter-python :exports results :results raw drawer
-  cluster_filter = mm.LoT=="PBE"
-  mm = mm[cluster_filter]
-  my = my[cluster_filter]
-  mix = mix[cluster_filter]
-  org = org[cluster_filter]
-#+end_src
-

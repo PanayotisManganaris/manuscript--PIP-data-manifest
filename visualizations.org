@@ -423,7 +423,10 @@ Various projections are generated
 - the site-averaged property vector space is more ambiguous. However,
   some topology is still evident. Again, X-site alloy compounds appear
   to constitute most of the "spread" in the projection, with other mixed 
-* Bi-variate relations
+* DONE Bi-variate relations
+:STATUSLOG:
+- State "DONE"       from              [2022-07-19 Tue 03:50]
+:END:
 it is unlikely that any of the targets is full explained by a single
 composition or composition derived axis. But there are probably
 relations.
@@ -433,37 +436,98 @@ relations.
 
 Then, if any exist, they will be plotted in detail.
 ** targets vs composition
+choose target lot. us X for preprocessed data, mm for default.
 #+begin_src jupyter-python :exports results :results raw drawer
-  mcvt = pd.concat([my, pmc], axis=1).select_dtypes(np.number).fillna(0)
-  pearson = pd.DataFrame(np.corrcoef(mcvt, rowvar=False),
-                         columns=mcvt.columns,
-                         index=mcvt.columns)
-  subset = pearson.filter(regex=r"HSE", axis=0).filter(regex=r"^(?!PBE|HSE|SLME|dielc|PV_FOM)")
-  subset = pearson.filter(regex=r"HSE", axis=0).filter(regex=r"^(?!.*dbg|.*FormE|.*SLME_100)", axis=0).filter(regex=r"^(?!PBE|HSE|SLME|dielc|PV_FOM)")
-  #first filter picks targets, second selects bases
-  p = sns.heatmap(subset, vmax=1.0, vmin=-1.0, cmap="seismic", annot=True, square=True)
-  p.set_xticklabels(p.get_xticklabels(), rotation=45, horizontalalignment='right')
-#+end_src
-
-#+begin_src jupyter-python :exports results :results raw drawer :file ./bivar/HSE_v_comp_pearson2.png
-  p = sns.heatmap(subset, vmax=1.0, vmin=-1.0, cmap="seismic", annot=True, square=True,
-                  annot_kws=dict(fontsize=20),
-                  xticklabels=True,
-                  yticklabels = ['Lattice Constant', 'Band Gap', 'Decomposition Energy'],
-                  cbar_kws=dict(shrink=0.5))
-  p.set_xticklabels(p.get_xticklabels(), rotation=45, horizontalalignment='right', fontdict=dict(fontsize=20))
-  p.set_yticklabels(p.get_yticklabels(), rotation=30, verticalalignment='top', fontdict=dict(fontsize=20))  
-  p.figure.show()
-#+end_src
-
-** correlated axes
-#+begin_src jupyter-python :exports results :results raw drawer
-  sns.relplot(x=("X","I"), y="HSE_LC", data=mcvt, hue="mix")
+  wdf = pd.concat([my[my.LoT=='PBE'], X[my.LoT=='PBE']], axis=1).select_dtypes(np.number).fillna(0)
+  pearson = pd.DataFrame(np.corrcoef(wdf, rowvar=False),
+                         columns=wdf.columns,
+                         index=wdf.columns)
 #+end_src
 
 #+RESULTS:
 :results:
-: <seaborn.axisgrid.FacetGrid at 0x7f591880fc50>
+: /opt/miniconda3/envs/mrg/lib/python3.10/site-packages/numpy/lib/function_base.py:2829: RuntimeWarning:
+: 
+: invalid value encountered in true_divide
+: 
+: /opt/miniconda3/envs/mrg/lib/python3.10/site-packages/numpy/lib/function_base.py:2830: RuntimeWarning:
+: 
+: invalid value encountered in true_divide
+: 
+:end:
+
+#+begin_src jupyter-python :exports results :results raw drawer
+  csub = pearson.iloc[[0,1,4,7], 12:26]
+  psub = pearson.iloc[[0,1,4,7], 26:61]
+  ytitles = ["Lattice Constant [A]", "Band Gap [eV]", "Decomposition Energy [eV]", "Efficiency"]
+#+end_src
+
+#+RESULTS:
+:results:
+:end:
+
+** make plots
+#+begin_src jupyter-python :exports results :results raw drawer :file ./bivar/PBE_v_comp_pearson2.png
+  p = px.imshow(csub, color_continuous_scale='RdBu_r', zmin=-1, zmax=1,
+                labels=dict(color="Pearson Coefficient"),
+                y = ytitles,
+                height=300, aspect=1.5)
+  p.update_xaxes(tickangle=-45)
+  p.update_yaxes(tickangle=-45, )
+  p.update_layout(coloraxis=dict(colorbar=dict(len=1, orientation='h', y=0.95)))
+  p.update_layout(
+      paper_bgcolor='rgba(255,255,255,0)',
+      plot_bgcolor='rgba(255,255,255,0)',)
+  p.update_layout(
+      xaxis = dict(tickmode='array',
+                   tickvals=list(range(14)),
+                   ticktext=csub.columns.str.slice(6))
+  )
+  p.show(renderer='png')
+#+end_src
+
+#+RESULTS:
+:results:
+#+attr_org: :width 700
+[[file:./bivar/PBE_v_comp_pearson2.png]]
+:end:
+
+
+#+begin_src jupyter-python :exports results :results raw drawer :file ./bivar/PBE_v_site_prop_pearson2.png
+  p = px.imshow(psub, color_continuous_scale='RdBu_r', zmin=-1, zmax=1,
+                labels=dict(color="Pearson Coefficient"),
+                y = ytitles,
+                height=300, aspect=1.5)
+  p.update_xaxes(tickangle=-45)
+  p.update_yaxes(tickangle=-45)
+  p.update_layout(coloraxis=dict(colorbar=dict(len=1, orientation='h', y=0.95)))
+  p.update_layout(
+      paper_bgcolor='rgba(255,255,255,0)',
+      plot_bgcolor='rgba(255,255,255,0)',)
+  p.update_layout(
+      xaxis = dict(tickmode='array',
+                   tickvals=list(range(36)),
+                   ticktext=psub.columns.str.slice(6))
+  )
+  p.show(renderer='png')
+#+end_src
+
+#+RESULTS:
+:results:
+#+attr_org: :width 700
+[[file:./bivar/PBE_v_site_prop_pearson2.png]]
+:end:
+
+** correlated axes
+#+begin_src jupyter-python :exports results :results raw drawer
+  p = px.scatter(wdf, x="comp__('X', 'I')", y="LC_A")
+  p.show(renderer='png')
+#+end_src
+
+#+RESULTS:
+:results:
+#+attr_org: :width 700
+[[file:./.ob-jupyter/5c975dde27c4778523019048b6ccaa5e23a37388.png]]
 :end:
 
 * PCA
